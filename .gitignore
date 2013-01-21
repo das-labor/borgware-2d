@@ -44,8 +44,6 @@ latex
 menu/obj_avr
 menu/obj_sim
 obj_avr
-obj_avr
-obj_sim
 obj_sim
 random/obj_avr
 random/obj_sim
