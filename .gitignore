@@ -49,6 +49,9 @@ random/obj_avr
 random/obj_sim
 rfm12/obj_avr
 rfm12/obj_sim
+scripts/lxdialog/a.exe
+scripts/lxdialog/lxdialog.exe
+scripts/lxdialog/*.o
 scrolltext/obj_avr
 scrolltext/obj_sim
 simulator/obj_sim
