@@ -145,6 +145,21 @@ menuconfig:
 	@echo "Next, you can: "
 	@echo " * 'make' to compile your borgware"
 
+test:
+	@echo $(CONFIG_SHELL)
+	@echo
+	@echo "========== Testing borg-16 ========== "
+	$(MAKE) -C scripts/lxdialog all
+	$(CONFIG_SHELL) scripts/Menuconfig config.in profiles/borg-16
+	$(MAKE) 
+	$(MAKE) clean
+	@echo
+	@echo "========== Testing borg-ls ========== "
+	$(MAKE) -C scripts/lxdialog all
+	$(CONFIG_SHELL) scripts/Menuconfig config.in profiles/borg-ls
+	$(MAKE) 
+	$(MAKE) clean
+
 #%/menuconfig:
 #	$(SH) "$(@D)/configure"
 #	@$(MAKE) what-now-msg

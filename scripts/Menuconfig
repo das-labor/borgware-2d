@@ -1722,32 +1722,39 @@ echo -n ", parsing"
 parse_config_files $CONFIG_IN
 
 echo "done."
-#
-# Start the ball rolling from the top.
-#
-activate_menu MCmenu0
 
-#
-# All done!
-#
-cleanup1
+if [ -z $2 ]; then             # Interactive mode
+	#
+	# Start the ball rolling from the top.
+	#
+	activate_menu MCmenu0
 
-#
-# Confirm and Save
-#
-if $DIALOG --backtitle "$backtitle" \
-	   --yesno "Do you wish to save your new Borg configuration?" 5 60
-then
+	#
+	# All done!
+	#
+	cleanup1
+	
+	#
+	# Confirm and Save
+	#
+	if $DIALOG --backtitle "$backtitle" \
+		   --yesno "Do you wish to save your new Borg configuration?" 5 60
+	then
+		save_configuration
+		echo
+		echo
+		echo "*** End of Borg configuration."
+		echo
+	else
+		echo
+	    	echo 
+		echo Your Borg configuration changes were NOT saved.
+		echo
+	fi
+else                            # Second argument give; noninteractive!
+	echo "Loading configuration file $2"
+	load_config_file $2
 	save_configuration
-	echo
-	echo
-	echo "*** End of Borg configuration."
-	echo
-else
-	echo
-    	echo 
-	echo Your Borg configuration changes were NOT saved.
-	echo
 fi
 
 # Remove log if empty.
