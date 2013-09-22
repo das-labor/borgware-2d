@@ -201,10 +201,11 @@ autoconf.h .config:
 	@echo make\'s goal: $(MAKECMDGOALS)
 ifneq ($(MAKECMDGOALS),menuconfig)
 	# make sure menuconfig isn't called twice, on `make menuconfig'
-	test -s autoconf.h -a -s .config || $(MAKE) no_deps=t menuconfig
+	#test -s autoconf.h -a -s .config || $(MAKE) no_deps=t menuconfig
 	# test the target file, test fails if it doesn't exist
 	# and will keep make from looping menuconfig.
-	test -s autoconf.h -a -s .config
+	#test -s autoconf.h -a -s .config
+	touch autoconf.h .config
 endif
 
 include depend.mk
