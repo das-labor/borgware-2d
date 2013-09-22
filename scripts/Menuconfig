@@ -1754,6 +1754,7 @@ if [ -z $2 ]; then             # Interactive mode
 else                            # Second argument give; noninteractive!
 	echo "Loading configuration file $2"
 	load_config_file $2
+	cleanup1
 	save_configuration
 fi
 
