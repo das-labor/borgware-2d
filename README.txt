@@ -1,7 +1,25 @@
 
-Hier liegt der Versuch, eine universelle Codebasis für 2d-borgs zu bauen, die
-durch 'make menuconfig' konfigurierbar ist.
-Zur Zeit ist es bereits möglich, gewisse Dinge in menuconfig einzustellen.
-Einfach mal ansehen! Compiliert werden kann das Ganze auch schon.
-Außerdem wird grade versucht, das Ganze mit dem Borg-api-Simulator zu
-integrieren.
+Borgware 2d
+===========
+
+Firmware für 2d Blinken Borgs.
+
+
+Kompilieren
+===========
+
+Zunächst müssen alle Abhänigkeiten installiert sein. Unter Debian/Ubuntu Systemen 
+ist ein 
+
+  sudo aptitude install -y build-essential make libncurses5-dev gcc-avr avr-libc binutils-avr avrdude freeglut3-dev
+
+ausreichend.
+
+Anschliessend kann die zu bauende Firmware mit 
+
+  make menuconfig
+
+konfigurier, und mit 
+
+  make 
+
