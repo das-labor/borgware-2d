@@ -9,8 +9,9 @@ Matrixanzeigen zum and die Wand hängen oder auf den Tisch stellen.
 Dies ist insbesondere die Software für den [Borg16](http://www.das-labor.org/wiki/Borg16) Bausatz, 
 aber auch für eine Reihe ähnlicher Priojekte.
 
-<img src="http://www.das-labor.org/w/images/thumb/5/5a/Borg16Screen.jpg/800px-Borg16Screen.jpg" height=300 /> &nbsp;
-<img src="http://www.das-labor.org/w/images/9/96/BlinkenBorg.jpg" height=300 />
+
+![Kleine Borg16](/doc/img/Borg16-small.jpg)
+![Glühbirnen Borg](/doc/img/Borg16-bulb.jpg)
  
 Animationen
 -----------
