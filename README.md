@@ -10,23 +10,24 @@ Dies ist insbesondere die Software für den [Borg16](http://www.das-labor.org/wik
 aber auch für eine Reihe ähnlicher Priojekte.
 
 
-![Kleine Borg16](/doc/img/Borg16-small.jpg)
-![Glühbirnen Borg](doc/img/Borg16-bulb.jpg)
+![Kleine Borg16](https://gitlab.das-labor.org/borgware/borgware-2d/raw/master/doc/img/Borg16-small.jpg) &nbsp;
+![Glühbirnen Borg](https://gitlab.das-labor.org/borgware/borgware-2d/raw/master/doc/img/Borg16-bulb.jpg)
  
 Animationen
 -----------
 
-<img src="http://www.das-labor.org/w/images/thumb/f/f4/Borgware2d_snake.png/120px-Borgware2d_snake.png"> &nbsp;
-<img src="http://www.das-labor.org/w/images/thumb/4/44/Borgware2d_matrix.png/120px-Borgware2d_matrix.png"> &nbsp;
-<img src="http://www.das-labor.org/w/images/thumb/4/4c/Borgware2d_feuer.png/120px-Borgware2d_feuer.png"> &nbsp;
-<img src="http://www.das-labor.org/w/images/thumb/1/1e/Borgware2d_scroll.png/120px-Borgware2d_scroll.png"> 
+![Matrix](https://gitlab.das-labor.org/borgware/borgware-2d/raw/master/doc/img/anim-matrix.png) &nbsp;
+![Feuer](https://gitlab.das-labor.org/borgware/borgware-2d/raw/master/doc/img/anim-feuer.jpg)
+![Scroll](https://gitlab.das-labor.org/borgware/borgware-2d/raw/master/doc/img/anim-scroll.jpg)
+
 
 Spiele
 ------
 
-### Tetris
+![Snake](https://gitlab.das-labor.org/borgware/borgware-2d/raw/master/doc/img/game-snake.png) &nbsp;
+![Tetris](https://gitlab.das-labor.org/borgware/borgware-2d/raw/master/doc/img/game-tetris.jpg)
 
-<img src="http://www.das-labor.org/w/images/thumb/0/0f/Borgware2d_tetris.png/120px-Borgware2d_tetris.png">
+### Tetris
 
  * Classic: Das ganz normale Tetris
  * First Person Tetris: Statt die Steine zu drehen, dreht man hierbei das Spielfeld um den Stein
