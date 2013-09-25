@@ -9,10 +9,35 @@ Matrixanzeigen zum and die Wand hängen oder auf den Tisch stellen.
 Dies ist insbesondere die Software für den [Borg16](http://www.das-labor.org/wiki/Borg16) Bausatz, 
 aber auch für eine Reihe ähnlicher Priojekte.
 
-<img src="http://www.das-labor.org/w/images/thumb/5/5a/Borg16Screen.jpg/800px-Borg16Screen.jpg" height=300 />
-&nbsp;
+<img src="http://www.das-labor.org/w/images/thumb/5/5a/Borg16Screen.jpg/800px-Borg16Screen.jpg" height=300 /> &nbsp;
 <img src="http://www.das-labor.org/w/images/9/96/BlinkenBorg.jpg" height=300 />
  
+Animationen
+-----------
+
+<img src="http://www.das-labor.org/w/images/thumb/f/f4/Borgware2d_snake.png/120px-Borgware2d_snake.png"> &nbsp;
+<img src="http://www.das-labor.org/w/images/thumb/4/44/Borgware2d_matrix.png/120px-Borgware2d_matrix.png"> &nbsp;
+<img src="http://www.das-labor.org/w/images/thumb/4/4c/Borgware2d_feuer.png/120px-Borgware2d_feuer.png"> &nbsp;
+<img src="http://www.das-labor.org/w/images/thumb/1/1e/Borgware2d_scroll.png/120px-Borgware2d_scroll.png"> 
+
+Spiele
+------
+
+### Tetris
+
+<img src="http://www.das-labor.org/w/images/thumb/0/0f/Borgware2d_tetris.png/120px-Borgware2d_tetris.png">
+
+ * Classic: Das ganz normale Tetris
+ * First Person Tetris: Statt die Steine zu drehen, dreht man hierbei das Spielfeld um den Stein
+ * Bastet: Diese Tetris Variante gibt einem stets den Stein, den man gerade am wenigsten gebrauchen kann
+
+### Snake
+
+### Pong
+
+### Space Invaders
+
+
 Kompilieren
 ===========
 
