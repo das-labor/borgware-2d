@@ -11,7 +11,7 @@ aber auch für eine Reihe ähnlicher Priojekte.
 
 
 ![Kleine Borg16](/doc/img/Borg16-small.jpg)
-![Glühbirnen Borg](/doc/img/Borg16-bulb.jpg)
+![Glühbirnen Borg](doc/img/Borg16-bulb.jpg)
  
 Animationen
 -----------
