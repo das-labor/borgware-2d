@@ -50,22 +50,23 @@
 /** Height of the canvas. */
 #define WND_Y_EXTENTS (NUM_ROWS * LED_EXTENT)
 
-
 /* string constants */
 LPCSTR g_strWindowClass = "BorgSimulatorWindowClass";
 LPCSTR g_strWindowTitle = "Borg Simulator";
 
-LPCSTR g_strError = "Error";
-LPCSTR g_strErrorRegisterWindow = "Could not register window class.";
-LPCSTR g_strErrorCreateWindow   = "Could not create window.";
-LPCSTR g_strErrorCreateEvent    = "Could not create wait event.";
-LPCSTR g_strErrorCreateThread   = "Could not create display loop thread.";
-LPCSTR g_strErrorCreateUITimer  = "Could not create UI Timer.";
+LPCSTR g_strErr                = "Error";
+LPCSTR g_strErrTimerResolution = "Could not retrieve minimum timer resolution.";
+LPCSTR g_strErrRegisterWindow  = "Could not register window class.";
+LPCSTR g_strErrCreateWindow    = "Could not create window.";
+LPCSTR g_strErrCreateEvent     = "Could not create wait event.";
+LPCSTR g_strErrCreateThread    = "Could not create display loop thread.";
+LPCSTR g_strErrCreateUITimer   = "Could not create UI Timer.";
 
+/** Minimum timer resolution the system is capable of. */
+UINT g_uResolution;
 
 /** Event object for the multimedia timer (wait() function). */
 HANDLE g_hWaitEvent;
-
 
 /** Fake port for simulating joystick input. */
 volatile unsigned char fakeport;
@@ -81,7 +82,6 @@ LRESULT CALLBACK simWndProc(HWND hWnd,
                             UINT msg,
                             WPARAM wParam,
                             LPARAM lParam);
-
 
 /**
  * Creates a new window and makes it visible.
@@ -110,7 +110,7 @@ HWND simCreateWindow(HINSTANCE hInstance,
 	if (RegisterClassA(&lpwc) != 0)
 	{
 		/* ensure that the client area has the right proportions */
-		RECT rect = {0, 0, WND_X_EXTENTS *  1.5 - 1, WND_Y_EXTENTS * 1.5 - 1};
+		RECT rect = {0, 0, WND_X_EXTENTS * 1.5 - 1, WND_Y_EXTENTS * 1.5 - 1};
 		AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW & ~(WS_OVERLAPPED), FALSE);
 
 		/* create window and retrieve its handle */
@@ -133,12 +133,11 @@ HWND simCreateWindow(HINSTANCE hInstance,
 	}
 	else
 	{
-		fprintf(stderr, g_strErrorRegisterWindow);
+		fprintf(stderr, g_strErrRegisterWindow);
 	}
 
 	return hWnd;
 }
-
 
 /**
  * Closes windows and unregisters its associated window class.
@@ -151,7 +150,6 @@ void simDestroyWindow(HWND hWnd,
 	DestroyWindow(hWnd);
 	UnregisterClassA(g_strWindowClass, hInstance);
 }
-
 
 /**
  * Draws the LED matrix on the given device context.
@@ -215,7 +213,6 @@ void simDrawMatrix(HDC hdc)
 		DeleteObject(SelectObject(hdc, hPenOld));
 	}
 }
-
 
 /**
  * Retrieves device context from given window, creates a compatible memory
@@ -363,7 +360,7 @@ LRESULT CALLBACK simWndProc(HWND hWnd,
 
 	/* map key releases to fake joystick movements */
 	case WM_KEYUP:
-		switch(wParam)
+		switch (wParam)
 		{
 		case VK_SPACE: /* fire */
 			fakeport &= ~0x01;
@@ -411,7 +408,6 @@ LRESULT CALLBACK simWndProc(HWND hWnd,
 	return lResult;
 }
 
-
 /**
  * Entry point for starting the the display loop in a thread.
  * @param lpParam Free style arguments for the thread function (not used here).
@@ -423,19 +419,36 @@ DWORD WINAPI simLoop(LPVOID lpParam)
 	return 0;
 }
 
+/**
+ * Retrieves and enforces the minimum timer resolution of the current system.
+ * @return Result of the multimedia timer operations.
+ */
+MMRESULT simSetMinimumTimerResolution()
+{
+	TIMECAPS tc;
+	MMRESULT mmresult;
+
+	mmresult = timeGetDevCaps(&tc, sizeof(tc));
+	if (mmresult == TIMERR_NOERROR)
+	{
+		/* retrieve best resolution and configure timer services accordingly */
+		g_uResolution = min(max(tc.wPeriodMin, 0), tc.wPeriodMax);
+		mmresult = timeBeginPeriod(g_uResolution);
+	}
+
+	return mmresult;
+}
 
 /**
  * Wait function which utilizes multimedia timers and thread synchronization
  * objects. Although this is much more complicated than calling the Sleep()
  * function, it is also much more precise.
  * @param ms The requested delay in milliseconds.
+ * @param uResolution The minimum timer resolution the system is capable of.
  */
 void wait(int ms)
 {
-	TIMECAPS tc;
-	MMRESULT mmresult;
 	MMRESULT mmTimerEventId;
-	UINT uResolution;
 
 	/* check if fire button is pressed (and if it is, jump to the menu) */
 	if (waitForFire)
@@ -446,34 +459,19 @@ void wait(int ms)
 		}
 	}
 
-	/* retrieve timer resolution capabilities of the current system */
-	mmresult = timeGetDevCaps(&tc, sizeof(tc));
-	if (mmresult == TIMERR_NOERROR)
+	/* retrieve a multimedia timer */
+	mmTimerEventId = timeSetEvent(ms, g_uResolution, g_hWaitEvent, 0,
+	    TIME_ONESHOT | TIME_CALLBACK_EVENT_SET);
+	if (mmTimerEventId != 0)
 	{
-		/* retrieve best resolution and configure timer services accordingly */
-		uResolution = min(max(tc.wPeriodMin, 0), tc.wPeriodMax);
-		mmresult = timeBeginPeriod(uResolution);
-		if (mmresult == TIMERR_NOERROR)
-		{
-			/* actually retrieve a multimedia timer */
-			mmTimerEventId = timeSetEvent(ms, uResolution, g_hWaitEvent, 0,
-					TIME_ONESHOT | TIME_CALLBACK_EVENT_SET);
-			if (mmTimerEventId != 0)
-			{
-				/* now halt until that timer pulses our wait event object */
-				WaitForSingleObject(g_hWaitEvent, INFINITE);
-				ResetEvent(g_hWaitEvent);
+		/* now halt until that timer pulses our wait event object */
+		WaitForSingleObject(g_hWaitEvent, INFINITE);
+		ResetEvent(g_hWaitEvent);
 
-				/* relieve the timer from its duties */
-				timeKillEvent(mmTimerEventId);
-			}
-
-			/* relax timer service constraints */
-			timeEndPeriod (uResolution);
-		}
+		/* relieve the timer from its duties */
+		timeKillEvent(mmTimerEventId);
 	}
 }
-
 
 /**
  * Main function of the windows simulator.
@@ -485,8 +483,8 @@ void wait(int ms)
  */
 int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
-                     LPSTR     lpCmdLine,
-                     int       nCmdShow)
+                     LPSTR lpCmdLine,
+                     int nCmdShow)
 {
 	HWND hWnd;
 	MSG msg;
@@ -496,55 +494,67 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 
 	if ((hWnd = simCreateWindow(hInstance, nCmdShow)) != NULL)
 	{
-		/* event handle for multimedia timer (for the wait() function) */
-		g_hWaitEvent = CreateEventA(NULL, TRUE, FALSE, "Local\\WaitEvent");
-		if (g_hWaitEvent != NULL)
+		/* retrieve minimum timer resolution */
+		if (simSetMinimumTimerResolution() == TIMERR_NOERROR)
 		{
-			/* start the display loop thread */
-			hLoopThread = CreateThread(NULL, 0, simLoop, NULL, 0, NULL);
-			if (hLoopThread != NULL)
+			/* event handle for multimedia timer (for the wait() function) */
+			g_hWaitEvent = CreateEventA(NULL, TRUE, FALSE, "Local\\WaitEvent");
+			if (g_hWaitEvent != NULL)
 			{
-				SetThreadPriority(hLoopThread, THREAD_PRIORITY_TIME_CRITICAL);
-
-				/* issue a UI timer message every 40 ms (roughly 25 fps) */
-				uTimerId = SetTimer(hWnd, 23, 40, NULL);
-				if (uTimerId != 0)
+				/* start the display loop thread */
+				hLoopThread = CreateThread(NULL, 0, simLoop, NULL, 0, NULL);
+				if (hLoopThread != NULL)
 				{
-					/* standard Windows(R) message loop */
-					while (GetMessageA(&msg, NULL, 0, 0))
-					{
-						TranslateMessage(&msg);
-						DispatchMessageA(&msg);
-					}
-					nExitCode = msg.wParam;
+					SetThreadPriority(hLoopThread,
+					THREAD_PRIORITY_TIME_CRITICAL);
 
-					KillTimer(hWnd, uTimerId);
+					/* issue a UI timer message every 40 ms (roughly 25 fps) */
+					uTimerId = SetTimer(hWnd, 23, 40, NULL);
+					if (uTimerId != 0)
+					{
+						/* standard Windows(R) message loop */
+						while (GetMessageA(&msg, NULL, 0, 0))
+						{
+							TranslateMessage(&msg);
+							DispatchMessageA(&msg);
+						}
+						nExitCode = msg.wParam;
+
+						KillTimer(hWnd, uTimerId);
+					}
+					else
+					{
+						fprintf(stderr, g_strErrCreateUITimer);
+					}
+
+					TerminateThread(hLoopThread, 0);
 				}
 				else
 				{
-					fprintf(stderr, g_strErrorCreateUITimer);
+					fprintf(stderr, g_strErrCreateThread);
 				}
 
-				TerminateThread(hLoopThread, 0);
+				/* relieve wait event object from its duties */
+				CloseHandle(g_hWaitEvent);
 			}
 			else
 			{
-				fprintf(stderr, g_strErrorCreateThread);
+				fprintf(stderr, g_strErrCreateEvent);
 			}
 
-			/* relieve wait event object from its duties */
-			CloseHandle(g_hWaitEvent);
+			/* relieve timer resolution constraints */
+			timeEndPeriod(g_uResolution);
 		}
 		else
 		{
-			fprintf(stderr, g_strErrorCreateEvent);
+			fprintf(stderr, g_strErrTimerResolution);
 		}
 
 		simDestroyWindow(hWnd, hInstance);
 	}
 	else
 	{
-		fprintf(stderr, g_strErrorCreateWindow);
+		fprintf(stderr, g_strErrCreateWindow);
 	}
 
 	return nExitCode;
