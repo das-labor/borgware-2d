@@ -20,3 +20,7 @@ endif
 ifeq ($(GAME_BREAKOUT),y)
   SUBDIRS += games/breakout
 endif
+
+ifeq ($(GAME_KART),y)
+  SUBDIRS += games/kart
+endif
