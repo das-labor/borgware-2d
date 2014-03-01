@@ -1,6 +1,6 @@
 /* Default linker script, for normal executables */
-OUTPUT_FORMAT(pei-i386)
-SEARCH_DIR("/usr/i686-cygwin/lib"); SEARCH_DIR("/usr/lib"); SEARCH_DIR("/usr/lib/w32api");
+OUTPUT_FORMAT(pei-x86-64)
+SEARCH_DIR("/usr/x86_64-pc-cygwin/lib"); SEARCH_DIR("/usr/lib"); SEARCH_DIR("/usr/lib/w32api");
 SECTIONS
 {
   /* Make the virtual address and file offset synced if the alignment is
@@ -16,15 +16,15 @@ SECTIONS
      *(.gnu.linkonce.t.*)
     *(.glue_7t)
     *(.glue_7)
+    . = ALIGN(8);
      ___CTOR_LIST__ = .; __CTOR_LIST__ = . ;
-			LONG (-1);*(.ctors); *(.ctor); *(SORT(.ctors.*));  LONG (0);
+			LONG (-1); LONG (-1);*(.ctors); *(.ctor); *(SORT(.ctors.*));  LONG (0); LONG (0);
      ___DTOR_LIST__ = .; __DTOR_LIST__ = . ;
-			LONG (-1); *(.dtors); *(.dtor); *(SORT(.dtors.*));  LONG (0);
+			LONG (-1); LONG (-1); *(.dtors); *(.dtor); *(SORT(.dtors.*));  LONG (0); LONG (0);
      *(.fini)
     /* ??? Why is .gcc_exc here?  */
      *(.gcc_exc)
     PROVIDE (etext = .);
-    PROVIDE (_etext = .);
      *(.gcc_except_table)
   }
   /* The Cygwin32 library uses a section to avoid copying certain data
@@ -39,10 +39,15 @@ SECTIONS
     *(.data2)
     *(SORT(.data$*))
     *(.jcr)
+    . = ALIGN(16);
+    _eeprom_start__ = . ;
     __eeprom_start__ = . ;
     *(.eeprom)
+    . = ALIGN(16);
+    _game_descriptors_start__ = . ;
     __game_descriptors_start__ = . ;
     *(.game_descriptors)
+    _game_descriptors_end__ = . ;
     __game_descriptors_end__ = . ;
     __data_end__ = . ;
     *(.data_cygwin_nocopy)
@@ -66,7 +71,11 @@ SECTIONS
   }
   .pdata BLOCK(__section_alignment__) :
   {
-    *(.pdata)
+    *(.pdata*)
+  }
+  .xdata BLOCK(__section_alignment__) :
+  {
+    *(.xdata*)
   }
   .bss BLOCK(__section_alignment__) :
   {
@@ -91,7 +100,7 @@ SECTIONS
   .idata BLOCK(__section_alignment__) :
   {
     /* This cannot currently be handled with grouped sections.
-	See pe.em:sort_sections.  */
+	See pep.em:sort_sections.  */
     SORT(*)(.idata$2)
     SORT(*)(.idata$3)
     /* These zeroes mark the end of the import list.  */
@@ -122,7 +131,7 @@ SECTIONS
     ___crt_xt_end__ = . ;
   }
   /* Windows TLS expects .tls$AAA to be at the start and .tls$ZZZ to be
-     at the end of section.  This is important because _tls_start MUST
+     at the end of the .tls section.  This is important because _tls_start MUST
      be at the beginning of the section to enable SECREL32 relocations with TLS
      data.  */
   .tls BLOCK(__section_alignment__) :
@@ -215,11 +224,11 @@ SECTIONS
   }
   .debug_frame BLOCK(__section_alignment__) (NOLOAD) :
   {
-    *(.debug_frame*)
+    *(.debug_frame)
   }
   .zdebug_frame BLOCK(__section_alignment__) (NOLOAD) :
   {
-    *(.zdebug_frame*)
+    *(.zdebug_frame)
   }
   .debug_str BLOCK(__section_alignment__) (NOLOAD) :
   {
@@ -302,6 +311,6 @@ SECTIONS
   }
   .zdebug_types BLOCK(__section_alignment__) (NOLOAD) :
   {
-    *(.zdebug_types .gnu.linkonce.wt.*)
+    *(.zdebug_types .zdebug.gnu.linkonce.wt.*)
   }
 }
