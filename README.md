@@ -10,34 +10,30 @@ kit. Other supported platforms are the
 projector from [Hackerspace FFM](http://www.hackerspace-ffm.de) or the 
 [ELO Ping-Pong Board](http://www.elo-web.de/elo/mikrocontroller-und-programmierung/ping-pong/das-franzis-pingpong).
 
-![Small Borg16](/doc/img/Borg16-small.jpg) &nbsp;
-![Glow Lamp Borg](/doc/img/Borg16-bulb.jpg)
+![Small Borg16](/doc/img/Borg16-small.jpg)
+![Glow Lamp Borg](/doc/img/Glow_Lamp_Borg.jpg)
  
 Animations
 ----------
 
-![Matrix](/doc/img/anim-matrix.png) &nbsp;
-![Fire](/doc/img/anim-feuer.jpg)
-![Scrolling Text](/doc/img/anim-scroll.jpg)
+![Matrix](/doc/img/anim-matrix.png)
+![Fire](/doc/img/anim-feuer.png)
+![Scrolling Text](/doc/img/anim-scroll.png)
 
 
 Games
 -----
 
-![Snake](/doc/img/game-snake.png) &nbsp;
-![Tetris](/doc/img/game-tetris.jpg)
+![Snake](/doc/img/game-snake.png)
+![Tetris](/doc/img/game-tetris.png)
 
-### Tetris
-
+* Tetris
  * Classic: Standard Tetris Clone
  * First Person Tetris: Rotate the bucket instead of the Tetromino.
  * Bastet: Dices the worst the possible Tetromino the whole time.
-
-### Snake
-
-### Pong
-
-### Space Invaders
+* Snake
+* Pong
+* Space Invaders
 
 
 Build
@@ -68,10 +64,10 @@ Dependencies Windows
 
 * [WinAVR](http://winavr.sourceforge.net) (includes avr-gcc and avrdude)
 * [Cygwin(64)](http://www.cygwin.com/)
-..* make
-..* gcc-core
-..* libncurses-devel (Cygwin)
-..* libwcurses-devel (Cygwin64)
+  * make
+  * gcc-core
+  * libncurses-devel (Cygwin)
+  * libwcurses-devel (Cygwin64)
 * [libusb-win32](http://sourceforge.net/apps/trac/libusb-win32/wiki) if you
   want to use your USBasp programmer device with avrdude on Windows
 
