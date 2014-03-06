@@ -41,7 +41,11 @@ MACHINE = $(shell uname -m)
 
 ifeq ($(findstring CYGWIN,$(OSTYPE)),CYGWIN)
   CFLAGS_SIM  = -g -Wall -pedantic -std=c99 -O0 -D_WIN32 -D_XOPEN_SOURCE=600
-  LDFLAGS_SIM = -T simulator/i386pe.x
+  ifeq ($(MACHINE),x86_64)
+    LDFLAGS_SIM = -T simulator/i386pep.x
+  else
+    LDFLAGS_SIM = -T simulator/i386pe.x
+  endif
   LIBS_SIM    = -lgdi32 -lwinmm -lm
 else
   ifeq ($(OSTYPE),FreeBSD)
