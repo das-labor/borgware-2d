@@ -1,0 +1,13 @@
+language: c
+
+# install dependencies
+before_install:
+  - uname -a
+  - lsb_release -a
+
+install:
+  - sudo apt-get install -qq libncurses5-dev gcc-avr avr-libc
+
+# run tests
+script: 
+  - make test
