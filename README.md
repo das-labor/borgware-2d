@@ -1,36 +1,37 @@
-Borgware 2d
+Borgware-2D
 ===========
 
-Firmware fur 2d Blinken Borks.
-[Blinken Borgs](http://www.das-labor.org/wiki/Blinken_Borgs) sind LED 
-Matrixanzeigen zum and die Wand h�ngen oder auf den Tisch stellen.
+Firmware for AVR based two-dimensional LED matrices, especially the
+[Blinken Borgs](http://www.das-labor.org/wiki/Blinken_Borgs) from
+[Das LABOR](http://das-labor.org/index.en.php).
+Main platform is the [Borg16](http://www.das-labor.org/wiki/Borg16) construction
+kit. Other supported platforms are the
+[LED Brett](http://www.hackerspace-ffm.de/wiki/index.php?title=LedBrett)
+projector from [Hackerspace FFM](http://www.hackerspace-ffm.de) or the 
+[ELO Ping-Pong Board](http://www.elo-web.de/elo/mikrocontroller-und-programmierung/ping-pong/das-franzis-pingpong).
 
-Dies ist insbesondere die Software f�r den [Borg16](http://www.das-labor.org/wiki/Borg16) Bausatz, 
-aber auch f�r eine Reihe �hnlicher Priojekte.
-
-
-![Kleine Borg16](/doc/img/Borg16-small.jpg) &nbsp;
-![Gl�hbirnen Borg](/doc/img/Borg16-bulb.jpg)
+![Small Borg16](/doc/img/Borg16-small.jpg) &nbsp;
+![Glow Lamp Borg](/doc/img/Borg16-bulb.jpg)
  
-Animationen
------------
+Animations
+----------
 
 ![Matrix](/doc/img/anim-matrix.png) &nbsp;
-![Feuer](/doc/img/anim-feuer.jpg)
-![Scroll](/doc/img/anim-scroll.jpg)
+![Fire](/doc/img/anim-feuer.jpg)
+![Scrolling Text](/doc/img/anim-scroll.jpg)
 
 
-Spiele
-------
+Games
+-----
 
 ![Snake](/doc/img/game-snake.png) &nbsp;
 ![Tetris](/doc/img/game-tetris.jpg)
 
 ### Tetris
 
- * Classic: Das ganz normale Tetris
- * First Person Tetris: Statt die Steine zu drehen, dreht man hierbei das Spielfeld um den Stein
- * Bastet: Diese Tetris Variante gibt einem stets den Stein, den man gerade am wenigsten gebrauchen kann
+ * Classic: Standard Tetris Clone
+ * First Person Tetris: Rotate the bucket instead of the Tetromino.
+ * Bastet: Dices the worst the possible Tetromino the whole time.
 
 ### Snake
 
@@ -39,23 +40,65 @@ Spiele
 ### Space Invaders
 
 
-Kompilieren
-===========
+Build
+=====
 
-Zunaechst muessen alle Abhaenigkeiten installiert sein. Unter Debian/Ubuntu Systemen 
-ist ein 
+Supported build platforms are Linux, FreeBSD and Windows (via Cygwin). Due to
+customized linker scripts, simulator support is currently limited to x86 and
+x86_64 archs. Following dependencies have to be met:
 
- > sudo aptitude install -y build-essential make libncurses5-dev gcc-avr avr-libc binutils-avr avrdude freeglut3-dev
+Dependencies Linux / FreeBSD
+----------------------------
 
-ausreichend.
+Package names are based on those packages found in the Debian/Ubuntu
+repositories. Please adapt the names according to your Linux distribution (or
+FreeBSD for that matter).
 
-Anschliessend kann die zu bauende Firmware mit 
+* build-essential (pulls in an ordinary gcc build tool chain for the host)
+* make (gmake on FreeBSD)
+* libncurses5-dev
+* gcc-avr
+* avr-libc
+* binutils-avr
+* avrdude
+* freeglut3-dev
 
+Dependencies Windows
+--------------------
+
+* [WinAVR](http://winavr.sourceforge.net) (includes avr-gcc and avrdude)
+* [Cygwin(64)](http://www.cygwin.com/)
+..* make
+..* gcc-core
+..* libncurses-devel (Cygwin)
+..* libwcurses-devel (Cygwin64)
+* [libusb-win32](http://sourceforge.net/apps/trac/libusb-win32/wiki) if you
+  want to use your USBasp programmer device with avrdude on Windows
+
+Configure
+---------
+
+Open a terminal and type:
  > make menuconfig
 
-konfiguriert, und mit 
+This brings up a curses based text interface for configuring certain aspects of
+your target platform. Be careful if you use a full-fledged IDE like Eclipse to
+manage the build, as integrated terminal emulators tend to choke on curses
+generated shell output. Just ensure that 'make menuconfig' has been run at least
+once in an ordinary terminal emulator after a fresh checkout or after issuing
+'make mrproper'.
 
+Compile
+-------
+
+To build for the actual target platform, just type:
  > make 
 
-gebaut werden.
+If you want to test and debug your code within a GUI applications, you can use
+the simulator:
+ > make simulator
 
+Please keep in mind that the simulator is NOT an emulator. All it does is to
+compile the Borgware 2D to an ordinary host application so you can step
+through your C-Code. The GUI application scans the simulated frame buffer every
+40ms and draws its contents.
