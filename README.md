@@ -67,7 +67,7 @@ Dependencies Windows
   * make
   * gcc-core
   * libncurses-devel (Cygwin)
-  * libwcurses-devel (Cygwin64)
+  * libncursesw-devel (Cygwin64)
 * [libusb-win32](http://sourceforge.net/apps/trac/libusb-win32/wiki) if you
   want to use your USBasp programmer device with avrdude on Windows
 
@@ -90,11 +90,12 @@ Compile
 To build for the actual target platform, just type:
  > make 
 
-If you want to test and debug your code within a GUI applications, you can use
+If you want to test and debug your code within a GUI application, you can use
 the simulator:
  > make simulator
+Then you can start the simulator by typing ./borgsim(.exe)
 
 Please keep in mind that the simulator is NOT an emulator. All it does is to
-compile the Borgware 2D to an ordinary host application so you can step
+compile the source code to an ordinary host application so you can step
 through your C-Code. The GUI application scans the simulated frame buffer every
 40ms and draws its contents.
