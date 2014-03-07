@@ -93,6 +93,7 @@ To build for the actual target platform, just type:
 If you want to test and debug your code within a GUI application, you can use
 the simulator:
  > make simulator
+
 Then you can start the simulator by typing ./borgsim(.exe)
 
 Please keep in mind that the simulator is NOT an emulator. All it does is to
