@@ -20,6 +20,8 @@ Animations
 ![Fire](/doc/img/anim-feuer.png)
 ![Scrolling Text](/doc/img/anim-scroll.png)
 
+[Animated GIF (3.5 MB)](/doc/img/borg_anim.gif)
+
 Games
 -----
 
