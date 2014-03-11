@@ -23,10 +23,6 @@ LIBS = -lm
 CFLAGS ?= -Wall -W -Wno-unused-parameter -Wno-sign-compare
 CFLAGS += -g -Os -std=gnu99 -fgnu89-inline -D_XOPEN_SOURCE=600 -DNDEBUG
 
-# flags for the linker
-LDFLAGS += -T ./avr5.x -Wl,-Map,image.map -mmcu=$(MCU)
-
-
 #############################################################################
 #Settings for Simulator build
 
@@ -100,6 +96,13 @@ ifneq ($(MAKECMDGOALS),menuconfig)
 include $(TOPDIR)/.config
 
 CPPFLAGS += -DF_CPU=$(FREQ)UL -mmcu=$(MCU)
+
+# flags for the linker
+ifeq ($(findstring atmega128,$(MCU)),atmega128)
+  LDFLAGS += -T ./avr51.x -Wl,-Map,image.map -mmcu=$(MCU)
+else
+  LDFLAGS += -T ./avr5.x -Wl,-Map,image.map -mmcu=$(MCU)
+endif
 
 endif # MAKECMDGOALS!=menuconfig
 endif # MAKECMDGOALS!=mrproper

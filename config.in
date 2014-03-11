@@ -11,6 +11,8 @@ comment "General Setup"
 	   ATmega328      atmega328   \
 	   ATmega644      atmega644   \
 	   ATmega644p     atmega644p  \
+	   ATmega1284     atmega1284  \
+	   ATmega1284p    atmega1284p \
 	   ATmega8515     atmega8515" \
 	   'ATmega32' MCU
 

@@ -62,7 +62,7 @@ void timer0_off(){
 	COLPORT = 0;
 	ROWPORT = 0;
 
-#if defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__)
+#if defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__) || (__AVR_ATmega1284P__) || defined (__AVR_ATmega1284__)
 	TCCR0A = 0x00;
 	TCCR0B = 0x00;
 	TIMSK0 = 0;
@@ -86,7 +86,7 @@ static void timer0_on(){
 
 */
 
-#if defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__)
+#if defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__) || (__AVR_ATmega1284P__) || defined (__AVR_ATmega1284__)
 	TCCR0A = 0x02; // CTC Mode
 	TCCR0B = 0x03; // clk/64
 	TCNT0  = 0x00; // reset timer

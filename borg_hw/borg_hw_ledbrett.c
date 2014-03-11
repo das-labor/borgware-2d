@@ -31,7 +31,7 @@
 
 #define MUX_ROWS        4
 
-#if defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__)
+#if defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__) || (__AVR_ATmega1284P__) || defined (__AVR_ATmega1284__)
 	/* more ifdef magic :-( */
 	#define OCR0 OCR0A
 	#define SIG_OUTPUT_COMPARE0 SIG_OUTPUT_COMPARE0A
@@ -283,7 +283,7 @@ void timer0_off() {
 	ROW3_OFF();
 	ROW4_OFF();
 
-#if defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__)
+#if defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__) || (__AVR_ATmega1284P__) || defined (__AVR_ATmega1284__)
 	TCCR0A = 0x00;
 	TCCR0B = 0x00;
 #else
@@ -305,7 +305,7 @@ static void timer0_on() {
 	 1    0    1       clk/1024
 	 */
 
-#if defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__)
+#if defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__) || (__AVR_ATmega1284P__) || defined (__AVR_ATmega1284__)
 	TCCR0A = 0x02; // CTC Mode
 	TCCR0B = 0x04; // clk/256
 	TCNT0  =    0; // reset timer

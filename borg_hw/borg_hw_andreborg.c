@@ -34,7 +34,7 @@
 #define COLDDR2  DDR(COLPORT2)
 #define ROWDDR   DDR(ROWPORT)
 
-#if defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__)
+#if defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__) || (__AVR_ATmega1284P__) || defined (__AVR_ATmega1284__)
 /* more ifdef magic :-( */
 #define OCR0 OCR0A
 #define TIMER0_COMP_vect TIMER0_COMPA_vect
@@ -120,7 +120,7 @@ void timer0_off() {
 	COLPORT2 = 0;
 	ROWPORT = 0;
 
-#if defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__)
+#if defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__) || (__AVR_ATmega1284P__) || defined (__AVR_ATmega1284__)
 	TCCR0A = 0x00;
 	TCCR0B = 0x00;
 #else
@@ -141,7 +141,7 @@ static void timer0_on() {
 	 1    0    1       clk/1024
 	 */
 
-#if defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__)
+#if defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__) || (__AVR_ATmega1284P__) || defined (__AVR_ATmega1284__)
 	TCCR0A = 0x02; // CTC Mode
 	TCCR0B = 0x03; // clk/64
 	TCNT0  = 0;    // reset timer
