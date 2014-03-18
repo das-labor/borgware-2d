@@ -49,6 +49,8 @@
 #include "../config.h"
 #include "../makros.h"
 
+#include <avr/interrupt.h>
+
 //Pin that the RFM12's slave select is connected to
 //#define DDR_SS DDRB
 //#define PORT_SS PORTB
@@ -124,13 +126,23 @@
 #define RFM12_INT_VECT (INT0_vect)
 
 //the interrupt mask register
-#define RFM12_INT_MSK GIMSK
+#ifdef EIMSK
+  #define RFM12_INT_MSK EIMSK
+#elif defined(GIMSK)
+  #define RFM12_INT_MSK GIMSK
+#else
+  #define RFM12_INT_MSK GICR
+#endif
 
 //the interrupt bit in the mask register
 #define RFM12_INT_BIT (INT0)
 
 //the interrupt flag register
-#define RFM12_INT_FLAG GIFR
+#ifdef EIFR
+  #define RFM12_INT_FLAG EIFR
+#else
+  #define RFM12_INT_FLAG GIFR
+#endif
 
 //the interrupt bit in the flag register
 #define RFM12_FLAG_BIT (INTF0)
@@ -159,7 +171,4 @@
  * en- or disable debugging via uart.
  */
 #define RFM12_UART_DEBUG 0
-
-
-
 

@@ -1,0 +1,3 @@
+[submodule "src/rfm12/rfm12_lib"]
+	path = src/rfm12/rfm12_lib
+	url = git@github.com:das-labor/librfm12.git
