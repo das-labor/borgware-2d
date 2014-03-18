@@ -1,5 +1,3 @@
-
-
 ##############################################################################
 # rules for buildung AVR objects
 
@@ -35,17 +33,14 @@ objects_sim: $(OBJECTS_SIM)
 	@ if [ ! -d obj_sim ]; then mkdir obj_sim ; fi
 	@ echo $(OBJECTS_SIM) > obj_sim/.objects
 
-
-
-
 clean-common:
 	$(RM) $(TARGET) *.[odasE] *.d.new *~
-	$(RM) -r ./obj_avr
-	$(RM) -r ./obj_sim
+	$(RM) -r obj_avr
+	$(RM) -r obj_sim
 
 clean: clean-common
 
 all:
 	$(MAKE) -C $(TOPDIR) all
 
-include $(TOPDIR)/depend.mk
+#include depend.mk
