@@ -7,6 +7,8 @@
 #ifndef BORG_TIME_H_
 #define BORG_TIME_H_
 
+#include <stdint.h>
+
 //send a time request packet via can
 void time_request(void);
 
