@@ -36,6 +36,9 @@
 #ifdef SMALLANIMATION_COLWALK
 #  include "smallani/colwalk.h"
 #endif
+#ifdef SMALLANIMATION_ROWBOUNCE
+#  include "smallani/rowbounce.h"
+#endif
 #ifdef SMALLANIMATION_COLBOUNCE
 #  include "smallani/colbounce.h"
 #endif
