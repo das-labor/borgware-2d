@@ -45,7 +45,8 @@ ifeq ($(findstring CYGWIN,$(OSTYPE)),CYGWIN)
   LIBS_SIM    = -lgdi32 -lwinmm -lm
 else
   ifeq ($(OSTYPE),FreeBSD)
-    CFLAGS_SIM  = -g -I/usr/local/include -Wall -pedantic -std=c99 -O0 -D_XOPEN_SOURCE=600
+    CFLAGS_SIM = -g -I/usr/local/include -Wall -pedantic -std=c99 -O0
+    CFLAGS_SIM += -D_XOPEN_SOURCE=600
     ifeq ($(MACHINE),amd64)
       LDFLAGS_SIM = -L/usr/local/lib -T ld_scripts/elf_x86_64_fbsd.x
     else
@@ -78,12 +79,17 @@ $(TARGET):
 ##############################################################################
 # include user's config.mk file
 
-config.mk: 
-	@echo "# Put your own config here!" > $@
-	@echo "#F_CPU = $(F_CPU)" >> $@
-	@echo "#MCU = $(MCU)" >> $@
-	@echo "created default config.mk, tune your settings there!"
--include config.mk
+$(MAKETOPDIR)/config.mk: 
+	@echo "# Customize your config here!" >$@
+	@echo "# Add further CFLAGS by using the += operator, eg." >>$@
+	@echo "# CFLAGS += -mstrict-X" >>$@
+	@echo "#" >>$@
+	@echo "# In case you wonder: -mstrict-X produces smaller code, but" >>$@
+	@echo "# is only available on avr-gcc 4.7.0 or higher." >>$@
+	@echo "#" >>$@
+	@echo "# Other flags you might want to tune: CPPFLAGS, LDFLAGS ..." >>$@
+	@echo "Created default config.mk, tune your settings there!"
+-include $(MAKETOPDIR)/config.mk
 
 
 ##############################################################################
@@ -97,7 +103,7 @@ include $(MAKETOPDIR)/.config
 
 CPPFLAGS += -DF_CPU=$(FREQ)UL -mmcu=$(MCU)
 
-# flags for the linker
+# flags for the linker, choose appropriate linker script
 ifeq ($(findstring atmega128,$(MCU)),atmega128)
   LDFLAGS += -T ld_scripts/avr51.x -Wl,-Map,image.map -mmcu=$(MCU)
 else

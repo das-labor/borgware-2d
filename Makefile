@@ -168,27 +168,26 @@ test:
 ##############################################################################
 clean:
 	$(MAKE) -f rules.mk no_deps=t clean-common
-	$(RM) $(TARGET) $(TARGET).bin $(TARGET).hex $(TARGET).lst .subdirs
+	$(RM) -f $(TARGET) $(TARGET).bin $(TARGET).hex $(TARGET).lst .subdirs
+	$(RM) -f $(TARGET).map 
 	for subdir in `find . -type d` ; do \
 	  test "x$$subdir" != "x." \
 	  && test -e $$subdir/Makefile \
 	  && $(MAKE) no_deps=t -C $$subdir clean ; done ; true
-	$(RM) -r $(TOPDIR)/obj_avr
-	$(RM) -r $(TOPDIR)/obj_sim
-	$(RM) $(TARGET)*
-	$(RM) $(TARGET_SIM) $(TARGET_SIM).exe
+	$(RM) -fr $(TOPDIR)/obj_avr $(TOPDIR)/obj_sim
+	$(RM) -f $(TARGET_SIM) $(TARGET_SIM).exe
 
 mrproper:
 	$(MAKE) clean
 	$(RM) -f $(TOPDIR)/autoconf.h .config config.mk .menuconfig.log .config.old
 
-sflash: $(TARGET).hex
+#sflash: $(TARGET).hex
 #	$(LAUNCH_BOOTLOADER) $(SERIAL) 115200
-	avrdude -p m32 -b 115200 -u -c avr109 -P $(SERIAL) -U f:w:$< -F
-	echo X > $(SERIAL)
+#	avrdude -p m32 -b 115200 -u -c avr109 -P $(SERIAL) -U f:w:$< -F
+#	echo X > $(SERIAL)
 
-uflash: $(TARGET).hex
-	avrdude -c usbasp  -p atmega32 -V -U f:w:$< -F
+#uflash: $(TARGET).hex
+#	avrdude -c usbasp  -p atmega32 -V -U f:w:$< -F
 
 .PHONY: clean mrproper sflash uflash
 ##############################################################################
