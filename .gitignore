@@ -10,8 +10,8 @@
 borgsim
 borgsim.exe
 config.mk
-docs/html
-docs/latex
+doc/html
+doc/latex
 gmon.out
 image
 image.bin
