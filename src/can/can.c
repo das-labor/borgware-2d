@@ -395,7 +395,13 @@ unsigned char mcp_status();
 			#else
 				//this turns on INT0 on the Atmel
 				MCUCR |=  (1<<ISC01);
-				GIMSK |= (1<<INT0);
+				#ifdef EIMSK
+					EIMSK |= (1<<INT0);
+				#elif defined(GIMSK)
+					GIMSK |= (1<<INT0);
+				#else
+					GICR |= (1<<INT0);
+				#endif
 			#endif //ATMEGA
 		#else  //CAN_INTERRUPT
 			// configure IRQ: this only configures the INT Output of the mcp2515,
