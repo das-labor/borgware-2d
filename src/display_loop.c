@@ -18,6 +18,7 @@
 #include "animations/bitmapscroller/fairydust.h"
 #include "animations/fpmath_patterns.h"
 #include "animations/mherweg.h"
+#include "animations/moire.h"
 #include "animations/blackhole.h"
 #include "animations/squares.h"
 #ifdef ANIMATION_TIME
@@ -183,62 +184,68 @@ void display_loop(){
 			break;
 #endif
 
-#ifdef ANIMATION_TIME
+#ifdef ANIMATION_MOIRE
 		case 15:
+			moire();
+			break;
+#endif
+
+#ifdef ANIMATION_TIME
+		case 16:
 			time_anim();
 			break;
 #endif
 
 #ifdef ANIMATION_LTN_ANT
-		case 16:
+		case 17:
 			ltn_ant();
 			break;
 #endif
 
 #ifdef ANIMATION_LABORLOGO
-		case 17:
+		case 18:
 			laborlogo();
 			break;
 #endif
 
 #ifdef ANIMATION_AMPHIBIAN
-		case 18:
+		case 19:
 			amphibian();
 			break;
 #endif
 
 #ifdef ANIMATION_LOGO_OOS
-		case 19:
+		case 20:
 			logo_OutOfSpec();
 			break;
 #endif
 
 #ifdef ANIMATION_FAIRYDUST
-		case 20:
+		case 21:
 			fairydust();
 			break;
 #endif
 
 #ifdef ANIMATION_PLASMA
-		case 21:
+		case 22:
 			plasma();
 			break;
 #endif
 
 #ifdef ANIMATION_PSYCHEDELIC
-		case 22:
+		case 23:
 			psychedelic();
 			break;
 #endif
 
 #ifdef ANIMATION_BLACKHOLE
-		case 23:
+		case 24:
 			blackhole();
 			break;
 #endif
 
 #ifdef ANIMATION_SQUARES
-		case 24:
+		case 25:
 			squares();
 			break;
 #endif

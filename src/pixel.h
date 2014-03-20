@@ -42,6 +42,15 @@ typedef struct cursor{
 	pixelmode_t mode;
 } cursor_t;
 
+
+#if NUM_ROWS < 64 && NUM_COLS < 64
+	/** use 8 bit operands where feasible */
+	typedef signed char operand_t;
+#else
+	/** use 16 bit operands if either width or height are >= 64 */
+	typedef int operand_t;
+#endif
+
 /****************************************************************************
  * Pixel routines
  */
@@ -78,5 +87,9 @@ static inline void set_cursor(cursor_t* cur, pixel p){
 	cur->pos = p;
 	setpixel(p, cur->mode ? 3 : 0);
 }
+
+void line(pixel p1,
+          pixel const p2,
+          unsigned char const color);
 
 #endif // PIXEL_H

@@ -58,3 +58,38 @@ unsigned char get_pixel(pixel p){
 		return 0!= (pixmap[0][p.y][p.x/8] & shl_table[p.x%8]);
 	}
 }
+
+/**
+ * An implementation of Bresenham's line drawing algorithm.
+ * @param p1 first coordinate of the line
+ * @param p2 second coordinate of the line
+ * @param color brightness level of the line
+ */
+void line(pixel p1,
+          pixel const p2,
+          unsigned char const color)
+{
+	operand_t const dx = p1.x < p2.x ? p2.x - p1.x : p1.x - p2.x;
+	operand_t const sx = p1.x < p2.x ? 1 : -1;
+	operand_t const dy = p1.y < p2.y ? p2.y - p1.y : p1.y - p2.y;
+	operand_t const sy = p1.y < p2.y ? 1 : -1;
+	operand_t error = dx - dy;
+
+	while(1)
+	{
+		setpixel(p1, color);
+		if ((p1.x == p2.x) && (p1.y == p2.y))
+			break;
+		operand_t const error2 = 2 * error;
+		if (error2 > -dy)
+		{
+			error -= dy;
+			p1.x += sx;
+		}
+		if (error2 < dx)
+		{
+			error += dx;
+			p1.y += sy;
+		}
+	}
+}

@@ -27,51 +27,6 @@
 #define PGM(x) pgm_read_byte(&(x))
 
 
-#if NUM_ROWS < 64 && NUM_COLS < 64
-	/** use 8 bit operands where feasible */
-	typedef signed char operand_t;
-#else
-	/** use 16 bit operands if either width or height are >= 64 */
-	typedef int operand_t;
-#endif
-
-
-/**
- * An implementation of Bresenham's line drawing algorithm.
- * @param p1 first coordinate of the line
- * @param p2 second coordinate of the line
- * @param color brightness level of the line
- */
-static void line(pixel p1,
-                 pixel const p2,
-                 unsigned char const color)
-{
-	operand_t const dx = p1.x < p2.x ? p2.x - p1.x : p1.x - p2.x;
-	operand_t const sx = p1.x < p2.x ? 1 : -1;
-	operand_t const dy = p1.y < p2.y ? p2.y - p1.y : p1.y - p2.y;
-	operand_t const sy = p1.y < p2.y ? 1 : -1;
-	operand_t error = dx - dy;
-
-	while(1)
-	{
-		setpixel(p1, color);
-		if ((p1.x == p2.x) && (p1.y == p2.y))
-			break;
-		operand_t const error2 = 2 * error;
-		if (error2 > -dy)
-		{
-			error -= dy;
-			p1.x += sx;
-		}
-		if (error2 < dx)
-		{
-			error += dx;
-			p1.y += sy;
-		}
-	}
-}
-
-
 /**
  * Draws a rectangle at the given coordinates.
  * @param p coordinate of the rectangle's upper right corner
