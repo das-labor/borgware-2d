@@ -54,7 +54,7 @@ ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(MAKECMDGOALS),mrproper)
 ifneq ($(MAKECMDGOALS),menuconfig)
 
-include $(MAKETOPDIR)/.subdirs
+-include $(MAKETOPDIR)/.subdirs
 include $(MAKETOPDIR)/.config
 include $(TOPDIR)/games/games.mk
 
