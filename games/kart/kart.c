@@ -41,19 +41,23 @@ game_descriptor_t kart_game_descriptor __attribute__((section(".game_descriptors
 };
 #endif
 
-#define WAIT 75
+#define WAIT 20
 
-#define DRIVEDIV 3
+#define DRIVEDIV 5
 #define MOVEDIV 1
-#define DECREASE_WIDTH_DIV 120
+#define DECREASE_WIDTH_DIV 600
+#define DIRECTION_DIV 20
+
+#define KEY_IGNORE 10
 
 #define CARCOLOR 3
 #define BORDERCOLOR 2
 #define LINECOLOR 1
 
-#define CURVE_PROP 30
+#define CURVE_PROP 50
 
 uint8_t borders[NUM_ROWS][2];
+uint8_t key_ignore[2];
 
 void kart_game(){
 
@@ -61,28 +65,22 @@ void kart_game(){
 	uint8_t carpos = NUM_COLS / 2;
 	uint32_t cycle = 0;
 	uint8_t draw_line = 1;
-	uint8_t width = NUM_COLS -2;
+	uint8_t width = NUM_COLS - 2;
 	uint8_t middle = NUM_COLS / 2;
 	char game_over[100] = "";
+
+	key_ignore[0] = 0;
+	key_ignore[1] = 0;
 
 	clear_screen(0);
 
 	// init border memory
 	for(uint8_t row = 0; row < NUM_ROWS; row++){
 		borders[row][0] = middle;
-		borders[row][1] = width;
+		borders[row][1] = NUM_COLS;
 	}
 
 	setpixel((pixel){carpos, NUM_ROWS-1}, CARCOLOR);
-
-	// Wait some seconds to start...
-	while(1){
-		cycle++;
-		wait(WAIT);
-		if(cycle >= DRIVEDIV*0){
-			break;
-		}
-	}
 
 	// main loop
 	while(1){
@@ -92,24 +90,31 @@ void kart_game(){
 			width--;
 		}
 
-		// MOVE-STEP
-		if(cycle % MOVEDIV == 0){
-			if (JOYISLEFT){
-				carpos++;
-				setpixel((pixel){carpos, NUM_ROWS-1}, 0);
-			}else if (JOYISRIGHT){
-				carpos--;
-				setpixel((pixel){carpos, NUM_ROWS-1}, 0);
-			}
+		// MOVE
+		if (JOYISLEFT && key_ignore[0] <= 0){
+			setpixel((pixel){carpos, NUM_ROWS-1}, 0);
+			carpos++;
 
-			if(check_collision(carpos)){
-				break;
-			}
+			key_ignore[0] = KEY_IGNORE;
+			key_ignore[1] = 0;
+		}else if (JOYISRIGHT && key_ignore[1] <= 0){
+			setpixel((pixel){carpos, NUM_ROWS-1}, 0);
+			carpos--;
+
+			key_ignore[1] = KEY_IGNORE;
+			key_ignore[0] = 0;
+		}else if(!(JOYISRIGHT || JOYISLEFT)){
+			key_ignore[1] = 0;
+			key_ignore[0] = 0;
 		}
 
-		// DRIVE-STEP
-		if(cycle % DRIVEDIV == 0){
+		if(check_collision(carpos)){
+			break;
+		}
 
+
+		// DIRECTION-STEP
+		if(cycle % DIRECTION_DIV == 0){
 			// generate a route
 			int rnd = random8();
 			if(rnd < CURVE_PROP && middle-(width/2) > 1){
@@ -117,7 +122,10 @@ void kart_game(){
 			}else if(rnd > 256-CURVE_PROP && middle+(width/2) < NUM_COLS-1){
 				middle++;
 			}
+		}
 
+		// DRIVE-STEP
+		if(cycle % DRIVEDIV == 0){
 			// shift pixmap down
 			drive();
 
@@ -139,7 +147,7 @@ void kart_game(){
 		}
 
 		// paint middle line
-		if(width > 4 && draw_line){
+		if(width > 6 && draw_line){
 			setpixel((pixel){middle, 0}, LINECOLOR);
 		}
 
@@ -147,6 +155,13 @@ void kart_game(){
 		setpixel((pixel){carpos, NUM_ROWS-1}, CARCOLOR);
 
 		cycle++;
+
+		if(key_ignore[0] > 0){
+			key_ignore[0]--;
+		}
+		if(key_ignore[1] > 0){
+			key_ignore[1]--;
+		}
 		wait(WAIT);
 	}
 
@@ -159,15 +174,17 @@ void kart_game(){
  */
 void drive(void){
 
-	unsigned char plane, row;
+	unsigned char plane, row, byte;
 
 	for(plane=0; plane<NUMPLANE; plane++){
 		for(row=NUM_ROWS-1;row>0; row--){
-			pixmap[plane][row][0] = pixmap[plane][row-1][0];
-			pixmap[plane][row][1] = pixmap[plane][row-1][1];
+			for(byte=0; byte < LINEBYTES; byte++){
+				pixmap[plane][row][byte] = pixmap[plane][row-1][byte];
+			}
 		}
-		pixmap[plane][0][0] = 0x00;
-		pixmap[plane][0][1] = 0x00;
+		for(byte=0; byte < LINEBYTES; byte++){
+			pixmap[plane][row][byte] = 0x00;
+		}
 	}
 
 }
