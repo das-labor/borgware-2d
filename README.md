@@ -50,6 +50,7 @@ Package names are based on Debian/Ubuntu repositories. Please adapt the names
 according to your Linux distribution (or FreeBSD for that matter).
 
 * build-essential (pulls in an ordinary gcc build tool chain for the host)
+* bc
 * make (gmake on FreeBSD)
 * libncurses5-dev
 * gcc-avr
@@ -60,15 +61,26 @@ according to your Linux distribution (or FreeBSD for that matter).
 
 Windows
 -------
-
-* [WinAVR](http://winavr.sourceforge.net) (includes avr-gcc and avrdude)
+* AVR GCC toolchain for Windows, choose your poison:
+  * [WinAVR](http://winavr.sourceforge.net)
+    * already includes [avrdude](http://www.nongnu.org/avrdude/)
+    * installer offers to add the toolchain to the system path
+    * straight forward download from SourceForge
+    * project abandoned in 2010, therefore heavily outdated (avr-gcc 4.3.3)
+  * [Atmel AVR Toolchain for Windows](http://www.atmel.com/tools/atmelavrtoolchainforwindows.aspx)
+    * actively maintained, therefore fairly up to date
+    * homepage nags you with rather akward registration process before download
+    * you have to add the toolchain to the system path manually
+    * avrdude is not included (but it is possible to install WinAVR in parallel)
 * [Cygwin(64)](http://www.cygwin.com/)
+  * bc
   * make
   * gcc-core
+  * gdb (in case you want to debug your code in the simulator)
   * libncurses-devel (Cygwin)
   * libncursesw-devel (Cygwin64)
-* [libusb-win32](http://sourceforge.net/apps/trac/libusb-win32/wiki) if you want
-  to use your USBasp programmer device with avrdude on Windows
+* [libusb-win32](http://sourceforge.net/apps/trac/libusb-win32/wiki) in case you
+  want to use an USBasp programmer device with avrdude
 
 Configure
 ---------
@@ -101,11 +113,10 @@ Simulator Handling
 ------------------
 
 Please keep in mind that the simulator is NOT an emulator. All it does is
-compile the source to a native host application so you can step through your
-C-Code. The GUI thread reads the simulated frame buffer every 40ms and draws its
-contents.
+compile the source code to a native host application so you can step through
+your C-Code. The GUI thread reads the simulated frame buffer every 40ms and
+draws its contents.
 
 Joystick directions are simulated by the WASD keys and SPACE acts as the fire
 button. The OpenGL based simulator (Linux/FreeBSD) enables you to adjust the
 viewing angle of the LED matrix via the arrow keys (not available on Windows).
-
