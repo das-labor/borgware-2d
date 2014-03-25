@@ -11,6 +11,8 @@ comment "General Setup"
 	   ATmega328      atmega328   \
 	   ATmega644      atmega644   \
 	   ATmega644p     atmega644p  \
+	   ATmega1284     atmega1284  \
+	   ATmega1284p    atmega1284p \
 	   ATmega8515     atmega8515" \
 	   'ATmega32' MCU
 
@@ -20,7 +22,7 @@ endmenu
 
 
 ### Borg Hardware Menu ########################################################
-source borg_hw/config.in
+source src/borg_hw/config.in
 ###############################################################################
 
 
@@ -34,22 +36,22 @@ endmenu
 
 
 ### Scrolltext Menu ###########################################################
-source scrolltext/config.in
+source src/scrolltext/config.in
 ###############################################################################
 
 
 ### RFM12 Menu ################################################################
-source rfm12/config.in
+source src/rfm12/config.in
 ###############################################################################
 
 
 ### Joystick Menu #############################################################
-source joystick/config.in
+source src/joystick/config.in
 ###############################################################################
 
 
 ### CAN Menu ##################################################################
-source can/config.in
+source src/can/config.in
 ###############################################################################
 
 
@@ -60,15 +62,15 @@ depends on JOYSTICK_SUPPORT
 
 
 ### Game Menu #################################################################
-source games/config.in
+source src/games/config.in
 ###############################################################################
 
 
 ### Animations Menu ###########################################################
-source animations/config.in
+source src/animations/config.in
 ###############################################################################
 
 
 ### small Animations Menu #####################################################
-source smallani/config.in
+source src/smallani/config.in
 ###############################################################################

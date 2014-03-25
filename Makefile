@@ -1,17 +1,18 @@
 TARGET     := image
 TARGET_SIM := borgsim
-TOPDIR = .
+TOPDIR = src
+MAKETOPDIR = .
 
 SRC = \
-	main.c            \
-	display_loop.c    \
-	eeprom_reserve.c  \
-	pixel.c           \
-	util.c            \
+	$(TOPDIR)/main.c            \
+	$(TOPDIR)/display_loop.c    \
+	$(TOPDIR)/eeprom_reserve.c  \
+	$(TOPDIR)/pixel.c           \
+	$(TOPDIR)/util.c            \
 
 SRC_SIM = \
-	display_loop.c    \
-	pixel.c           \
+	$(TOPDIR)/display_loop.c    \
+	$(TOPDIR)/pixel.c           \
 
 
 LAUNCH_BOOTLOADER = launch-bootloader
@@ -24,26 +25,26 @@ all: compile-$(TARGET)
 	@echo "==============================="
 	@echo "$(TARGET) compiled for: $(MCU)"
 	@echo "size is: "
-	@$(CONFIG_SHELL) ${TOPDIR}/scripts/size $(TARGET)
+	@$(CONFIG_SHELL) scripts/size $(TARGET)
 	@echo "==============================="
 
 ##############################################################################
 # generic fluff
-include defaults.mk
-#include $(TOPDIR)/rules.mk
+include $(MAKETOPDIR)/defaults.mk
+#include $(MAKETOPDIR)/rules.mk
 
 ##############################################################################
 # generate SUBDIRS variable
 #
 
-.subdirs: autoconf.h
+.subdirs: $(TOPDIR)/autoconf.h
 	@ echo "checking in which subdirs to build"
 	@ $(RM) -f $@
-	@ echo "SUBDIRS += animations" >> $@
-	@ echo "SUBDIRS += animations/bitmapscroller" >> $@
-	@ echo "SUBDIRS += smallani" >> $@
-	@ (for subdir in `grep -e "^#define .*_SUPPORT" autoconf.h \
-	      | sed -e "s/^#define //" -e "s/_SUPPORT.*//" \
+	@ echo "SUBDIRS += $(TOPDIR)/animations" >> $@
+	@ echo "SUBDIRS += $(TOPDIR)/animations/bitmapscroller" >> $@
+	@ echo "SUBDIRS += $(TOPDIR)/smallani" >> $@
+	@ (for subdir in `grep -e "^#define .*_SUPPORT" $(TOPDIR)/autoconf.h \
+	      | sed -e "s/^#define /$(TOPDIR)\//" -e "s/_SUPPORT.*//" \
 	      | tr "[A-Z]\\n" "[a-z] " `; do \
 	  test -d $$subdir && echo "SUBDIRS += $$subdir" ; \
 	done) | sort -u >> $@
@@ -53,8 +54,8 @@ ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(MAKECMDGOALS),mrproper)
 ifneq ($(MAKECMDGOALS),menuconfig)
 
-include $(TOPDIR)/.subdirs
-include $(TOPDIR)/.config
+-include $(MAKETOPDIR)/.subdirs
+include $(MAKETOPDIR)/.config
 include $(TOPDIR)/games/games.mk
 
 endif # MAKECMDGOALS!=menuconfig
@@ -65,7 +66,7 @@ endif # no_deps!=t
 
 ##############################################################################
 
-SUBDIRS_AVR = borg_hw
+SUBDIRS_AVR = $(TOPDIR)/borg_hw
 SUBDIRS_AVR += $(SUBDIRS)
 
 .PHONY: compile-subdirs_avr
@@ -77,7 +78,7 @@ compile-$(TARGET): compile-subdirs_avr $(TARGET).hex $(TARGET).bin $(TARGET).lst
 
 
 
-OBJECTS += $(patsubst %.c,./obj_avr/%.o,${SRC})
+OBJECTS += $(patsubst $(TOPDIR)/%.c,$(TOPDIR)/obj_avr/%.o,${SRC})
 SUBDIROBJECTS = $(foreach subdir,$(SUBDIRS_AVR),$(foreach object,$(shell cat $(subdir)/obj_avr/.objects 2>/dev/null),$(subdir)/$(object)))
 
 $(TARGET): $(OBJECTS) $(SUBDIROBJECTS)
@@ -86,8 +87,8 @@ $(TARGET): $(OBJECTS) $(SUBDIROBJECTS)
 
 ##############################################################################
 #generic rules for AVR-Build
-./obj_avr/%.o: %.c
-	@ if [ ! -d obj_avr ]; then mkdir obj_avr ; fi
+$(TOPDIR)/obj_avr/%.o: $(TOPDIR)/%.c
+	@ if [ ! -d $(TOPDIR)/obj_avr ]; then mkdir $(TOPDIR)/obj_avr ; fi
 	@ echo "compiling $<"
 	@ $(CC) -o $@ $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -c $<
 
@@ -109,25 +110,25 @@ $(TARGET): $(OBJECTS) $(SUBDIROBJECTS)
 ##############################################################################
 #Rules for simulator build
 
-SUBDIRS_SIM  = simulator
+SUBDIRS_SIM  = $(TOPDIR)/simulator
 SUBDIRS_SIM += $(SUBDIRS)
 
 .PHONY: compile-subdirs_sim
 compile-subdirs_sim:
 	@ for dir in $(SUBDIRS_SIM); do $(MAKE) -C $$dir objects_sim || exit 5; done
-	@ $(MAKE) -C ./simulator/ objects_sim || exit 5;
+	@ $(MAKE) -C $(TOPDIR)/simulator/ objects_sim || exit 5;
 
-simulator: autoconf.h .config .subdirs compile-subdirs_sim $(TARGET_SIM)
+simulator: $(TOPDIR)/autoconf.h .config .subdirs compile-subdirs_sim $(TARGET_SIM)
 
 SUBDIROBJECTS_SIM = $(foreach subdir,$(SUBDIRS_SIM),$(foreach object,$(shell cat $(subdir)/obj_sim/.objects 2>/dev/null),$(subdir)/$(object)))
 
-OBJECTS_SIM = $(patsubst %.c,obj_sim/%.o,${SRC_SIM})
+OBJECTS_SIM = $(patsubst $(TOPDIR)/%.c,$(TOPDIR)/obj_sim/%.o,${SRC_SIM})
 
 $(TARGET_SIM): $(OBJECTS_SIM) $(SUBDIROBJECTS_SIM)
 	$(HOSTCC) $(LDFLAGS_SIM) -o $@ $(OBJECTS_SIM) $(SUBDIROBJECTS_SIM) $(LIBS_SIM)
 
-./obj_sim/%.o: %.c
-	@ if [ ! -d obj_sim ]; then mkdir obj_sim ; fi
+$(TOPDIR)/obj_sim/%.o: $(TOPDIR)/%.c
+	@ if [ ! -d $(TOPDIR)/obj_sim ]; then mkdir $(TOPDIR)/obj_sim ; fi
 	@ echo "compiling $<"
 	@ $(HOSTCC) -o $@ $(CFLAGS_SIM) -c $<
 
@@ -145,6 +146,21 @@ menuconfig:
 	@echo "Next, you can: "
 	@echo " * 'make' to compile your borgware"
 
+test:
+	@echo $(CONFIG_SHELL)
+	@echo
+	@echo "========== Testing borg-16 ========== "
+	$(MAKE) -C scripts/lxdialog all
+	$(CONFIG_SHELL) scripts/Menuconfig config.in profiles/borg-16
+	$(MAKE) 
+	$(MAKE) clean
+	@echo
+	@echo "========== Testing borg-ls ========== "
+	$(MAKE) -C scripts/lxdialog all
+	$(CONFIG_SHELL) scripts/Menuconfig config.in profiles/borg-ls
+	$(MAKE) 
+	$(MAKE) clean
+
 #%/menuconfig:
 #	$(SH) "$(@D)/configure"
 #	@$(MAKE) what-now-msg
@@ -152,44 +168,48 @@ menuconfig:
 ##############################################################################
 clean:
 	$(MAKE) -f rules.mk no_deps=t clean-common
-	$(RM) $(TARGET) $(TARGET).bin $(TARGET).hex $(TARGET).lst .subdirs
-	for subdir in `find . -type d` ; do \
+	$(RM) -f $(TARGET) $(TARGET).bin $(TARGET).hex $(TARGET).lst .subdirs
+	$(RM) -f $(TARGET).map 
+	for subdir in `find . -type d ! -iwholename './src/rfm12/rfm12_lib/examples/*'` ; do \
 	  test "x$$subdir" != "x." \
 	  && test -e $$subdir/Makefile \
 	  && $(MAKE) no_deps=t -C $$subdir clean ; done ; true
+	$(RM) -fr $(TOPDIR)/obj_avr $(TOPDIR)/obj_sim
+	$(RM) -f $(TARGET_SIM) $(TARGET_SIM).exe
 
 mrproper:
 	$(MAKE) clean
-	$(RM) -f autoconf.h .config config.mk .menuconfig.log .config.old
+	$(RM) -f $(TOPDIR)/autoconf.h .config config.mk .menuconfig.log .config.old
 
-sflash: $(TARGET).hex
+#sflash: $(TARGET).hex
 #	$(LAUNCH_BOOTLOADER) $(SERIAL) 115200
-	avrdude -p m32 -b 115200 -u -c avr109 -P $(SERIAL) -U f:w:$< -F
-	echo X > $(SERIAL)
+#	avrdude -p m32 -b 115200 -u -c avr109 -P $(SERIAL) -U f:w:$< -F
+#	echo X > $(SERIAL)
 
-uflash: $(TARGET).hex
-	avrdude -c usbasp  -p atmega32 -V -U f:w:$< -F
+#uflash: $(TARGET).hex
+#	avrdude -c usbasp  -p atmega32 -V -U f:w:$< -F
 
 .PHONY: clean mrproper sflash uflash
 ##############################################################################
 # configure ethersex
 #
-show-config: autoconf.h
+show-config: $(TOPDIR)/autoconf.h
 	@echo
 	@echo "These modules are currently enabled: "
 	@echo "======================================"
-	@grep -e "^#define .*_SUPPORT" autoconf.h | sed -e "s/^#define / * /" -e "s/_SUPPORT.*//"
+	@grep -e "^#define .*_SUPPORT" $(TOPDIR)/autoconf.h | sed -e "s/^#define / * /" -e "s/_SUPPORT.*//"
 
 .PHONY: show-config
 
-autoconf.h .config:
+$(TOPDIR)/autoconf.h .config:
 	@echo make\'s goal: $(MAKECMDGOALS)
 ifneq ($(MAKECMDGOALS),menuconfig)
 	# make sure menuconfig isn't called twice, on `make menuconfig'
-	test -s autoconf.h -a -s .config || $(MAKE) no_deps=t menuconfig
+	#test -s $(TOPDIR)/autoconf.h -a -s .config || $(MAKE) no_deps=t menuconfig
 	# test the target file, test fails if it doesn't exist
 	# and will keep make from looping menuconfig.
-	test -s autoconf.h -a -s .config
+	#test -s $(TOPDIR)/autoconf.h -a -s .config
+	touch $(TOPDIR)/autoconf.h .config
 endif
 
-include depend.mk
+include $(MAKETOPDIR)/depend.mk
