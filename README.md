@@ -69,7 +69,7 @@ Windows
     * project abandoned in 2010, therefore heavily outdated (avr-gcc 4.3.3)
   * [Atmel AVR Toolchain for Windows](http://www.atmel.com/tools/atmelavrtoolchainforwindows.aspx)
     * actively maintained, therefore fairly up to date
-    * homepage nags you with rather akward registration process before download
+    * homepage nags you with rather awkward registration process before download
     * you have to add the toolchain to the system path manually
     * avrdude is not included (but it is possible to install WinAVR in parallel)
 * [Cygwin(64)](http://www.cygwin.com/)
