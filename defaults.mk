@@ -23,10 +23,6 @@ LIBS = -lm
 CFLAGS ?= -Wall -W -Wno-unused-parameter -Wno-sign-compare
 CFLAGS += -g -Os -std=gnu99 -fgnu89-inline -D_XOPEN_SOURCE=600 -DNDEBUG
 
-# flags for the linker
-LDFLAGS += -T ./avr5.x -Wl,-Map,image.map -mmcu=$(MCU)
-
-
 #############################################################################
 #Settings for Simulator build
 
@@ -42,27 +38,28 @@ MACHINE = $(shell uname -m)
 ifeq ($(findstring CYGWIN,$(OSTYPE)),CYGWIN)
   CFLAGS_SIM  = -g -Wall -pedantic -std=c99 -O0 -D_WIN32 -D_XOPEN_SOURCE=600
   ifeq ($(MACHINE),x86_64)
-    LDFLAGS_SIM = -T simulator/i386pep.x
+    LDFLAGS_SIM = -T ld_scripts/i386pep.x
   else
-    LDFLAGS_SIM = -T simulator/i386pe.x
+    LDFLAGS_SIM = -T ld_scripts/i386pe.x
   endif
   LIBS_SIM    = -lgdi32 -lwinmm -lm
 else
   ifeq ($(OSTYPE),FreeBSD)
-    CFLAGS_SIM  = -g -I/usr/local/include -Wall -pedantic -std=c99 -O0 -D_XOPEN_SOURCE=600
+    CFLAGS_SIM = -g -I/usr/local/include -Wall -pedantic -std=c99 -O0
+    CFLAGS_SIM += -D_XOPEN_SOURCE=600
     ifeq ($(MACHINE),amd64)
-      LDFLAGS_SIM = -L/usr/local/lib -T simulator/elf_x86_64_fbsd.x
+      LDFLAGS_SIM = -L/usr/local/lib -T ld_scripts/elf_x86_64_fbsd.x
     else
-      LDFLAGS_SIM = -L/usr/local/lib -T simulator/elf_i386_fbsd.x
+      LDFLAGS_SIM = -L/usr/local/lib -T ld_scripts/elf_i386_fbsd.x
     endif
     LIBS_SIM = -lglut -lpthread -lGL -lGLU -lm
   else
     ifeq ($(OSTYPE),Linux)
       CFLAGS_SIM  = -g -Wall -pedantic -std=c99 -O0 -D_XOPEN_SOURCE=600
       ifeq ($(MACHINE),x86_64)
-        LDFLAGS_SIM = -g -T simulator/elf_x86_64.x
+        LDFLAGS_SIM = -T ld_scripts/elf_x86_64.x
       else
-        LDFLAGS_SIM = -T simulator/elf_i386.x
+        LDFLAGS_SIM = -T ld_scripts/elf_i386.x
       endif
       LIBS_SIM = -lglut -lpthread -lGL -lGLU -lm
     else
@@ -82,12 +79,17 @@ $(TARGET):
 ##############################################################################
 # include user's config.mk file
 
-$(TOPDIR)/config.mk: 
-	@echo "# Put your own config here!" > $@
-	@echo "#F_CPU = $(F_CPU)" >> $@
-	@echo "#MCU = $(MCU)" >> $@
-	@echo "created default config.mk, tune your settings there!"
--include $(TOPDIR)/config.mk
+$(MAKETOPDIR)/config.mk: 
+	@echo "# Customize your config here!" >$@
+	@echo "# Add further CFLAGS by using the += operator, eg." >>$@
+	@echo "# CFLAGS += -mstrict-X" >>$@
+	@echo "#" >>$@
+	@echo "# In case you wonder: -mstrict-X produces smaller code, but" >>$@
+	@echo "# is only available on avr-gcc 4.7.0 or higher." >>$@
+	@echo "#" >>$@
+	@echo "# Other flags you might want to tune: CPPFLAGS, LDFLAGS ..." >>$@
+	@echo "Created default config.mk, tune your settings there!"
+-include $(MAKETOPDIR)/config.mk
 
 
 ##############################################################################
@@ -97,17 +99,24 @@ ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(MAKECMDGOALS),mrproper)
 ifneq ($(MAKECMDGOALS),menuconfig)  
 
-include $(TOPDIR)/.config
+include $(MAKETOPDIR)/.config
 
 CPPFLAGS += -DF_CPU=$(FREQ)UL -mmcu=$(MCU)
+
+# flags for the linker, choose appropriate linker script
+ifeq ($(findstring atmega128,$(MCU)),atmega128)
+  LDFLAGS += -T ld_scripts/avr51.x -Wl,-Map,image.map -mmcu=$(MCU)
+else
+  LDFLAGS += -T ld_scripts/avr5.x -Wl,-Map,image.map -mmcu=$(MCU)
+endif
 
 endif # MAKECMDGOALS!=menuconfig
 endif # MAKECMDGOALS!=mrproper
 endif # MAKECMDGOALS!=clean
 
 ifeq ($(BOOTLOADER_SUPPORT),y)  
-LDFLAGS += -Wl,--section-start=.text=0xE000
-CFLAGS  += -mcall-prologues
+  LDFLAGS += -Wl,--section-start=.text=0xE000
+  CFLAGS  += -mcall-prologues
 endif
 
 
