@@ -25,14 +25,15 @@
 #if defined MENU_SUPPORT && defined GAME_KART
 // icon (TODO: convert to hex)
 static const uint8_t icon[8] PROGMEM =
-	{	0b11100001,
-		0b11100001,
-		0b11000011,
-		0b10000111,
-		0b10000111,
-		0b11000011,
-		0b11000011,
-		0b10010111};
+	{	0xE1, 	// 0b11100001,
+		0xE1,	// 0b11100001,
+		0xC3,	// 0b11000011,
+		0x87,	// 0b10000111,
+		0x87,	// 0b10000111,
+		0xC3,	// 0b11000011,
+		0xC3,	// 0b11000011,
+		0x97,	// 0b10010111
+	};
 
 game_descriptor_t kart_game_descriptor __attribute__((section(".game_descriptors"))) =
 {
@@ -41,44 +42,64 @@ game_descriptor_t kart_game_descriptor __attribute__((section(".game_descriptors
 };
 #endif
 
-#define WAIT 20
+#define WAIT 15
 
-#define DRIVEDIV 5
-#define MOVEDIV 1
-#define DECREASE_WIDTH_DIV 600
+#define DRIVE_DIV 10
 #define DIRECTION_DIV 20
+#define DECREASE_WIDTH_DIV 300
+#define ACCELERATE_DIV 800
 
-#define KEY_IGNORE 10
+#define CURVE_PROP 50
+#define OBSTACLE_PROP 30
+// !! OBSTACLE_DIV in relation to drive steps
+#define OBSTACLE_DIV 3
+#define BOOST_CYCLES 150
+#define BOOST_MULTIPLIER 5
+
+#define KEY_IGNORE_INITIAL 15
+#define KEY_IGNORE 7
 
 #define CARCOLOR 3
 #define BORDERCOLOR 2
 #define LINECOLOR 1
+#define OBSTACLE_COLOR 3
 
-#define CURVE_PROP 50
-
-uint8_t borders[NUM_ROWS][2];
-uint8_t key_ignore[2];
+// borders = (middle, width, obstacle_pos)
+uint8_t borders[NUM_ROWS][3];
+uint32_t extra_score = 0;
 
 void kart_game(){
 
 	// Initialisation
+	uint32_t decrease_width_div = DECREASE_WIDTH_DIV;
+	uint8_t key_ignore[2];
+	uint8_t drive_div = DRIVE_DIV;
 	uint8_t carpos = NUM_COLS / 2;
 	uint32_t cycle = 0;
-	uint8_t draw_line = 1;
+	uint8_t draw_middle_line = 1;
 	uint8_t width = NUM_COLS - 2;
 	uint8_t middle = NUM_COLS / 2;
+	// obstacle_pos == 0 --> no obstacle
+	uint8_t obstacle_pos = 0;
 	char game_over[100] = "";
+	uint32_t boost_till = 0;
+	uint8_t boost_multiplier = 1;
 
 	key_ignore[0] = 0;
 	key_ignore[1] = 0;
 
 	clear_screen(0);
 
-	// init border memory
+	// init street memory
 	for(uint8_t row = 0; row < NUM_ROWS; row++){
 		borders[row][0] = middle;
 		borders[row][1] = NUM_COLS;
+		borders[row][2] = 0;
 	}
+
+	// init street border
+	line((pixel){0,0}, (pixel){0,NUM_ROWS}, BORDERCOLOR);
+	line((pixel){NUM_COLS-1,0}, (pixel){NUM_COLS-1,NUM_ROWS}, BORDERCOLOR);
 
 	setpixel((pixel){carpos, NUM_ROWS-1}, CARCOLOR);
 
@@ -86,23 +107,44 @@ void kart_game(){
 	while(1){
 
 		// DECREASE WIDTH
-		if(cycle % DECREASE_WIDTH_DIV == 0){
+		if(cycle % decrease_width_div == 0){
 			width--;
+			decrease_width_div = decrease_width_div*2;
+		}
+
+		// INCREASE SPEED
+		if(cycle % ACCELERATE_DIV == 0 ){
+			drive_div--;
 		}
 
 		// MOVE
-		if (JOYISLEFT && key_ignore[0] <= 0){
+		if (JOYISLEFT && key_ignore[0] == 1){
 			setpixel((pixel){carpos, NUM_ROWS-1}, 0);
 			carpos++;
 
 			key_ignore[0] = KEY_IGNORE;
 			key_ignore[1] = 0;
-		}else if (JOYISRIGHT && key_ignore[1] <= 0){
+		}else if (JOYISRIGHT && key_ignore[1] == 1){
 			setpixel((pixel){carpos, NUM_ROWS-1}, 0);
 			carpos--;
 
 			key_ignore[1] = KEY_IGNORE;
 			key_ignore[0] = 0;
+		}else if (JOYISLEFT && key_ignore[0] <= 0){
+			setpixel((pixel){carpos, NUM_ROWS-1}, 0);
+			carpos++;
+
+			key_ignore[0] = KEY_IGNORE_INITIAL;
+			key_ignore[1] = 0;
+		}else if (JOYISRIGHT && key_ignore[1] <= 0){
+			setpixel((pixel){carpos, NUM_ROWS-1}, 0);
+			carpos--;
+
+			key_ignore[1] = KEY_IGNORE_INITIAL;
+			key_ignore[0] = 0;
+		}else if(JOYISUP && boost_till == 0){
+			boost_till = cycle + BOOST_CYCLES;
+			boost_multiplier = BOOST_MULTIPLIER;
 		}else if(!(JOYISRIGHT || JOYISLEFT)){
 			key_ignore[1] = 0;
 			key_ignore[0] = 0;
@@ -110,6 +152,14 @@ void kart_game(){
 
 		if(check_collision(carpos)){
 			break;
+		}
+
+		if(boost_till <= cycle && boost_multiplier > 1){
+			boost_till = cycle + BOOST_CYCLES;
+			boost_multiplier--;
+		}else if(boost_multiplier == 1){
+			boost_till = 0;
+			extra_score += BOOST_CYCLES * BOOST_MULTIPLIER;
 		}
 
 
@@ -125,12 +175,12 @@ void kart_game(){
 		}
 
 		// DRIVE-STEP
-		if(cycle % DRIVEDIV == 0){
+		if(cycle % (drive_div / boost_multiplier) == 0){
 			// shift pixmap down
 			drive();
 
 			// save border state
-			save_borders(middle, width);
+			save_street(middle, width, obstacle_pos);
 
 			// draw new first line
 			unsigned int px;
@@ -139,16 +189,26 @@ void kart_game(){
 					setpixel((pixel){px, 0}, BORDERCOLOR);
 				}
 			}
-		}
 
-		// toggle drawing the middle line
-		if(cycle % (DRIVEDIV*4) == 0){
-			draw_line = 1-draw_line;
-		}
+			// toggle drawing the middle line
+			if(cycle % ((drive_div / boost_multiplier)*4) == 0){
+				draw_middle_line = 1-draw_middle_line;
+			}
 
-		// paint middle line
-		if(width > 6 && draw_line){
-			setpixel((pixel){middle, 0}, LINECOLOR);
+			// paint middle line
+			if(width > 6 && draw_middle_line){
+				setpixel((pixel){middle, 0}, LINECOLOR);
+			}
+
+			// set obstacle
+			obstacle_pos = 0;
+			if(cycle % OBSTACLE_DIV == 0 ){
+				int rnd = random8();
+				if(rnd < OBSTACLE_PROP){
+					obstacle_pos = (random8() % width) + (middle - width/2);
+					setpixel((pixel){obstacle_pos, 0}, OBSTACLE_COLOR);
+				}
+			}
 		}
 
 		// Paint car
@@ -190,17 +250,20 @@ void drive(void){
 }
 
 /**
- * Save the border state at the top line, so collision detection can
+ * Save the street state at the top line, so collision detection can
  * work in the last line (where the car is).
  */
-void save_borders(uint8_t middle, uint8_t width){
+void save_street(uint8_t middle, uint8_t width, uint8_t obstacle_pos){
 	uint8_t row;
 	for(row = NUM_ROWS-1; row > 0 ; row--){
 		borders[row][0] = borders[row-1][0];
 		borders[row][1] = borders[row-1][1];
+		borders[row][2] = borders[row-1][2];
 	}
 	borders[0][0] = middle;
 	borders[0][1] = width;
+	borders[0][2] = obstacle_pos;
+
 }
 
 /**
@@ -209,6 +272,7 @@ void save_borders(uint8_t middle, uint8_t width){
 uint8_t check_collision(uint8_t carpos){
 	uint8_t middle = borders[NUM_ROWS-1][0];
 	uint8_t width = borders[NUM_ROWS-1][1];
+	uint8_t obstacle_pos = borders[NUM_ROWS-1][2];
 
-	return ( carpos<middle-(width/2) || carpos >= middle+(width/2) );
+	return ( carpos<middle-(width/2) || carpos >= middle+(width/2) || (obstacle_pos != 0 && carpos == obstacle_pos) );
 }
