@@ -27,6 +27,10 @@ ifeq ($(BORG_HW),HW_BORG_MH)
   SRC = borg_hw_borg_mh.c
 endif
 
+ifeq ($(BORG_HW),HW_LOLSHIELD)
+  SRC = borg_hw_lolshield.c
+endif
+
 ifeq ($(BORG_HW),HW_BORG_LSJO)
   SRC = borg_hw_borg_lsjo.c
 endif

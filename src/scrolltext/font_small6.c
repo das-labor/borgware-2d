@@ -1,6 +1,6 @@
 #include "font.h"
 
-unsigned int PROGMEM fontIndex_small6[] = {                                    
+unsigned int const PROGMEM fontIndex_small6[] = {
                                     0, /*   */
                                     1, /* ! */
                                     2, /* " */
@@ -96,14 +96,14 @@ unsigned int PROGMEM fontIndex_small6[] = {
                                     309, /* | */
                                     310, /* } */
                                     312, /* ~ */
-                                    316, /* ß */
-                                    321, /* ä */
-                                    324, /* ö */                                                                                                            
-                                    328, /* ü */	                                
+                                    316, /* ï¿½ */
+                                    321, /* ï¿½ */
+                                    324, /* ï¿½ */                                                                                                            
+                                    328, /* ï¿½ */	                                
                                     331
 };
 
-unsigned char PROGMEM fontData_small6[] = {
+unsigned char const PROGMEM fontData_small6[] = {
                                 0x00, /*          */
                                 0x2f, /*   # #### */
                                 0x03, /*       ## */

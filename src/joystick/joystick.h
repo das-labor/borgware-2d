@@ -41,6 +41,14 @@ void joy_init();
 #		define JOYISFIRE  (! ((1<<4) & hc165_joystick_val))
 
 
+#	elif defined(NULL_JOYSTICK_SUPPORT)
+
+#		define JOYISUP    (0)
+#		define JOYISDOWN  (0)
+#		define JOYISLEFT  (0)
+#		define JOYISRIGHT (0)
+#		define JOYISFIRE  (0)
+
 #	else
 
 #		define JOYISUP    (!(JOYSTICK_PIN_UP    & (1<<JOYSTICK_BIT_UP   )))

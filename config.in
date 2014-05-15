@@ -9,6 +9,7 @@ comment "General Setup"
  	  "ATmega8        atmega8     \
 	   ATmega32       atmega32    \
 	   ATmega328      atmega328   \
+	   ATmega328p     atmega328p  \
 	   ATmega644      atmega644   \
 	   ATmega644p     atmega644p  \
 	   ATmega1284     atmega1284  \
