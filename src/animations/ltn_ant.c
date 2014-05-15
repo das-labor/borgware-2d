@@ -35,27 +35,20 @@
 #define NX (UNUM_COLS - 1u)
 #define NY (UNUM_ROWS - 1u)
 
-#if UNUM_ROWS == UNUM_COLS
-	static coord_t const dcomp[] = {0, P, NX};
-	#define xdcomp dcomp
-	#define ydcomp dcomp
-#else
-	static coord_t const xdcomp[] = {0, P, NX};
-	static coord_t const ydcomp[] = {0, P, NY};
-#endif
+static coord_t const xdcomp[] = {0, P,  0, NX};
+static coord_t const ydcomp[] = {P, 0, NY,  0};
 
-
+typedef struct ant_s {
+	coord_t  x,  y;
+	coord_t ox, oy; /* Used to set old pixels to brightness 2 */
+	unsigned char vector_index;
+} ant_t;
 
 void ltn_ant() {
 	clear_screen(0);
 
-	struct {
-		coord_t  x,  y;
-		coord_t ox, oy; /* Used to set old pixels to brightness 2 */
-		coord_t dx, dy; /* Vector can only be (0,1),(1,0),(0,-1),(-1,0) */
-	} ant; 
-		                    
-	unsigned char temp;
+	ant_t ant;
+
 	unsigned int cycles = 500;
 
 	/* Random start position and direction */
@@ -63,10 +56,7 @@ void ltn_ant() {
 	ant.y = random8() % UNUM_ROWS;
 
 	/* Make sure we do have a valid vector */
-	ant.dx = xdcomp[random8() % 3];
-	do {
-		ant.dy = ydcomp[random8() % 3];
-	} while(ant.dx == ant.dy);
+	ant.vector_index = random8() % 4u;
 
 	ant.ox = ant.x;
 	ant.oy = ant.y;
@@ -76,9 +66,8 @@ void ltn_ant() {
 		if(get_pixel((pixel) {ant.x, ant.y}) == 0) {
 			setpixel((pixel) {ant.x, ant.y}, 3);
 			
-			temp   = ant.dx;
-			ant.dx = ant.dy;
-			ant.dy =  -temp; /* Turn 90 degrees to the right */
+			// turn right
+			ant.vector_index = (ant.vector_index + 1u) % 8u;
 			
 			/* Lets the last pixel be darker than the latest */
 			if((ant.ox != ant.x) || (ant.oy != ant.y))
@@ -86,20 +75,17 @@ void ltn_ant() {
 
 			ant.ox = ant.x;
 			ant.oy = ant.y;
-
 		} else {
 			setpixel((pixel) {ant.x, ant.y}, 0);
-			
-			temp   = ant.dy;
-			ant.dy = ant.dx;
-			ant.dx =  -temp; /* Turn 90 degrees to the left */
+			// turn left
+			ant.vector_index = (ant.vector_index + 3u) % 8u;
 		}
 
 		wait(100);
 
 		/* Playing field is modeled after a torus */
-		ant.x = (coord_t)(ant.x + ant.dx) % UNUM_COLS;
-		ant.y = (coord_t)(ant.y + ant.dy) % UNUM_ROWS;
+		ant.x = (coord_t)(ant.x + xdcomp[ant.vector_index]) % UNUM_COLS;
+		ant.y = (coord_t)(ant.y + ydcomp[ant.vector_index]) % UNUM_ROWS;
 
 		cycles--;
 	}
