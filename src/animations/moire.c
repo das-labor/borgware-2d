@@ -45,25 +45,25 @@ void moire(void)
 		// walk around the border; do that by mapping a linear increasing value
 		// to appropriate screen coordinates
 
-		// first pixel is between top right and top left corner
-		if (pos < NUM_COLS)
+		// pixel is between top right and top left corner
+		if (pos < (NUM_COLS - 1))
 		{
-			p1.x = pos;
+			p1.x = pos + 1;
 		}
-		// first pixel is between top left and bottom left corner
-		else if (pos < (NUM_COLS + NUM_ROWS - 1))
+		// pixel is between top left and bottom left corner
+		else if (pos < (NUM_COLS + NUM_ROWS - 2))
 		{
-			p1.y = pos - (NUM_COLS - 1);
+			p1.y = pos - (NUM_COLS - 2);
 		}
-		// first pixel is between bottom left and bottom right corner
-		else if (pos < (2 * NUM_COLS + NUM_ROWS - 2))
+		// pixel is between bottom left and bottom right corner
+		else if (pos < (2 * NUM_COLS + NUM_ROWS - 3))
 		{
-			p1.x = 2 * NUM_COLS + NUM_ROWS - 3 - pos;
+			p1.x = 2 * NUM_COLS + NUM_ROWS - 4 - pos;
 		}
-		// first pixel is between bottom right and top left corner
+		// pixel is between bottom right and top left corner
 		else
 		{
-			p1.y = 3 * NUM_COLS + NUM_ROWS - 4 - pos;
+			p1.y = 2 * NUM_COLS + 2 * NUM_ROWS - 5 - pos;
 		}
 
 		// second pixel in opposite direction
