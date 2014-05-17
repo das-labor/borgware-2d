@@ -54,7 +54,8 @@ static signed char cos_i(unsigned char const angle) {
 
 
 #define NUM_CIRCLE 7
-
+#define W (NUM_COLS * 4)
+#define H (NUM_ROWS * 4)
 
 /**
  * Draws a black hole like pattern (viewed from different perspectives).
@@ -71,8 +72,8 @@ void blackhole(void) {
 			for (signed char j = 0; j < 64; j += 8) {
 				signed char a = (j & 0x08) ? 0 : 4;
 				pixel p;
-				p.x = (64 + cos_i(angle + j + a) * helpRadius / 64) >> 3;
-				p.y = (64 + sin_i(angle + add + j + a) * helpRadius / 64) >> 3;
+				p.x = (W + cos_i(angle + j + a) * helpRadius / W) / 8u;
+				p.y = (H + sin_i(angle + add + j + a) * helpRadius / H) / 8u;
 				if ((p.x < NUM_COLS) && (p.y < NUM_ROWS)) {
 					setpixel(p, 3);
 				}
