@@ -25,8 +25,12 @@
 void moire(void)
 {
 	// add rotating color map
-#if NUMPLANE == 3
+#if NUMPLANE == 3 && NUM_COLS == 16 && NUM_ROWS == 16
 	static unsigned char const gradient[] = {0, 1, 2, 3, 2, 1};
+#	define WRAP 6u
+#elif NUMPLANE == 3 && NUM_COLS == 14 && NUM_ROWS == 9
+	static unsigned char const gradient[] = {0, 1, 1, 2, 2, 3, 3, 2, 2, 1, 1};
+#	define WRAP 11u
 #else
 	static unsigned char gradient[NUMPLANE * 2u] = {0};
 	for (unsigned char i = 1; i <= NUMPLANE; ++i)
@@ -34,6 +38,7 @@ void moire(void)
 		gradient[i] = i;
 		gradient[(NUMPLANE * 2) - i] = i;
 	}
+#	define WRAP (2u * NUMPLANE)
 #endif
 
 	unsigned int cycles = 30000;
@@ -81,7 +86,7 @@ void moire(void)
 			wait(40);
 		}
 		// ensure the color index keeps within bounds
-		color_index %= (2u * NUMPLANE);
+		color_index %= WRAP;
 	}
 }
 
