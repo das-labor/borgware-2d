@@ -47,45 +47,32 @@ void test_palette2(){
 
 
 #ifdef ANIMATION_SPIRAL
-static void walk(cursor_t* cur, unsigned char steps, int delay){
-	unsigned char x;
-	for(x=steps;x--;){
-		set_cursor(cur, next_pixel(cur->pos, cur->dir));
-		wait(delay);
-	}
-}
-
-void spiral(int delay){
+void spiral(int delay) {
 	clear_screen(0);
+	static signed char const PROGMEM delta[5] = { 0, -1, 0, 1, 0 };
+	unsigned char length[2] = { NUM_ROWS, NUM_COLS - 1 };
+	unsigned char x = NUM_COLS - 1, y = NUM_ROWS, i = 0;
 
-	cursor_t cur;
-	cur.dir = right;
-	cur.mode = set;
-	set_cursor (&cur, (pixel){NUM_COLS-1,0});
-
-	unsigned char clearbit=0;
-	while(clearbit == 0){
-
-		clearbit = 1;
-		while (!get_next_pixel(cur.pos, cur.dir)){
-			clearbit = 0;
-			walk(&cur, 1, delay);
+	while (length[i & 0x01]) {
+		for (unsigned char j = 0; j < length[i & 0x01]; ++j) {
+			x += pgm_read_byte(&delta[i]);
+			y += pgm_read_byte(&delta[i + 1]);
+			setpixel((pixel){x, y}, NUMPLANE);
+			wait(delay);
 		}
-		cur.dir = direction_r(cur.dir);
+		length[i++ & 0x01]--;
+		i %= 4;
 	}
-
-	cur.mode = clear;
-	set_cursor(&cur, (pixel){(NUM_COLS/2)-1,(NUM_ROWS/2)-1});
-
-	for(clearbit=0;clearbit==0;){
-		if( get_next_pixel(cur.pos, direction_r(cur.dir)) ){
-			cur.dir = direction_r(cur.dir);
+	i = (i + 2u) % 4u;
+	while (length[0] <= NUM_ROWS && length[1] < NUM_COLS) {
+		for (unsigned char j = 0; j < length[i & 0x01]; ++j) {
+			setpixel((pixel){x, y}, 0);
+			x += pgm_read_byte(&delta[i]);
+			y += pgm_read_byte(&delta[i + 1]);
+			wait(delay);
 		}
-		if( get_next_pixel(cur.pos, cur.dir) == 1 ){
-			walk(&cur , 1, delay);
-		}else{
-			clearbit = 1;
-		}
+		length[(i += 3) & 0x01]++;
+		i %= 4;
 	}
 }
 #endif
@@ -179,17 +166,18 @@ void fire()
  * void random_bright(void)
  *  by Daniel Otte
  */
-void random_bright(unsigned cycles){
-	uint8_t t,x,y;
-	while(cycles--){
-		for(y=0; y<NUM_ROWS; ++y)
-			for(x=0; x<NUM_COLS/4; ++x){
-				t=random8();
-				setpixel((pixel){x*4+0, y}, 0x3&(t>>0));
-				setpixel((pixel){x*4+1, y}, 0x3&(t>>2));
-				setpixel((pixel){x*4+2, y}, 0x3&(t>>4));
-				setpixel((pixel){x*4+3, y}, 0x3&(t>>6));
+void random_bright(unsigned int cycles) {
+	while (cycles--) {
+		for (unsigned char p = NUMPLANE; p--;) {
+			for (unsigned char y = NUM_ROWS; y--;) {
+				for (unsigned char x = LINEBYTES; x--;) {
+					if (p < (NUMPLANE - 1)) {
+						pixmap[p][y][x] |= pixmap[p - 1][y][x];
+					}
+					pixmap[p][y][x] = random8();
+				}
 			}
+		}
 		wait(200);
 	}
 }
