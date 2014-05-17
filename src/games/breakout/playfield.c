@@ -67,7 +67,7 @@ static void brick_damage (int8_t in_x, int8_t in_y)
 
 void playfield_set (uint8_t in_x, uint8_t in_y, game_field_t in_field)
 {
-	if (in_x >= NUM_ROWS || in_y >= NUM_COLS)
+	if (in_x >= NUM_COLS || in_y >= NUM_ROWS)
 	{
 		return;
 	}
@@ -78,10 +78,10 @@ int8_t check_bounce (int8_t in_x, int8_t in_y)
 {
 	int8_t ov = 0;
 	/* overflow check */
-	if (in_x >= NUM_ROWS || in_x < 0)
+	if (in_x >= NUM_COLS || in_x < 0)
 		ov |= BOUNCE_X;
 	
-	if (in_y >= NUM_COLS || in_y < 0)
+	if (in_y >= NUM_ROWS || in_y < 0)
 		ov |= BOUNCE_Y;
 	
 	if (ov)
@@ -119,9 +119,9 @@ void playfield_draw ()
 {
 	uint8_t x,y;
 
-	for (x=0;x<NUM_ROWS;x++)
+	for (x=0;x<NUM_COLS;x++)
 	{
-		for (y=0;y<NUM_COLS;y++)
+		for (y=0;y<NUM_ROWS;y++)
 		{
 			draw_single_field (x,y, (*playfield)[x][y]);
 		}
