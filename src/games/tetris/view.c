@@ -52,23 +52,8 @@
 /** color of line counter */
 #define TETRIS_VIEW_COLORCOUNTER 2
 
-
-#ifdef GAME_TETRIS_FP
-	#if NUM_ROWS < NUM_COLS
-		#define VIEWCOLS NUM_ROWS
-		#define VIEWROWS NUM_ROWS
-	#elif NUM_ROWS > NUM_COLS
-		#define VIEWCOLS NUM_COLS
-		#define VIEWROWS NUM_COLS
-	#else
-		#define VIEWCOLS NUM_COLS
-		#define VIEWROWS NUM_ROWS
-	#endif
-#else
-	#define VIEWCOLS NUM_COLS
-	#define VIEWROWS NUM_ROWS
-#endif
-
+#define VIEWCOLS NUM_COLS
+#define VIEWROWS NUM_ROWS
 
 #if VIEWROWS >= 20
 	#define TETRIS_VIEW_YOFFSET_DUMP         ((VIEWROWS - 20) / 2)

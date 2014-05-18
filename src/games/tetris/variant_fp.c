@@ -32,6 +32,9 @@
 #include "variant_std.h"
 #include "variant_fp.h"
 
+#if (NUM_ROWS != NUM_COLS)
+		#error "First Person Tetris does not support non-square displays!"
+#endif
 
 /***************
  * entry point *
