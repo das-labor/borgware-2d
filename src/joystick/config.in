@@ -194,7 +194,7 @@ if [ "$JOYSTICK_SUPPORT" = "y" ]; then
 ###############################################################################
 
 ###################### null joystick menu ####################################
-   dep_bool "null joystick support" NULL_JOYSTICK_SUPPORT y
+   dep_bool "null joystick support" NULL_JOYSTICK_SUPPORT n
 ###############################################################################
 
 
