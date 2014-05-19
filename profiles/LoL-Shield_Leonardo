@@ -5,7 +5,7 @@
 #
 # General Setup
 #
-MCU=atmega328p
+MCU=atmega32u4
 FREQ=16000000
 
 #
@@ -20,6 +20,7 @@ BORG_HW=HW_LOLSHIELD
 # lolshield setup
 #
 USER_TIMER0_FOR_WAIT=1
+BRIGHTNESS=127
 
 #
 # Features

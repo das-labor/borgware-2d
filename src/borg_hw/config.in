@@ -14,7 +14,7 @@ choice 'Hardware Driver'			\
     Andre-Borg             HW_BORG_ANDRE \
     Laufschrift-Borg	   HW_BORG_LS \
     Laufschrift-Borg-MH    HW_BORG_MH \
-    LoL-Shield/Diavolino   HW_LOLSHIELD \
+    LoL-Shield             HW_LOLSHIELD \
     FFM-Jochen             HW_BORG_LSJO \
     FFM-LedBrett           HW_LEDBRETT \
     Borg-Mini              HW_BORG_MINI \

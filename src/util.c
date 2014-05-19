@@ -21,7 +21,6 @@ extern jmp_buf newmode_jmpbuf;
 
 
 void wait(int ms){
-
 /* Always use Timer1 except for the Arduino/LoL Shield platform. */
 #ifndef USER_TIMER0_FOR_WAIT
 	TCCR1B = _BV(WGM12) | _BV(CS12); //CTC Mode, clk/256
@@ -35,7 +34,6 @@ void wait(int ms){
 	TCCR0B = _BV(CS02);
 	OCR0A = (F_CPU/256000);	//1000Hz
 #endif
-
 
 	for(;ms>0;ms--){
 
@@ -57,7 +55,7 @@ void wait(int ms){
 		}
 #endif
 
-#if defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__) || defined (__AVR_ATmega328__) || defined (__AVR_ATmega328P__) || (__AVR_ATmega1284P__) || defined (__AVR_ATmega1284__)
+#if defined (__AVR_ATmega32U4__) || defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__) || defined (__AVR_ATmega328__) || defined (__AVR_ATmega328P__) || (__AVR_ATmega1284P__) || defined (__AVR_ATmega1284__)
 /* Timer1 for the masses */
 #	ifndef USER_TIMER0_FOR_WAIT
 		while(!(TIFR1 & _BV(OCF1A))); //wait for compare match flag
