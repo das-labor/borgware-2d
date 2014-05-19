@@ -916,5 +916,5 @@ void borg_hw_init() {
 
 	// activate watchdog timer
 	wdt_reset();
-	wdt_enable(WDTO_500MS); // 17ms watchdog
+	wdt_enable(WDTO_15MS); // 15ms watchdog
 }
