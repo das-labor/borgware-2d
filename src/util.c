@@ -55,7 +55,7 @@ void wait(int ms){
 		}
 #endif
 
-#if defined (__AVR_ATmega32U4__) || defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__) || defined (__AVR_ATmega328__) || defined (__AVR_ATmega328P__) || (__AVR_ATmega1284P__) || defined (__AVR_ATmega1284__)
+#if defined (__AVR_ATmega1280__) || defined (__AVR_ATmega2560__) || defined (__AVR_ATmega32U4__) || defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__) || defined (__AVR_ATmega328__) || defined (__AVR_ATmega328P__) || (__AVR_ATmega1284P__) || defined (__AVR_ATmega1284__)
 /* Timer1 for the masses */
 #	ifndef USER_TIMER0_FOR_WAIT
 		while(!(TIFR1 & _BV(OCF1A))); //wait for compare match flag

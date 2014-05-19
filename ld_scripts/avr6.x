@@ -1,10 +1,10 @@
 /* Default linker script, for normal executables */
 OUTPUT_FORMAT("elf32-avr","elf32-avr","elf32-avr")
-OUTPUT_ARCH(avr:51)
+OUTPUT_ARCH(avr:6)
 MEMORY
 {
-  text      (rx)   : ORIGIN = 0, LENGTH = 128K
-  data      (rw!x) : ORIGIN = 0x800100, LENGTH = 0xff00
+  text      (rx)   : ORIGIN = 0, LENGTH = 1024K
+  data      (rw!x) : ORIGIN = 0x800200, LENGTH = 0xfe00
   eeprom    (rw!x) : ORIGIN = 0x810000, LENGTH = 64K
   fuse      (rw!x) : ORIGIN = 0x820000, LENGTH = 1K
   lock      (rw!x) : ORIGIN = 0x830000, LENGTH = 1K
