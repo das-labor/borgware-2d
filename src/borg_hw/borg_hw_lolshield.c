@@ -234,7 +234,10 @@ static void compose_cycle(uint8_t const cycle, uint8_t plane) {
 	uint8_t *const p = &pixmap[plane][0][0];
 
 #if defined (__AVR_ATmega1280__) || defined (__AVR_ATmega2560__)
-#	warning "BEWARE: Borgware-2D has not been tested on Arduino Mega 1280/2560!"
+#	ifdef __AVR_ATmega1280__
+#		warning "BEWARE: Borgware-2D has not been tested on Arduino Mega 1280!"
+#	endif
+
 	// Set sink pin to Vcc/source, turning off current.
 	static uint8_t sink_b = 0, sink_e = 0, sink_g = 0, sink_h = 0;
 	PINB = sink_b;
@@ -247,13 +250,13 @@ static void compose_cycle(uint8_t const cycle, uint8_t plane) {
 	DDRG &= ~0x20;
 	DDRH &= ~0x78;
 
-	static uint8_t const sink_b_cycle[] =
+	static uint8_t const PROGMEM sink_b_cycle[] =
 		{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x20, 0x40, 0x80};
-	static uint8_t const sink_e_cycle[] =
+	static uint8_t const PROGMEM sink_e_cycle[] =
 		{0x10, 0x20, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-	static uint8_t const sink_g_cycle[] =
+	static uint8_t const PROGMEM sink_g_cycle[] =
 		{0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-	static uint8_t const sink_h_cycle[] =
+	static uint8_t const PROGMEM sink_h_cycle[] =
 		{0x00, 0x00, 0x00, 0x00, 0x08, 0x10, 0x20, 0x40, 0x00, 0x00, 0x00, 0x00};
 
 	uint8_t pins_b = sink_b = pgm_read_byte(&sink_b_cycle[cycle]);
@@ -662,7 +665,7 @@ static void compose_cycle(uint8_t const cycle, uint8_t plane) {
 	// (I could have done this with a lookup table, but that would be slower as
 	// non-constant bit shifts are quite expensive on AVR)
 	// NOTE: (0,0) is UPPER RIGHT in the Borgware realm
-    if (plane < NUMPLANE) {
+	if (plane < NUMPLANE) {
 		switch(cycle) {
 		case 0:
 			pins_b |= (0x02u & p[ 0]) << 4; // x= 1, y= 0, mapped pin D13
@@ -815,7 +818,7 @@ static void compose_cycle(uint8_t const cycle, uint8_t plane) {
 			pins_d |= (0x40u & p[16]) >> 1; // x= 6, y= 8, mapped pin D5
 			break;
 		}
-    }
+	}
 
 	// Enable pullups on new output pins.
 	PORTD = pins_d;
