@@ -39,7 +39,7 @@
 #define RC_POS 0
 
 static
-void gamma(uint32_t* a){
+void noekeon_gamma(uint32_t* a){
 	uint32_t tmp;
 	
 	a[1] ^= ~((a[3]) | (a[2]));
@@ -94,7 +94,7 @@ void noekeon_round(uint32_t* key, uint32_t* state, uint8_t const1, uint8_t const
 	theta(key, state);
 	((uint8_t*)state)[RC_POS] ^= const2;
 	pi1(state);
-	gamma(state);
+	noekeon_gamma(state);
 	pi2(state);
 }
 
