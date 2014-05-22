@@ -172,7 +172,7 @@ void random_bright(unsigned int cycles) {
 			for (unsigned char y = NUM_ROWS; y--;) {
 				for (unsigned char x = LINEBYTES; x--;) {
 					if (p < (NUMPLANE - 1)) {
-						pixmap[p][y][x] |= pixmap[p - 1][y][x];
+						pixmap[p][y][x] |= pixmap[p + 1][y][x];
 					}
 					pixmap[p][y][x] = random8();
 				}
