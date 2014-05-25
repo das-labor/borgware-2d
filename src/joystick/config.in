@@ -1,18 +1,36 @@
-dep_bool_menu "joystick support" JOYSTICK_SUPPORT y
+mainmenu_option next_comment
+comment "Joystick Support"
+
+bool "Joystick Support" JOYSTICK_SUPPORT n
+
+if [ "x$JOYSTICK_CHOICE" == "x" ] ; then
+   define_string JOYSTICK_CHOICE "JOY_PARALLEL"
+fi
 
 if [ "$JOYSTICK_SUPPORT" = "y" ]; then
-###################### Parallel joystick menu #################################
-   dep_bool_menu "parallel joystick support" PARALLEL_JOYSTICK_SUPPORT y
+   choice 'Joystick Type' \
+      "Atari-9-Pin   JOY_PARALLEL \
+       NES-Game-Pad  JOY_NES_PAD \
+       RFM12         JOY_RFM12 \
+       LED-Brett     JOY_LEDBRETT \
+       LoL-Shield    JOY_LOLSHIELD \
+       None          JOY_NULL" \
+       'Atari-9-Pin' JOYSTICK_CHOICE
 
-   if [ "$PARALLEL_JOYSTICK_SUPPORT" = "y" ]; then
-      choice 'Pin up'			\
+###################### parallel joystick menu #################################
+   if [ "$JOYSTICK_CHOICE" == "JOY_PARALLEL" ]; then
+      mainmenu_option next_comment
+      comment "Joystick Settings"
+
+      define_bool PARALLEL_JOYSTICK_SUPPORT y
+      choice 'Pin up' \
          "PINA  PINA \
           PINB  PINB \
           PINC  PINC \
           PIND  PIND" \
          'PINB' JOYSTICK_PIN_UP
 
-      choice 'Bit up'			\
+      choice 'Bit up' \
          "Bit0 0 \
           Bit1 1 \
           Bit2 2 \
@@ -23,14 +41,14 @@ if [ "$JOYSTICK_SUPPORT" = "y" ]; then
           Bit7 7" \
          'Bit0' JOYSTICK_BIT_UP
 
-      choice 'Pin down'			\
+      choice 'Pin down' \
          "PINA  PINA \
           PINB  PINB \
           PINC  PINC \
           PIND  PIND" \
          'PINB' JOYSTICK_PIN_DOWN
 
-      choice 'Bit down'			\
+      choice 'Bit down' \
          "Bit0 0 \
           Bit1 1 \
           Bit2 2 \
@@ -41,14 +59,14 @@ if [ "$JOYSTICK_SUPPORT" = "y" ]; then
           Bit7 7" \
          'Bit1' JOYSTICK_BIT_DOWN
 
-      choice 'Pin left'			\
+      choice 'Pin left' \
          "PINA  PINA \
           PINB  PINB \
           PINC  PINC \
           PIND  PIND" \
          'PINB' JOYSTICK_PIN_LEFT
 
-      choice 'Bit left'			\
+      choice 'Bit left' \
          "Bit0 0 \
           Bit1 1 \
           Bit2 2 \
@@ -59,14 +77,14 @@ if [ "$JOYSTICK_SUPPORT" = "y" ]; then
           Bit7 7" \
          'Bit2' JOYSTICK_BIT_LEFT
 
-      choice 'Pin right'			\
+      choice 'Pin right' \
          "PINA  PINA \
           PINB  PINB \
           PINC  PINC \
           PIND  PIND" \
          'PINB' JOYSTICK_PIN_RIGHT
 
-      choice 'Bit right'			\
+      choice 'Bit right' \
          "Bit0 0 \
           Bit1 1 \
           Bit2 2 \
@@ -77,14 +95,14 @@ if [ "$JOYSTICK_SUPPORT" = "y" ]; then
           Bit7 7" \
          'Bit3' JOYSTICK_BIT_RIGHT
 
-      choice 'Pin fire'			\
+      choice 'Pin fire' \
          "PINA  PINA \
           PINB  PINB \
           PINC  PINC \
           PIND  PIND" \
          'PIND' JOYSTICK_PIN_FIRE
 
-      choice 'Bit fire'			\
+      choice 'Bit fire' \
          "Bit0 0 \
           Bit1 1 \
           Bit2 2 \
@@ -94,37 +112,40 @@ if [ "$JOYSTICK_SUPPORT" = "y" ]; then
           Bit6 6 \
           Bit7 7" \
          'Bit3' JOYSTICK_BIT_FIRE
-   fi
 
-   endmenu
+      endmenu
+   fi
 ###############################################################################
 
-###################### NES-Pad menu #################################
-   dep_bool_menu "nes-pad support" NES_PAD_SUPPORT y
+###################### NES-Pad menu ###########################################
+   if [ "$JOYSTICK_CHOICE" == "JOY_NES_PAD" ]; then
+      mainmenu_option next_comment
+      comment "Joystick Settings"
 
-   if [ "$NES_PAD_SUPPORT" = "y" ]; then
-      choice 'Port clk'			\
+      define_bool NES_PAD_SUPPORT y
+
+      choice 'Port clk' \
          "PORTA  PORTA \
           PORTB  PORTB \
           PORTC  PORTC \
           PORTD  PORTD" \
          'PORTB' NES_PAD_PORT_CLK
 
-      choice 'Port ds'			\
+      choice 'Port ds' \
          "PORTA  PORTA \
           PORTB  PORTB \
           PORTC  PORTC \
           PORTD  PORTD" \
-         'PORTB' NES_PAD_PORT_PL 
+         'PORTB' NES_PAD_PORT_PL
 
-      choice 'Pin pl'			\
+      choice 'Pin pl' \
          "PORTA  PORTA \
           PORTB  PORTB \
           PORTC  PORTC \
           PORTD  PORTD" \
          'PORTB' NES_PAD_PORT_DS
 
-      choice 'Bit clk'			\
+      choice 'Bit clk' \
          "Bit0 0 \
           Bit1 1 \
           Bit2 2 \
@@ -135,7 +156,7 @@ if [ "$JOYSTICK_SUPPORT" = "y" ]; then
           Bit7 7" \
          'Bit0' NES_PAD_BIT_CLK
 
-      choice 'Bit pl'			\
+      choice 'Bit pl' \
          "Bit0 0 \
           Bit1 1 \
           Bit2 2 \
@@ -146,7 +167,7 @@ if [ "$JOYSTICK_SUPPORT" = "y" ]; then
           Bit7 7" \
          'Bit1' NES_PAD_BIT_PL
 
-      choice 'Bit ds'			\
+      choice 'Bit ds' \
          "Bit0 0 \
           Bit1 1 \
           Bit2 2 \
@@ -157,28 +178,31 @@ if [ "$JOYSTICK_SUPPORT" = "y" ]; then
           Bit7 7" \
          'Bit2' NES_PAD_BIT_DS
 
+      endmenu
    fi
-
-   endmenu
 ###############################################################################
 
 ###################### RFM12 joystick menu ####################################
-   dep_bool_menu "RFM12 Joystick support" RFM12_JOYSTICK_SUPPORT y
-
-   endmenu
+   if [ "$JOYSTICK_CHOICE" == "JOY_RFM12" ]; then
+      define_bool RFM12_JOYSTICK_SUPPORT y
+   fi
+###############################################################################
 
 ###################### 74HC165 joystick menu #################################
-   dep_bool_menu "74HC165 joystick support" HC165_JOYSTICK_SUPPORT y
+   if [ "$JOYSTICK_CHOICE" == "JOY_LEDBRETT" ]; then
+      mainmenu_option next_comment
+      comment "Joystick Settings"
 
-   if [ "$HC165_JOYSTICK_SUPPORT" = "y" ]; then
-      choice 'Port load'			\
+      define_bool HC165_JOYSTICK_SUPPORT y
+
+      choice 'Port load' \
          "PORTA  PORTA \
           PORTB  PORTB \
           PORTC  PORTC \
           PORTD  PORTD" \
          'PORTD' HC165_JOYSTICK_PORT_LOAD
 
-      choice 'Bit load'			\
+      choice 'Bit load' \
          "Bit0 0 \
           Bit1 1 \
           Bit2 2 \
@@ -188,15 +212,22 @@ if [ "$JOYSTICK_SUPPORT" = "y" ]; then
           Bit6 6 \
           Bit7 7" \
          'Bit2' HC165_JOYSTICK_BIT_LOAD
+
+      endmenu
    fi
-
-   endmenu
 ###############################################################################
 
-###################### null joystick menu ####################################
-   bool "null joystick support" NULL_JOYSTICK_SUPPORT n
+###################### LoL Shield joystick menu ###############################
+   if [ "$JOYSTICK_CHOICE" == "JOY_NULL" ]; then
+      define_bool NULL_JOYSTICK_SUPPORT y
+   fi
 ###############################################################################
 
+###################### null joystick menu #####################################
+   if [ "$JOYSTICK_CHOICE" == "JOY_LOLSHIELD" ]; then
+      define_bool LOLSHIELD_JOYSTICK_SUPPORT y
+   fi
+###############################################################################
 
 fi
 

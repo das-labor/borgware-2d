@@ -37,7 +37,12 @@ SCROLL_X_SPEED=10
 SCROLL_Y_SPEED=20
 SCROLLTEXT_TEXT="</#COMMODORE C64 - All your base are belong to us!!!"
 # RFM12_SUPPORT is not set
+
+#
+# Joystick Support
+#
 # JOYSTICK_SUPPORT is not set
+JOYSTICK_CHOICE="JOY_PARALLEL"
 # CAN_SUPPORT is not set
 # MENU_SUPPORT is not set
 
@@ -83,6 +88,7 @@ GOL_DELAY=10
 GOL_CYCLES=360
 # ANIMATION_BREAKOUT is not set
 # ANIMATION_MHERWEG is not set
+# ANIMATION_MOIRE is not set
 # ANIMATION_LTN_ANT is not set
 # ANIMATION_TIME is not set
 TIME_MASTER_ADDR=0x00

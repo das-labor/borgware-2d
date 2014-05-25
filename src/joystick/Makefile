@@ -18,6 +18,9 @@ endif
 ifeq ($(HC165_JOYSTICK_SUPPORT), y)
   SRC  = hc165_joystick.c
 endif
+ifeq ($(LOLSHIELD_JOYSTICK_SUPPORT), y)
+  SRC  = lolshield_joystick.c
+endif
 ifeq ($(NULL_JOYSTICK_SUPPORT), y)
   SRC  = null_joystick.c
 endif
