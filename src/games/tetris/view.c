@@ -52,8 +52,14 @@
 /** color of line counter */
 #define TETRIS_VIEW_COLORCOUNTER 2
 
-#define VIEWCOLS NUM_COLS
-#define VIEWROWS NUM_ROWS
+#if (NUM_ROWS < 16) && (NUM_COLS > NUM_ROWS) && (!defined GAME_TETRIS_FP)
+#	define VIEWCOLS NUM_ROWS
+#	define VIEWROWS NUM_COLS
+#	define VIEW_TILT
+#else
+#	define VIEWCOLS NUM_COLS
+#	define VIEWROWS NUM_ROWS
+#endif
 
 #if VIEWROWS >= 20
 	#define TETRIS_VIEW_YOFFSET_DUMP         ((VIEWROWS - 20) / 2)
@@ -112,6 +118,11 @@ static void tetris_view_setpixel(tetris_bearing_t nBearing,
                                  uint8_t y,
                                  uint8_t nColor)
 {
+#ifdef VIEW_TILT
+	// tilt counter clockwise
+	nBearing = (nBearing + 3) % 4u;
+#endif
+
 	x = VIEWCOLS - 1 - x;
 
 	pixel px;
