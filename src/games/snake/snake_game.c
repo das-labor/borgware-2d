@@ -51,9 +51,14 @@ game_descriptor_t snake_game_descriptor __attribute__((section(".game_descriptor
 	#define SNAKE_MAX_APPLES 10
 #endif
 
-#if !defined SNAKE_CYCLE_DELAY || defined DOXYGEN
+#if !defined SNAKE_GAME_DELAY || defined DOXYGEN
 	/** Delay (in ms) between every state change. */
-	#define SNAKE_CYCLE_DELAY 100
+	#define SNAKE_GAME_DELAY 200
+#endif
+
+#if !defined SNAKE_ANIM_DELAY || defined DOXYGEN
+	/** Delay (in ms) between every state change. */
+	#define SNAKE_ANIM_DELAY 100
 #endif
 
 #if !defined SNAKE_TERMINATION_DELAY || defined DOXYGEN
@@ -192,11 +197,21 @@ static snake_dir_t snake_queryJoystick(void)
  */
 static void snake_initGameProtagonist(snake_protagonist_t *pprotSnake)
 {
-	pprotSnake->aSegments[0] = (pixel){NUM_COLS / 2, NUM_ROWS / 2};
-	pprotSnake->aSegments[1] = (pixel){NUM_COLS / 2, NUM_ROWS / 2 - 1};
+#if NUM_ROWS > NUM_COLS
+	pprotSnake->aSegments[0] =
+			(pixel){(NUM_COLS - 2) / 2 + 1, (NUM_ROWS - 2) / 2 + 1};
+	pprotSnake->aSegments[1] =
+			(pixel){(NUM_COLS - 2) / 2 + 1, (NUM_ROWS - 2) / 2};
+	pprotSnake->dir = SNAKE_DIR_DOWN;
+#else
+	pprotSnake->aSegments[0] =
+			(pixel){(NUM_COLS - 2) / 2 + 1, (NUM_ROWS - 2) / 2 + 1};
+	pprotSnake->aSegments[1] =
+			(pixel){(NUM_COLS - 2) / 2 + 2, (NUM_ROWS - 2) / 2 + 1};
+	pprotSnake->dir = SNAKE_DIR_RIGHT;
+#endif
 	pprotSnake->nTailIndex = 0;
 	pprotSnake->nHeadIndex = 1;
-	pprotSnake->dir = SNAKE_DIR_UP;
 }
 
 #ifdef GAME_SNAKE
@@ -403,7 +418,7 @@ void snake_engine(uint8_t bDemoMode)
 	clear_screen(0);
 	snake_drawBorder();
 
-	for (uint8_t nAppleColor = 0; 1; nAppleColor ^= SNAKE_COLOR_APPLE)
+	for (uint8_t nTick = 0; 1; nTick ^= SNAKE_COLOR_APPLE)
 	{
 		// determine new direction
 #if defined ANIMATION_SNAKE && defined GAME_SNAKE
@@ -415,48 +430,66 @@ void snake_engine(uint8_t bDemoMode)
 		{
 			snake_userControl(&protSnake, &dirLast);
 		}
+		if (bDemoMode || nTick) {
 #elif defined ANIMATION_SNAKE
 		snake_autoRoute(&protSnake, &apples);
+		{
 #else
 		snake_userControl(&protSnake, &dirLast);
+		if (nTick) {
 #endif
 
-		// actually move head
-		pixel pxOldHead = protSnake.aSegments[protSnake.nHeadIndex];
-		protSnake.nHeadIndex = (protSnake.nHeadIndex + 1u) % USNAKE_MAX_LENGTH;
-		protSnake.aSegments[protSnake.nHeadIndex] =
-				snake_nextDirection(pxOldHead, protSnake.dir);
+			// actually move head
+			pixel pxOldHead = protSnake.aSegments[protSnake.nHeadIndex];
+			protSnake.nHeadIndex = (protSnake.nHeadIndex + 1u) % USNAKE_MAX_LENGTH;
+			protSnake.aSegments[protSnake.nHeadIndex] =
+					snake_nextDirection(pxOldHead, protSnake.dir);
 
-		// look if we have found an apple
-		if (!snake_checkForApple(&apples,
-				protSnake.aSegments[protSnake.nHeadIndex]))
-		{
-			// quit game if we hit something which is not an apple
-			if (get_pixel(protSnake.aSegments[protSnake.nHeadIndex]))
+			// look if we have found an apple
+			if (!snake_checkForApple(&apples,
+					protSnake.aSegments[protSnake.nHeadIndex]))
 			{
-				snake_eliminateProtagonist(&protSnake);
-				return;
+				// quit game if we hit something which is not an apple
+				if (get_pixel(protSnake.aSegments[protSnake.nHeadIndex]))
+				{
+					snake_eliminateProtagonist(&protSnake);
+					return;
+				}
+
+				// remove last segment
+				clearpixel(protSnake.aSegments[protSnake.nTailIndex])
+				protSnake.nTailIndex =
+						(protSnake.nTailIndex + 1u) % USNAKE_MAX_LENGTH;
+
+				// new apples
+				snake_spawnApples(&apples);
 			}
-
-			// remove last segment
-			clearpixel(protSnake.aSegments[protSnake.nTailIndex])
-			protSnake.nTailIndex =
-					(protSnake.nTailIndex + 1u) % USNAKE_MAX_LENGTH;
-
-			// new apples
-			snake_spawnApples(&apples);
+			// draw new head
+			setpixel(protSnake.aSegments[protSnake.nHeadIndex],
+					SNAKE_COLOR_PROTAGONIST);
 		}
-		// draw new head
-		setpixel(protSnake.aSegments[protSnake.nHeadIndex],
-				SNAKE_COLOR_PROTAGONIST);
 
 		// draw apples
 		for (uint8_t i = apples.nAppleCount; i--;)
 		{
-			setpixel(apples.aApples[i], nAppleColor);
+			// nTick also serves as blinking color
+			setpixel(apples.aApples[i], nTick);
 		}
 
-		wait(SNAKE_CYCLE_DELAY);
+#if defined ANIMATION_SNAKE && defined GAME_SNAKE
+		if (bDemoMode)
+		{
+			wait(SNAKE_ANIM_DELAY);
+		}
+		else
+		{
+			wait(SNAKE_GAME_DELAY / 2);
+		}
+#elif defined ANIMATION_SNAKE
+		wait(SNAKE_ANIM_DELAY);
+#else
+		wait(SNAKE_GAME_DELAY / 2);
+#endif
 	}
 }
 
@@ -466,6 +499,9 @@ void snake_engine(uint8_t bDemoMode)
 void snake_game(void)
 {
 	snake_engine(0);
+#if defined GAME_SNAKE && defined SCROLLTEXT_SUPPORT
+	scrolltext("</#Game Over!");
+#endif
 }
 
 /*@}*/
