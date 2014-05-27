@@ -869,7 +869,7 @@ ISR(TIMER1_COMPA_vect) {
     defined (__AVR_ATmega1280__) || \
     defined (__AVR_ATmega2560__)
 	TCCR2B = prescaler[plane];
-#elif defined (__AVR_ATmega8__) \
+#elif defined (__AVR_ATmega8__) || \
       defined (__AVR_ATmega128__)
 	TCCR2 = prescaler[page];
 #elif defined (__AVR_ATmega32U4__)
