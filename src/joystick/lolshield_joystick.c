@@ -27,7 +27,8 @@
 #include <avr/io.h>
 
 void joy_init(){
-#if defined (__AVR_ATmega48__)   || \
+#if defined (__AVR_ATmega8__)    || \
+    defined (__AVR_ATmega48__)   || \
     defined (__AVR_ATmega48P__)  || \
     defined (__AVR_ATmega88__)   || \
     defined (__AVR_ATmega88P__)  || \
