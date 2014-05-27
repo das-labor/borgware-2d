@@ -1,15 +1,20 @@
 /**
  * @file borg_hw_lolshield.c
  * @brief Driver for Jimmie Rodgers' LoL Shield
- * @author Christian Kroll
- * @author Jimmie Rodgers
+ * @author Christian Kroll <chris@das-labor.org>
  * @date 2014
  * @copyright GNU Public License 2 or later
  * @see http://jimmieprodgers.com/kits/lolshield/
  *
- * This driver is partly based on Jimmie Rodger's LoL Shield Library which
- * is available at https://code.google.com/p/lolshield/ (parts of the file
- * "Charliplexing.cpp" have been incorporated into this file).
+ * This driver is partly based on the LoL Shield Library which is available at
+ * https://code.google.com/p/lolshield/ (parts of the file "Charliplexing.cpp"
+ * have been incorporated into this file).
+ *
+ * With contributions from (via "Charliplexing.cpp"):
+ *  Alex Wenger <a.wenger@gmx.de> http://arduinobuch.wordpress.com/
+ *  Matt Mets <mahto@cibomahto.com> http://cibomahto.com/
+ *  Timer init code from MsTimer2 - Javier Valencia <javiervalencia80@gmail.com>
+ *  Misc functions from Benjamin Sonntag <benjamin@sonntag.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
