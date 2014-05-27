@@ -48,7 +48,17 @@ unsigned char pixmap[NUMPLANE][NUM_ROWS][LINEBYTES];
 #define	TICKS (F_CPU + 6 * (FRAMERATE << SLOWSCALERSHIFT)) / (12 * (FRAMERATE << SLOWSCALERSHIFT))
 #define	CUTOFF(scaler)	((128 * 12 - 6) * FRAMERATE * scaler)
 
-#if defined (__AVR_ATmega168__) || defined (__AVR_ATmega48__) || defined (__AVR_ATmega88__) || defined (__AVR_ATmega328P__) || defined (__AVR_ATmega1280__) || defined (__AVR_ATmega2560__) || defined (__AVR_ATmega8__)
+#if defined (__AVR_ATmega8__)    || \
+    defined (__AVR_ATmega48__)   || \
+    defined (__AVR_ATmega48P__)  || \
+    defined (__AVR_ATmega88__)   || \
+    defined (__AVR_ATmega88P__)  || \
+    defined (__AVR_ATmega168__)  || \
+    defined (__AVR_ATmega168P__) || \
+    defined (__AVR_ATmega328__)  || \
+    defined (__AVR_ATmega328P__) || \
+    defined (__AVR_ATmega1280__) || \
+    defined (__AVR_ATmega2560__)
 #	if F_CPU < CUTOFF(8)
 #		define FASTPRESCALER (_BV(CS20))                          // 1
 #		define SLOWPRESCALER (_BV(CS21))                          // 8
@@ -848,9 +858,19 @@ ISR(TIMER1_COMPA_vect) {
 	// NOTE: a "plane" in the Borgware is the same as a "page" in Jimmie's lib
 	static uint8_t plane = 0;
 
-#if defined (__AVR_ATmega168__) || defined (__AVR_ATmega48__) || defined (__AVR_ATmega88__) || defined (__AVR_ATmega328P__) || defined (__AVR_ATmega1280__) || defined (__AVR_ATmega2560__)
+#if defined (__AVR_ATmega48__)   || \
+    defined (__AVR_ATmega48P__)  || \
+    defined (__AVR_ATmega88__)   || \
+    defined (__AVR_ATmega88P__)  || \
+    defined (__AVR_ATmega168__)  || \
+    defined (__AVR_ATmega168P__) || \
+    defined (__AVR_ATmega328__)  || \
+    defined (__AVR_ATmega328P__) || \
+    defined (__AVR_ATmega1280__) || \
+    defined (__AVR_ATmega2560__)
 	TCCR2B = prescaler[plane];
-#elif defined (__AVR_ATmega8__) || defined (__AVR_ATmega128__)
+#elif defined (__AVR_ATmega8__) \
+      defined (__AVR_ATmega128__)
 	TCCR2 = prescaler[page];
 #elif defined (__AVR_ATmega32U4__)
 	TCCR1B = prescaler[plane];
@@ -876,7 +896,16 @@ ISR(TIMER1_COMPA_vect) {
 
 void borg_hw_init() {
 
-#if defined (__AVR_ATmega168__) || defined (__AVR_ATmega48__) || defined (__AVR_ATmega88__) || defined (__AVR_ATmega328P__) || defined (__AVR_ATmega1280__) || defined (__AVR_ATmega2560__)
+#if defined (__AVR_ATmega48__)   || \
+    defined (__AVR_ATmega48P__)  || \
+    defined (__AVR_ATmega88__)   || \
+    defined (__AVR_ATmega88P__)  || \
+    defined (__AVR_ATmega168__)  || \
+    defined (__AVR_ATmega168P__) || \
+    defined (__AVR_ATmega328__)  || \
+    defined (__AVR_ATmega328P__) || \
+    defined (__AVR_ATmega1280__) || \
+    defined (__AVR_ATmega2560__)
 	TIMSK2 &= ~(_BV(TOIE2) | _BV(OCIE2A));
 	TCCR2A &= ~(_BV(WGM21) | _BV(WGM20));
 	TCCR2B &= ~_BV(WGM22);
@@ -899,10 +928,20 @@ void borg_hw_init() {
 	setBrightness();
 
 	// Then start the display
-#if defined (__AVR_ATmega168__) || defined (__AVR_ATmega48__) || defined (__AVR_ATmega88__) || defined (__AVR_ATmega328P__) || defined (__AVR_ATmega1280__) || defined (__AVR_ATmega2560__)
+#if defined (__AVR_ATmega48__)   || \
+    defined (__AVR_ATmega48P__)  || \
+    defined (__AVR_ATmega88__)   || \
+    defined (__AVR_ATmega88P__)  || \
+    defined (__AVR_ATmega168__)  || \
+    defined (__AVR_ATmega168P__) || \
+    defined (__AVR_ATmega328__)  || \
+    defined (__AVR_ATmega328P__) || \
+    defined (__AVR_ATmega1280__) || \
+    defined (__AVR_ATmega2560__)
 	TIMSK2 |= _BV(TOIE2);
 	TCCR2B = FASTPRESCALER;
-#elif defined (__AVR_ATmega8__) || defined (__AVR_ATmega128__)
+#elif defined (__AVR_ATmega8__) || \
+      defined (__AVR_ATmega128__)
 	TIMSK |= _BV(TOIE2);
 	TCCR2 = FASTPRESCALER;
 #elif defined (__AVR_ATmega32U4__)
