@@ -39,7 +39,7 @@
 #define RC_POS 0
 
 static
-void gamma(uint32_t* a){
+void noekeon_gamma(uint32_t* a){
 	uint32_t tmp;
 	
 	a[1] ^= ~((a[3]) | (a[2]));
@@ -94,13 +94,13 @@ void noekeon_round(uint32_t* key, uint32_t* state, uint8_t const1, uint8_t const
 	theta(key, state);
 	((uint8_t*)state)[RC_POS] ^= const2;
 	pi1(state);
-	gamma(state);
+	noekeon_gamma(state);
 	pi2(state);
 }
 
-uint8_t rc_tab[]
+uint8_t const rc_tab[]
 #ifdef __AVR__
- PROGMEM 
+ PROGMEM
 #endif
   = {
 /*	0x80, */
@@ -146,7 +146,7 @@ void noekeon_enc(void* buffer, const void* key){
 	for(i=0; i<ROUND_NR; ++i){
 		noekeon_round((uint32_t*)keyb, (uint32_t*)buffer, rc, 0);
 #ifdef __AVR__
-		rc = pgm_read_byte(rc_tab+i);
+		rc = pgm_read_byte(&rc_tab[i]);
 #else
 		rc = rc_tab[i];
 #endif
@@ -177,7 +177,7 @@ void noekeon_dec(void* buffer, const void* key){
 	
 	for(i=ROUND_NR-1; i>=0; --i){
 #ifdef __AVR__
-		rc = pgm_read_byte(rc_tab+i);
+		rc = pgm_read_byte(&rc_tab[i]);
 #else
 		rc = rc_tab[i];
 #endif

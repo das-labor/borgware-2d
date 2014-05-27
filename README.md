@@ -7,8 +7,10 @@ Firmware for AVR based two-dimensional LED matrices, especially the
 Main platform is the [Borg16](http://www.das-labor.org/wiki/Borg16) construction
 kit. Other supported platforms are the
 [LED Brett](http://www.hackerspace-ffm.de/wiki/index.php?title=LedBrett)
-projector from [Hackerspace FFM](http://www.hackerspace-ffm.de) or the 
-[ELO Ping-Pong Board](http://www.elo-web.de/elo/mikrocontroller-und-programmierung/ping-pong/das-franzis-pingpong).
+projector from [Hackerspace FFM](http://www.hackerspace-ffm.de), the 
+[ELO Ping-Pong Board](http://www.elo-web.de/elo/mikrocontroller-und-programmierung/ping-pong/das-franzis-pingpong) 
+or the [LoL Shield](http://jimmieprodgers.com/kits/lolshield/) from Jimmie P.
+Rodgers.
 
 ![Small Borg16](/doc/img/Borg16-small.jpg)
 ![Glow Lamp Borg](/doc/img/Glow_Lamp_Borg.jpg)

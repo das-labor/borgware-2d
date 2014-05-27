@@ -14,6 +14,7 @@ choice 'Hardware Driver'			\
     Andre-Borg             HW_BORG_ANDRE \
     Laufschrift-Borg	   HW_BORG_LS \
     Laufschrift-Borg-MH    HW_BORG_MH \
+    LoL-Shield             HW_LOLSHIELD \
     FFM-Jochen             HW_BORG_LSJO \
     FFM-LedBrett           HW_LEDBRETT \
     Borg-Mini              HW_BORG_MINI \
@@ -43,6 +44,10 @@ fi
 
 if [ "$BORG_HW" == "HW_BORG_MH" ] ; then
   source src/borg_hw/config_borg_mh.in
+fi
+
+if [ "$BORG_HW" == "HW_LOLSHIELD" ] ; then
+  source src/borg_hw/config_lolshield.in
 fi
 
 if [ "$BORG_HW" == "HW_BORG_LSJO" ] ; then

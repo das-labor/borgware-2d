@@ -126,21 +126,29 @@ static void movinglines()
  */
 static void rectangle1()
 {
+	// define a sane maximum expansion
+#if NUM_COLS < NUM_ROWS
+#	define RECT_SIZE NUM_COLS
+#else
+#	define RECT_SIZE NUM_ROWS
+#endif
+
 	// we want a centered square
-	unsigned char const xcenter = NUM_COLS / 2, ycenter = NUM_ROWS / 2;
-	// it should be as big as the borg's height
-	unsigned char size = NUM_ROWS;
+#define RECT_OFFSET_X ((UNUM_COLS - RECT_SIZE) / 2u)
+#define RECT_OFFSET_Y ((UNUM_ROWS - RECT_SIZE) / 2u)
+
+	unsigned char size = RECT_SIZE;
 	// darkest color as a starting point for the gradient
-	unsigned char color = 0;
+	unsigned char color = 1;
 	// wait about 500 ms between each frame
 	int const delay = 500;
 
 	// create a gradient by drawing shrinking rectangles on top of each other
 	clear_screen(0);
-	for (unsigned char x = 8; x > 0; x--)
+	for (unsigned char pos = 0; pos < (RECT_SIZE / 2); ++pos)
 	{
 		// draw the rectangle and wait for a moment
-		filled_rectangle((pixel){(xcenter - x), (ycenter - x)},
+		filled_rectangle((pixel){pos + RECT_OFFSET_X, pos + RECT_OFFSET_Y},
 				size, size, color);
 		wait(delay);
 

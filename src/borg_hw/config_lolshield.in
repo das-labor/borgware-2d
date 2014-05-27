@@ -1,0 +1,8 @@
+mainmenu_option next_comment
+comment "lolshield setup"
+
+define_int USER_TIMER0_FOR_WAIT 1
+
+uint "Brightness (0-127)"  BRIGHTNESS  127
+
+endmenu

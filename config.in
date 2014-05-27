@@ -7,12 +7,19 @@ comment "General Setup"
 
 	choice 'Target MCU'           \
  	  "ATmega8        atmega8     \
+ 	   ATmega16       atmega16    \
+ 	   ATmega168      atmega168   \
+ 	   ATmega168P     atmega168p  \
 	   ATmega32       atmega32    \
+	   ATmega32U4     atmega32u4  \
 	   ATmega328      atmega328   \
+	   ATmega328p     atmega328p  \
 	   ATmega644      atmega644   \
 	   ATmega644p     atmega644p  \
+	   ATmega1280     atmega1280  \
 	   ATmega1284     atmega1284  \
 	   ATmega1284p    atmega1284p \
+	   ATmega2560     atmega2560  \
 	   ATmega8515     atmega8515" \
 	   'ATmega32' MCU
 

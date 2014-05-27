@@ -35,73 +35,51 @@
 #define NX (UNUM_COLS - 1u)
 #define NY (UNUM_ROWS - 1u)
 
-#if UNUM_ROWS == UNUM_COLS
-	static coord_t const dcomp[] = {0, P, NX};
-	#define xdcomp dcomp
-	#define ydcomp dcomp
-#else
-	static coord_t const xdcomp[] = {0, P, NX};
-	static coord_t const ydcomp[] = {0, P, NY};
-#endif
+static coord_t const xdcomp[] = {0, NX,  0, P};
+static coord_t const ydcomp[] = {P,  0, NY, 0};
 
-
+typedef struct ant_s {
+	coord_t  x,  y; /* current postion */
+	coord_t ox, oy; /* previous position, used to dim out old pixels */
+	unsigned char vector_index; /* index to one of (0,1),(1,0),(0,-1),(-1,0) */
+} ant_t;
 
 void ltn_ant() {
 	clear_screen(0);
 
-	struct {
-		coord_t  x,  y;
-		coord_t ox, oy; /* Used to set old pixels to brightness 2 */
-		coord_t dx, dy; /* Vector can only be (0,1),(1,0),(0,-1),(-1,0) */
-	} ant; 
-		                    
-	unsigned char temp;
+	ant_t ant;
+
 	unsigned int cycles = 500;
 
-	/* Random start position and direction */
-	ant.x = random8() % UNUM_COLS;
-	ant.y = random8() % UNUM_ROWS;
+	/* random start position and direction */
+	ant.x = ant.ox = random8() % UNUM_COLS;
+	ant.y = ant.oy = random8() % UNUM_ROWS;
 
-	/* Make sure we do have a valid vector */
-	ant.dx = xdcomp[random8() % 3];
-	do {
-		ant.dy = ydcomp[random8() % 3];
-	} while(ant.dx == ant.dy);
+	/* make sure we have a valid vector */
+	ant.vector_index = random8() % 4u;
 
-	ant.ox = ant.x;
-	ant.oy = ant.y;
-
-	while(cycles != 0) {
-		/* If the pixel is not set turn it on */
+	while(cycles--) {
+		/* if the pixel is turned off turn it on */
 		if(get_pixel((pixel) {ant.x, ant.y}) == 0) {
-			setpixel((pixel) {ant.x, ant.y}, 3);
-			
-			temp   = ant.dx;
-			ant.dx = ant.dy;
-			ant.dy =  -temp; /* Turn 90 degrees to the right */
-			
-			/* Lets the last pixel be darker than the latest */
-			if((ant.ox != ant.x) || (ant.oy != ant.y))
-				setpixel((pixel) {ant.ox, ant.oy}, 2);
+			setpixel((pixel) {ant.x, ant.y}, NUMPLANE);
+			ant.vector_index = (ant.vector_index + 3u) % 4u; // turn left
 
+			/* dim the previous pixel */
+			setpixel((pixel){ant.ox, ant.oy}, NUMPLANE - 1);
+
+			/* memorize this position */
 			ant.ox = ant.x;
 			ant.oy = ant.y;
-
+		/* if the pixel is turned on turn it off */
 		} else {
 			setpixel((pixel) {ant.x, ant.y}, 0);
-			
-			temp   = ant.dy;
-			ant.dy = ant.dx;
-			ant.dx =  -temp; /* Turn 90 degrees to the left */
+			ant.vector_index = (ant.vector_index + 1u) % 4u; // turn right
 		}
 
+		/* move to next pixel, playing field is modeled after a torus */
+		ant.x = (ant.x + xdcomp[ant.vector_index]) % UNUM_COLS;
+		ant.y = (ant.y + ydcomp[ant.vector_index]) % UNUM_ROWS;
+
 		wait(100);
-
-		/* Playing field is modeled after a torus */
-		ant.x = (coord_t)(ant.x + ant.dx) % UNUM_COLS;
-		ant.y = (coord_t)(ant.y + ant.dy) % UNUM_ROWS;
-
-		cycles--;
 	}
-	wait(300);
 }

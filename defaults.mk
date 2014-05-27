@@ -104,10 +104,14 @@ include $(MAKETOPDIR)/.config
 CPPFLAGS += -DF_CPU=$(FREQ)UL -mmcu=$(MCU)
 
 # flags for the linker, choose appropriate linker script
-ifeq ($(findstring atmega128,$(MCU)),atmega128)
-  LDFLAGS += -T ld_scripts/avr51.x -Wl,-Map,image.map -mmcu=$(MCU)
+ifeq ($(findstring atmega256,$(MCU)),atmega256)
+  LDFLAGS += -T ld_scripts/avr6.x -Wl,-Map,image.map -mmcu=$(MCU)
 else
-  LDFLAGS += -T ld_scripts/avr5.x -Wl,-Map,image.map -mmcu=$(MCU)
+  ifeq ($(findstring atmega128,$(MCU)),atmega128)
+    LDFLAGS += -T ld_scripts/avr51.x -Wl,-Map,image.map -mmcu=$(MCU)
+  else
+  	LDFLAGS += -T ld_scripts/avr5.x -Wl,-Map,image.map -mmcu=$(MCU)
+  endif
 endif
 
 endif # MAKECMDGOALS!=menuconfig

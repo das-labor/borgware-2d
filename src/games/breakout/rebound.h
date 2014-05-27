@@ -30,7 +30,7 @@ inline static uint8_t rebound_getpos ()
 
 inline static void rebound_init()
 {
-	rbpos = (NUM_ROWS / 2) - (REBOUND_SIZE / 2);
+	rbpos = (NUM_COLS / 2) - (REBOUND_SIZE / 2);
 	rebound_draw();
 }
 
