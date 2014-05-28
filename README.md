@@ -53,7 +53,7 @@ according to your Linux distribution (or BSD for that matter).
 
 * build-essential (pulls in an ordinary gcc build tool chain for the host)
 * bc
-* make (gmake on FreeBSD)
+* make (gmake on BSD)
 * libncurses5-dev
 * gcc-avr
 * avr-libc
@@ -132,5 +132,5 @@ your C-Code with an ordinary host debugger. The GUI thread reads the simulated
 frame buffer every 20ms (40ms on  Windows) and draws its contents.
 
 Joystick directions are simulated by the WASD keys and SPACE acts as the fire
-button. The OpenGL based simulator (Linux/FreeBSD) enables you to adjust the
+button. The OpenGL based simulator (Linux/BSD) enables you to adjust the
 viewing angle of the LED matrix via the arrow keys (not available on Windows).
