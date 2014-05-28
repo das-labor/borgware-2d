@@ -41,15 +41,15 @@ Games
 Build
 =====
 
-Supported build platforms are Linux, FreeBSD and Windows (via Cygwin). Due to
-customized linker scripts, simulator support is currently limited to x86 and
-x86_64 archs. Following dependencies have to be met:
+Supported build platforms are Linux, FreeBSD, NetBSD and Windows (via Cygwin).
+Due to customized linker scripts, simulator support is currently limited to x86
+and x86_64 archs. Following dependencies have to be met:
 
-Linux / FreeBSD
----------------
+Linux / FreeBSD / NetBSD
+------------------------
 
 Package names are based on Debian/Ubuntu repositories. Please adapt the names
-according to your Linux distribution (or FreeBSD for that matter).
+according to your Linux distribution (or BSD for that matter).
 
 * build-essential (pulls in an ordinary gcc build tool chain for the host)
 * bc
@@ -60,6 +60,7 @@ according to your Linux distribution (or FreeBSD for that matter).
 * binutils-avr
 * avrdude
 * freeglut3-dev
+* bash (note to the BSD folks: bash is required for the config tool)
 
 Windows
 -------
@@ -90,12 +91,21 @@ Configure
 Open a (Cygwin) terminal, change to your checkout directory and type:
  > make menuconfig
 
-This starts a curses based text interface for configuring certain aspects of
-your target platform. Be careful if you use an IDE like Eclipse to manage the
-build, as integrated terminal emulators tend to choke on curses generated shell
-output. Make sure that 'make menuconfig' has been run at least once in an
-ordinary terminal emulator after a fresh checkout or after issuing 'make
-mrproper'.
+In case you build on BSD, just use 'gmake' instead of 'make'. This starts an
+Ncurses based text interface for configuring certain aspects of your target
+platform. After a fresh checkout, the first thing you do is to load a profile
+with sane defaults. In the menuconfig interface, select 'Load a Default
+Configuration' and choose a preset. After hitting enter, the main menu returns
+immediately. You can either tune your configuration or just exit (choose 'Yes'
+at the confirmation dialog to save your stuff).
+
+Be careful if you use an IDE like Eclipse to manage the build, as
+integrated terminal emulators tend to choke on Ncurses generated output.
+Make sure that 'make menuconfig' has been run at least once in an ordinary
+terminal emulator after a fresh checkout or after issuing 'make mrproper'.
+
+Note: Always use 'make clean' after changing something in the menu, because
+subsequent builds may be broken if you don't.
 
 Compile
 -------
@@ -103,11 +113,13 @@ Compile
 To build for the actual target platform, just type:
  > make 
 
+This yields an 'image.hex' file which you can flash to your AVR device.
+
 If you want to test and debug your code within a GUI application, you can use
 the simulator:
  > make simulator
 
-In case you build on FreeBSD, just use 'gmake' instead of 'make'.
+Again, use 'gmake' instead of 'make' on BSD.
 
 You can start the simulator by typing ./borgsim(.exe)
 
@@ -116,8 +128,8 @@ Simulator Handling
 
 Please keep in mind that the simulator is NOT an emulator. All it does is
 compile the source code to a native host application so you can step through
-your C-Code. The GUI thread reads the simulated frame buffer every 40ms and
-draws its contents.
+your C-Code with an ordinary host debugger. The GUI thread reads the simulated
+frame buffer every 20ms (40ms on  Windows) and draws its contents.
 
 Joystick directions are simulated by the WASD keys and SPACE acts as the fire
 button. The OpenGL based simulator (Linux/FreeBSD) enables you to adjust the

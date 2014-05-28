@@ -43,7 +43,7 @@ ifeq ($(findstring CYGWIN,$(OSTYPE)),CYGWIN)
     ifeq ($(MACHINE),i686)
       LDFLAGS_SIM = -T ld_scripts/i386pe.x
     else
-        $(error $(n)$(n)Simulator build is only supported on i386 and amd64.$(n)$(n))
+        $(warning $(n)$(n)Simulator build is only supported on i386 and amd64.$(n)$(n))
     endif
   endif
   LIBS_SIM    = -lgdi32 -lwinmm -lm
@@ -57,7 +57,7 @@ else
       ifeq ($(MACHINE),i386)
         LDFLAGS_SIM = -L/usr/local/lib -T ld_scripts/elf_i386_fbsd.x
       else
-        $(error $(n)$(n)Simulator build is only supported on i386 and amd64.$(n)$(n))
+        $(warning $(n)$(n)Simulator build is only supported on i386 and amd64.$(n)$(n))
       endif
     endif
     LIBS_SIM = -lglut -lpthread -lGL -lGLU -lm
@@ -71,7 +71,7 @@ else
         ifeq ($(MACHINE),i386)
            LDFLAGS_SIM = -L/usr/pkg/lib -L/usr/X11R7/lib -T ld_scripts/elf_i386_nbsd.x -Wl,-R/usr/pkg/lib,-R/usr/X11R7/lib
          else
-            $(error $(n)$(n)Simulator build is only supported on i386 and amd64.$(n)$(n))
+            $(warning $(n)$(n)Simulator build is only supported on i386 and amd64.$(n)$(n))
          endif
       endif
       LIBS_SIM = -lglut -lpthread -lGL -lGLU -lm
@@ -84,22 +84,21 @@ else
           ifeq ($(MACHINE),i686)
             LDFLAGS_SIM = -T ld_scripts/elf_i386.x
           else
-             $(error $(n)$(n)Simulator build is only supported on i386 and amd64.$(n)$(n))
+             $(warning $(n)$(n)Simulator build is only supported on i386 and amd64.$(n)$(n))
           endif
         endif
         LIBS_SIM = -lglut -lpthread -lGL -lGLU -lm
       else
-        ($(error $(n)$(n)Simulator build is not supported on your system.$(n)$(n)\
+        ($(warning $(n)$(n)Simulator build is not supported on your system.$(n)$(n)\
 Currently supported platforms:$(n) \
-  Linux on x86 and amd64$(n) \
-  FreeBSD on x86 and amd64$(n) \
-  NetBSD on x86 and amd64$(n) \
-  Windows (via Cygwin) on x86 and amd64)
+  Linux on i386 and amd64$(n) \
+  FreeBSD on i386 and amd64$(n) \
+  NetBSD on i386 and amd64$(n) \
+  Windows (via Cygwin) on i386 and amd64)
       endif
     endif
   endif
 endif
-
 ##############################################################################
 # the default target
 $(TARGET):
