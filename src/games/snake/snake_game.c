@@ -19,6 +19,7 @@
 #include "../../util.h"
 #include "../../joystick/joystick.h"
 #include "../../menu/menu.h"
+#include "../../scrolltext/scrolltext.h"
 #include "snake_game.h"
 
 
