@@ -131,6 +131,44 @@ compile the source code to a native host application so you can step through
 your C-Code with an ordinary host debugger. The GUI thread reads the simulated
 frame buffer every 20ms (40ms on  Windows) and draws its contents.
 
-Joystick directions are simulated by the WASD keys and SPACE acts as the fire
+Joystick movements are simulated by the WASD keys and SPACE acts as the fire
 button. The OpenGL based simulator (Linux/BSD) enables you to adjust the
 viewing angle of the LED matrix via the arrow keys (not available on Windows).
+
+LoL Shield on Arduino (and clones)
+----------------------------------
+
+Although this project supports the LoL Shield on various Arduino boards, it does
+not use the Arduino software stack at all. Instead, it follows the classical
+Unix approach involving make files and mere command line tools. If you haven't
+used anything besides the Arduino IDE, getting the Borgware to run (let alone
+extending it) might be difficult at first. This README won't even try to cover
+all workflows involved.
+
+However, here are some hints:
+
+* Find out what 'avrdude' command line parameters are used by the Arduino IDE to
+  flash your device (look into the upload log). Use that parameters (with the -U
+  option pointing to the Borgware 'image.hex' file) to flash your board.
+* Pay attention to the size of your image. Borgware 2D can easily be configured
+  to exceed the usable flash memory of a 32 KiB device. After a successful
+  build, both flash and SRAM usage are displayed. Keep in mind that stock
+  Arduino MCUs already reserve 0.5 to 4KiB of flash memory for bootloaders.
+* Same with SRAM. The "data size" should not exceed 2KiB (make that 1.5 KiB as
+  we still need some additional SRAM at runtime).
+* In case avrdude gives you a verification error, chances are that your image
+  already reaches the bootloader area in the flash. Try to disable some
+  animations or games in Menuconfig to trim your image.
+
+Digital joysticks are supported on the 'analog' pins, which are used in digital
+input mode with internal pullups turned on. Just connect them to GND to signal
+joystick movements.
+
+| Arduino Pin | Meaning       |
+| ----------- | ------------- |
+| A0          | Up            |
+| A1          | Down          |
+| A2          | Left          |
+| A3          | Right         |
+| A4          | Not Connected |
+| A5          | Fire          |
