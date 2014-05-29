@@ -3,6 +3,7 @@ comment "lolshield setup"
 
 define_int USER_TIMER0_FOR_WAIT 1
 
-uint "Brightness (0-127)"  BRIGHTNESS  127
+uint "Brightness (0-127)"     BRIGHTNESS 127
+uint "Framerate (default 80)" FRAMERATE   80
 
 endmenu

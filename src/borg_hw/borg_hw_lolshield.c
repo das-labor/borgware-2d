@@ -47,11 +47,19 @@
 // buffer which holds the currently shown frame
 unsigned char pixmap[NUMPLANE][NUM_ROWS][LINEBYTES];
 
+
+/* adjust frame rate at the menuconfig, this is just a fallback */
+#ifndef FRAMERATE
+#	define FRAMERATE 80
+#elif FRAMERATE < 1
+#	error FRAMERATE must be greater than 0
+#endif
+
 // Number of ticks of the prescaled timer per cycle per frame, based on the
 // CPU clock speed and the desired frame rate.
-#define FRAMERATE 80UL
-#define	TICKS (F_CPU + 6 * (FRAMERATE << SLOWSCALERSHIFT)) / (12 * (FRAMERATE << SLOWSCALERSHIFT))
-#define	CUTOFF(scaler)	((128 * 12 - 6) * FRAMERATE * scaler)
+#define	TICKS (F_CPU + 6ul * (FRAMERATE << SLOWSCALERSHIFT)) / \
+	(12ul * (FRAMERATE << SLOWSCALERSHIFT))
+#define	CUTOFF(scaler)	((128ul * 12 - 6) * FRAMERATE * scaler##ul)
 
 #if defined (__AVR_ATmega8__)    || \
     defined (__AVR_ATmega48__)   || \
