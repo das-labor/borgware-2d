@@ -51,6 +51,9 @@
 
 #include <avr/interrupt.h>
 
+// don't ask...someone wanted to invent something more fancy than __AVR__ *sigh*
+#define __PLATFORM_AVR__
+
 //Pin that the RFM12's slave select is connected to
 //#define DDR_SS DDRB
 //#define PORT_SS PORTB
@@ -171,4 +174,3 @@
  * en- or disable debugging via uart.
  */
 #define RFM12_UART_DEBUG 0
-
