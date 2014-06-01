@@ -265,10 +265,6 @@ static void compose_cycle(uint8_t const cycle, uint8_t plane) {
 	uint8_t *const p = &pixmap[plane][0][0];
 
 #if defined (__AVR_ATmega1280__) || defined (__AVR_ATmega2560__)
-#	ifdef __AVR_ATmega1280__
-#		warning "BEWARE: Borgware-2D has not been tested on Arduino Mega 1280!"
-#	endif
-
 	// Set sink pin to Vcc/source, turning off current.
 	static uint8_t sink_b = 0, sink_e = 0, sink_g = 0, sink_h = 0;
 	PINB = sink_b;
