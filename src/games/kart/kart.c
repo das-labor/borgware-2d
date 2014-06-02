@@ -60,8 +60,8 @@ game_descriptor_t kart_game_descriptor __attribute__((section(".game_descriptors
 #define KEY_IGNORE 7
 
 #define CARCOLOR 3
-#define BORDERCOLOR 2
-#define LINECOLOR 1
+#define BORDER_LIGHT 1
+#define BORDER_DARK 2
 #define OBSTACLE_COLOR 3
 
 // borders = (middle, width, obstacle_pos)
@@ -76,7 +76,7 @@ void kart_game(){
 	uint8_t drive_div = DRIVE_DIV;
 	uint8_t carpos = NUM_COLS / 2;
 	uint32_t cycle = 0;
-	uint8_t draw_middle_line = 1;
+	uint8_t light_border = 1;
 	uint8_t width = NUM_COLS - 2;
 	uint8_t middle = NUM_COLS / 2;
 	// obstacle_pos == 0 --> no obstacle
@@ -98,8 +98,8 @@ void kart_game(){
 	}
 
 	// init street border
-	line((pixel){0,0}, (pixel){0,NUM_ROWS}, BORDERCOLOR);
-	line((pixel){NUM_COLS-1,0}, (pixel){NUM_COLS-1,NUM_ROWS}, BORDERCOLOR);
+	line((pixel){0,0}, (pixel){0,NUM_ROWS}, BORDER_DARK);
+	line((pixel){NUM_COLS-1,0}, (pixel){NUM_COLS-1,NUM_ROWS}, BORDER_DARK);
 
 	setpixel((pixel){carpos, NUM_ROWS-1}, CARCOLOR);
 
@@ -186,18 +186,17 @@ void kart_game(){
 			unsigned int px;
 			for(px=0; px < NUM_COLS; px++){
 				if(px<middle-(width/2) || px >= middle+(width/2)){
-					setpixel((pixel){px, 0}, BORDERCOLOR);
+					if(light_border){
+						setpixel((pixel){px, 0}, BORDER_LIGHT);
+					}else{
+						setpixel((pixel){px, 0}, BORDER_DARK);
+					}
 				}
 			}
 
-			// toggle drawing the middle line
+			// toggle border color
 			if(cycle % ((drive_div / boost_multiplier)*4) == 0){
-				draw_middle_line = 1-draw_middle_line;
-			}
-
-			// paint middle line
-			if(width > 6 && draw_middle_line){
-				setpixel((pixel){middle, 0}, LINECOLOR);
+				light_border = 1-light_border;
 			}
 
 			// set obstacle
