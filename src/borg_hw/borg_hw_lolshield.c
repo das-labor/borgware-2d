@@ -1,15 +1,20 @@
 /**
  * @file borg_hw_lolshield.c
  * @brief Driver for Jimmie Rodgers' LoL Shield
- * @author Christian Kroll
- * @author Jimmie Rodgers
+ * @author Christian Kroll <chris@das-labor.org>
  * @date 2014
  * @copyright GNU Public License 2 or later
  * @see http://jimmieprodgers.com/kits/lolshield/
  *
- * This driver is partly based on Jimmie Rodger's LoL Shield Library which
- * is available at https://code.google.com/p/lolshield/ (parts of the file
- * "Charliplexing.cpp" have been incorporated into this file).
+ * This driver is partly based on the LoL Shield Library which is available at
+ * https://code.google.com/p/lolshield/ (parts of the file "Charliplexing.cpp"
+ * have been incorporated into this file).
+ *
+ * With contributions from (via "Charliplexing.cpp"):
+ *  Alex Wenger <a.wenger@gmx.de> http://arduinobuch.wordpress.com/
+ *  Matt Mets <mahto@cibomahto.com> http://cibomahto.com/
+ *  Timer init code from MsTimer2 - Javier Valencia <javiervalencia80@gmail.com>
+ *  Misc functions from Benjamin Sonntag <benjamin@sonntag.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,11 +47,19 @@
 // buffer which holds the currently shown frame
 unsigned char pixmap[NUMPLANE][NUM_ROWS][LINEBYTES];
 
+
+/* adjust frame rate at the menuconfig, this is just a fallback */
+#ifndef FRAMERATE
+#	define FRAMERATE 80
+#elif FRAMERATE < 1
+#	error FRAMERATE must be greater than 0
+#endif
+
 // Number of ticks of the prescaled timer per cycle per frame, based on the
 // CPU clock speed and the desired frame rate.
-#define FRAMERATE 80UL
-#define	TICKS (F_CPU + 6 * (FRAMERATE << SLOWSCALERSHIFT)) / (12 * (FRAMERATE << SLOWSCALERSHIFT))
-#define	CUTOFF(scaler)	((128 * 12 - 6) * FRAMERATE * scaler)
+#define	TICKS (F_CPU + 6ul * (FRAMERATE << SLOWSCALERSHIFT)) / \
+	(12ul * (FRAMERATE << SLOWSCALERSHIFT))
+#define	CUTOFF(scaler)	((128ul * 12 - 6) * FRAMERATE * scaler##ul)
 
 #if defined (__AVR_ATmega8__)    || \
     defined (__AVR_ATmega48__)   || \
@@ -120,17 +133,6 @@ unsigned char pixmap[NUMPLANE][NUM_ROWS][LINEBYTES];
 #   error no support for this chip
 #endif
 
-
-#ifndef BRIGHTNESS
-#	define BRIGHTNESS 127 /* full brightness by default */
-#elif BRIGHTNESS < 0 || BRIGHTNESS > 127
-#	error BRIGHTNESS must be between 0 and 127
-#endif
-
-#define BRIGHTNESSPERCENT ((BRIGHTNESS * BRIGHTNESS + 8ul) / 16ul)
-#define M (TICKS << FASTSCALERSHIFT) * BRIGHTNESSPERCENT /*10b*/
-#define C(x) ((M * (unsigned long)(x * 1024) + (1 << 19)) >> 20) /*10b+10b-20b=0b*/
-
 #if NUMPLANE < 8
 uint8_t const prescaler[NUMPLANE + 1] = {
 	FASTPRESCALER,
@@ -158,81 +160,100 @@ uint8_t const prescaler[NUMPLANE + 1] = {
 uint8_t prescaler[NUMPLANE + 1] = {0};
 #endif
 
-uint8_t counts[NUMPLANE + 1] = {0};
+/* adjust brightness in the menuconfig, this is just a fallback */
+#ifndef BRIGHTNESS
+#	define BRIGHTNESS 127 /* full brightness by default */
+#elif BRIGHTNESS < 0 || BRIGHTNESS > 127
+#	error BRIGHTNESS must be between 0 and 127
+#endif
 
+#define BRIGHTNESSPERCENT ((BRIGHTNESS * BRIGHTNESS + 8ul) / 16ul)
+#define M (TICKS << FASTSCALERSHIFT) * BRIGHTNESSPERCENT /*10b*/
+#define C(x) ((M * (unsigned long)(x * 1024UL) + (1UL << 19)) >> 20) /*10b+10b-20b=0b*/
+
+#define COUNT(u, v) (256 - (((C(v) - C(u)) != 0) ? (C(v) - C(u)) : 1))
+#define LAST_COUNT(u) (256 - (((TICKS - (C(u) >> FASTSCALERSHIFT)) != 0) ? \
+		(TICKS - (C(u) >> FASTSCALERSHIFT)) : 1))
+
+#if NUMPLANE < 8
+// NOTE: The argumentS of COUNT() are calculated as follows:
+// pow((double)x / (double)NUMPLANE, 1.8) with 0 <= x <= NUMPLANE
+// Changing the scale of 1.8 invalidates any tables above!
+uint8_t const counts[NUMPLANE + 1] = {
+#	if NUMPLANE == 1
+		COUNT(0.000000000000000000000000, 1.000000000000000000000000),
+#	elif NUMPLANE == 2
+		COUNT(0.000000000000000000000000, 0.287174588749258719033719),
+		COUNT(0.287174588749258719033719, 1.000000000000000000000000),
+#	elif NUMPLANE == 3
+		COUNT(0.000000000000000000000000, 0.138414548846168578011273),
+		COUNT(0.138414548846168578011273, 0.481987453865643789008288),
+		COUNT(0.481987453865643789008288, 1.000000000000000000000000),
+#	elif NUMPLANE == 4
+		COUNT(0.000000000000000000000000, 0.082469244423305887448095),
+		COUNT(0.082469244423305887448095, 0.287174588749258719033719),
+		COUNT(0.287174588749258719033719, 0.595813410589956848895099),
+		COUNT(0.595813410589956848895099, 1.000000000000000000000000),
+#	elif NUMPLANE == 5
+		COUNT(0.000000000000000000000000, 0.055189186458448592775827),
+		COUNT(0.055189186458448592775827, 0.192179909437029006191722),
+		COUNT(0.192179909437029006191722, 0.398723883569384374148115),
+		COUNT(0.398723883569384374148115, 0.669209313658414961523135),
+		COUNT(0.669209313658414961523135, 1.000000000000000000000000),
+#	elif NUMPLANE == 6
+		COUNT(0.000000000000000000000000, 0.039749141141812646682574),
+		COUNT(0.039749141141812646682574, 0.138414548846168578011273),
+		COUNT(0.138414548846168578011273, 0.287174588749258719033719),
+		COUNT(0.287174588749258719033719, 0.481987453865643789008288),
+		COUNT(0.481987453865643789008288, 0.720234228706005730202833),
+		COUNT(0.720234228706005730202833, 1.000000000000000000000000),
+#	elif NUMPLANE == 7
+		COUNT(0.000000000000000000000000, 0.030117819624378608378557),
+		COUNT(0.030117819624378608378557, 0.104876339357015443964904),
+		COUNT(0.104876339357015443964904, 0.217591430058779483625031),
+		COUNT(0.217591430058779483625031, 0.365200625214741059210155),
+		COUNT(0.365200625214741059210155, 0.545719579451565794947498),
+		COUNT(0.545719579451565794947498, 0.757697368024318751444923),
+		COUNT(0.757697368024318751444923, 1.000000000000000000000000),
+#	endif
+		LAST_COUNT(1.0)
+};
+#else
+uint8_t counts[NUMPLANE + 1];
+#endif
+
+
+#if NUMPLANE >= 8
 /**
- *  Set the overall brightness of the screen from 0 (off) to 127 (full on).
+ *  Set the overall brightness of the screen from 0 (very dim) to 127 (full on).
  */
 static void setBrightness()
 {
+#	warning "NUMPLANE >= 8 links floating point stuff into the image"
 	/*   ---- This needs review! Please review. -- thilo  */
 	// set up page counts
 	uint8_t i;
-
-	// NOTE: The argument of C() is calculated as follows:
-	// pow((double)x / (double)NUMPLANE, 1.8) with 0 <= x <= NUMPLANE
-	// Changing the scale of 1.8 invalidates any tables above!
-#if NUMPLANE < 8
-	int const temp_counts[NUMPLANE + 1] = {
-		0.000000000000000000000000000,
-#	if NUMPLANE == 2
-		C(0.287174588749258719033719),
-#	elif NUMPLANE == 3
-		C(0.138414548846168578011273),
-		C(0.481987453865643789008288),
-#	elif NUMPLANE == 4
-		C(0.082469244423305887448095),
-		C(0.287174588749258719033719),
-		C(0.595813410589956848895099),
-#	elif NUMPLANE == 5
-		C(0.055189186458448592775827),
-		C(0.192179909437029006191722),
-		C(0.398723883569384374148115),
-		C(0.669209313658414961523135),
-#	elif NUMPLANE == 6
-		C(0.039749141141812646682574),
-		C(0.138414548846168578011273),
-		C(0.287174588749258719033719),
-		C(0.481987453865643789008288),
-		C(0.720234228706005730202833),
-#	elif NUMPLANE == 7
-		C(0.030117819624378608378557),
-		C(0.104876339357015443964904),
-		C(0.217591430058779483625031),
-		C(0.365200625214741059210155),
-		C(0.545719579451565794947498),
-		C(0.757697368024318751444923),
-#	endif
-		C(1.000000000000000000000000),
-	};
-#else
-#	warning "NUMPLANE >= 8 links floating point stuff into the image"
 	// NOTE: Changing "scale" invalidates any tables above!
 	const float scale = 1.8f;
 	int temp_counts[NUMPLANE + 1] = {0};
-
 	for (i = 1; i < (NUMPLANE + 1); i++) {
 		temp_counts[i] = C(pow(i / (float)(NUMPLANE), scale));
 	}
-#endif
 
 	// Compute on time for each of the pages
 	// Use the fast timer; slow timer is only useful for < 3 shades.
 	for (i = 0; i < NUMPLANE; i++) {
 		int interval = temp_counts[i + 1] - temp_counts[i];
 		counts[i] = 256 - (interval ? interval : 1);
-#if NUMPLANE >= 8
 		prescaler[i] = FASTPRESCALER;
-#endif
 	}
 
 	// Compute off time
 	int interval = TICKS - (temp_counts[i] >> FASTSCALERSHIFT);
 	counts[i] = 256 - (interval ? interval : 1);
-#if NUMPLANE >= 8
-		prescaler[i] = SLOWPRESCALER;
-#endif
+	prescaler[i] = SLOWPRESCALER;
 }
+#endif
 
 /**
  * Distributes the framebuffer content among current cycle pins.
@@ -244,10 +265,6 @@ static void compose_cycle(uint8_t const cycle, uint8_t plane) {
 	uint8_t *const p = &pixmap[plane][0][0];
 
 #if defined (__AVR_ATmega1280__) || defined (__AVR_ATmega2560__)
-#	ifdef __AVR_ATmega1280__
-#		warning "BEWARE: Borgware-2D has not been tested on Arduino Mega 1280!"
-#	endif
-
 	// Set sink pin to Vcc/source, turning off current.
 	static uint8_t sink_b = 0, sink_e = 0, sink_g = 0, sink_h = 0;
 	PINB = sink_b;
@@ -925,7 +942,9 @@ void borg_hw_init() {
 	OCR1A = 256;
 #endif
 
+#if NUMPLANE >= 8
 	setBrightness();
+#endif
 
 	// Then start the display
 #if defined (__AVR_ATmega48__)   || \

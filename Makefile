@@ -170,7 +170,7 @@ clean:
 	$(MAKE) -f rules.mk no_deps=t clean-common
 	$(RM) -f $(TARGET) $(TARGET).bin $(TARGET).hex $(TARGET).lst .subdirs
 	$(RM) -f $(TARGET).map 
-	for subdir in `find . -type d ! -iwholename './src/rfm12/rfm12_lib/examples/*'` ; do \
+	for subdir in `find . -type d ! -regex './src/rfm12/rfm12_lib/examples/.*'` ; do \
 	  test "x$$subdir" != "x." \
 	  && test -e $$subdir/Makefile \
 	  && $(MAKE) no_deps=t -C $$subdir clean ; done ; true
