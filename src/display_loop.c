@@ -18,6 +18,7 @@
 #include "animations/bitmapscroller/amphibian.h"
 #include "animations/bitmapscroller/outofspec.h"
 #include "animations/bitmapscroller/fairydust.h"
+#include "animations/bitmapscroller/thisisnotdetroit.h"
 #include "animations/fpmath_patterns.h"
 #include "animations/mherweg.h"
 #include "animations/moire.h"
@@ -269,6 +270,12 @@ void display_loop(){
 #ifdef ANIMATION_SURFACE_WAVE
 		case 27:
 			surfaceWave();
+			break;
+#endif
+
+#ifdef ANIMATION_THISISNOTDETROIT
+		case 28:
+			logo_thisIsNotDetroit();
 			break;
 #endif
 
