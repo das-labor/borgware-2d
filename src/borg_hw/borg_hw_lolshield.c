@@ -493,8 +493,6 @@ static void compose_cycle(uint8_t const cycle, uint8_t plane) {
 	uint8_t pins_e = sink_e = pgm_read_byte(&sink_e_cycle[cycle]);
 
 	// convert Borgware-2D framebuffer to LoL Shield cycles on Arduino Leonardo
-	// (I could have done this with a lookup table, but that would be slower as
-	// non-constant bit shifts are quite expensive on AVR)
 	// NOTE: (0,0) is UPPER RIGHT in the Borgware realm
 	if (plane < NUMPLANE) {
 		switch(cycle) {
