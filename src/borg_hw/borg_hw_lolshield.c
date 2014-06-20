@@ -292,160 +292,158 @@ static void compose_cycle(uint8_t const cycle, uint8_t plane) {
 	uint8_t pins_h = sink_h = pgm_read_byte(&sink_h_cycle[cycle]);
 
 	// convert framebuffer to LoL Shield cycles on Arduino Mega 1280/2560
-	// (I could have done this with a lookup table, but that would be slower as
-	// non-constant bit shifts are quite expensive on AVR)
 	// NOTE: (0,0) is UPPER RIGHT in the Borgware realm
 	if (plane < NUMPLANE) {
 		switch(cycle) {
 		case 0:
-			pins_b |= (0x02u & p[ 0]) << 6; // x= 1, y= 0, mapped pin D13
-			pins_b |= (0x02u & p[ 2]) << 5; // x= 1, y= 1, mapped pin D12
-			pins_b |= (0x02u & p[ 4]) << 4; // x= 1, y= 2, mapped pin D11
-			pins_b |= (0x02u & p[ 6]) << 3; // x= 1, y= 3, mapped pin D10
-			pins_e |= (0x02u & p[16]) << 2; // x= 1, y= 8, mapped pin D5
-			pins_h |= (0x02u & p[ 8]) << 5; // x= 1, y= 4, mapped pin D9
-			pins_h |= (0x02u & p[10]) << 4; // x= 1, y= 5, mapped pin D8
-			pins_h |= (0x02u & p[12]) << 3; // x= 1, y= 6, mapped pin D7
-			pins_h |= (0x02u & p[14]) << 2; // x= 1, y= 7, mapped pin D6
+			if (0x02u & p[ 0]) pins_b |= 0x80; // x= 1, y= 0, mapped pin D13
+			if (0x02u & p[ 2]) pins_b |= 0x40; // x= 1, y= 1, mapped pin D12
+			if (0x02u & p[ 4]) pins_b |= 0x20; // x= 1, y= 2, mapped pin D11
+			if (0x02u & p[ 6]) pins_b |= 0x10; // x= 1, y= 3, mapped pin D10
+			if (0x02u & p[ 8]) pins_h |= 0x40; // x= 1, y= 4, mapped pin D9
+			if (0x02u & p[10]) pins_h |= 0x20; // x= 1, y= 5, mapped pin D8
+			if (0x02u & p[12]) pins_h |= 0x10; // x= 1, y= 6, mapped pin D7
+			if (0x02u & p[14]) pins_h |= 0x08; // x= 1, y= 7, mapped pin D6
+			if (0x02u & p[16]) pins_e |= 0x08; // x= 1, y= 8, mapped pin D5
 			break;
 		case 1:
-			pins_b |= (0x08u & p[ 0]) << 4; // x= 3, y= 0, mapped pin D13
-			pins_b |= (0x08u & p[ 2]) << 3; // x= 3, y= 1, mapped pin D12
-			pins_b |= (0x08u & p[ 4]) << 2; // x= 3, y= 2, mapped pin D11
-			pins_b |= (0x08u & p[ 6]) << 1; // x= 3, y= 3, mapped pin D10
-			pins_e |= (0x08u & p[16]);      // x= 3, y= 8, mapped pin D5
-			pins_h |= (0x08u & p[ 8]) << 3; // x= 3, y= 4, mapped pin D9
-			pins_h |= (0x08u & p[10]) << 2; // x= 3, y= 5, mapped pin D8
-			pins_h |= (0x08u & p[12]) << 1; // x= 3, y= 6, mapped pin D7
-			pins_h |= (0x08u & p[14]);      // x= 3, y= 7, mapped pin D6
+			if (0x08u & p[ 0]) pins_b |= 0x80; // x= 3, y= 0, mapped pin D13
+			if (0x08u & p[ 2]) pins_b |= 0x40; // x= 3, y= 1, mapped pin D12
+			if (0x08u & p[ 4]) pins_b |= 0x20; // x= 3, y= 2, mapped pin D11
+			if (0x08u & p[ 6]) pins_b |= 0x10; // x= 3, y= 3, mapped pin D10
+			if (0x08u & p[ 8]) pins_h |= 0x40; // x= 3, y= 4, mapped pin D9
+			if (0x08u & p[10]) pins_h |= 0x20; // x= 3, y= 5, mapped pin D8
+			if (0x08u & p[12]) pins_h |= 0x10; // x= 3, y= 6, mapped pin D7
+			pins_e |= (0x08u & p[16]);         // x= 3, y= 8, mapped pin D5
+			pins_h |= (0x08u & p[14]);         // x= 3, y= 7, mapped pin D6
 			break;
 		case 2:
-			pins_b |= (0x20u & p[ 0]) << 2; // x= 5, y= 0, mapped pin D13
-			pins_b |= (0x20u & p[ 2]) << 1; // x= 5, y= 1, mapped pin D12
-			pins_b |= (0x20u & p[ 4]);      // x= 5, y= 2, mapped pin D11
-			pins_b |= (0x20u & p[ 6]) >> 1; // x= 5, y= 3, mapped pin D10
-			pins_e |= (0x20u & p[16]) >> 2; // x= 5, y= 8, mapped pin D5
-			pins_h |= (0x20u & p[ 8]) << 1; // x= 5, y= 4, mapped pin D9
-			pins_h |= (0x20u & p[10]);      // x= 5, y= 5, mapped pin D8
-			pins_h |= (0x20u & p[12]) >> 1; // x= 5, y= 6, mapped pin D7
-			pins_h |= (0x20u & p[14]) >> 2; // x= 5, y= 7, mapped pin D6
+			if (0x20u & p[ 0]) pins_b |= 0x80; // x= 5, y= 0, mapped pin D13
+			if (0x20u & p[ 2]) pins_b |= 0x40; // x= 5, y= 1, mapped pin D12
+			if (0x20u & p[ 6]) pins_b |= 0x10; // x= 5, y= 3, mapped pin D10
+			if (0x20u & p[ 8]) pins_h |= 0x40; // x= 5, y= 4, mapped pin D9
+			if (0x20u & p[12]) pins_h |= 0x10; // x= 5, y= 6, mapped pin D7
+			if (0x20u & p[14]) pins_h |= 0x08; // x= 5, y= 7, mapped pin D6
+			if (0x20u & p[16]) pins_e |= 0x08; // x= 5, y= 8, mapped pin D5
+			pins_b |= (0x20u & p[ 4]);         // x= 5, y= 2, mapped pin D11
+			pins_h |= (0x20u & p[10]);         // x= 5, y= 5, mapped pin D8
 			break;
 		case 3:
-			pins_b |= (0x20u & p[ 1]) << 2; // x=13, y= 0, mapped pin D13
-			pins_b |= (0x20u & p[ 3]) << 1; // x=13, y= 1, mapped pin D12
-			pins_b |= (0x20u & p[ 5]);      // x=13, y= 2, mapped pin D11
-			pins_b |= (0x20u & p[ 7]) >> 1; // x=13, y= 3, mapped pin D10
-			pins_e |= (0x01u & p[16]) << 4; // x= 0, y= 8, mapped pin D2
-			pins_e |= (0x04u & p[16]) << 3; // x= 2, y= 8, mapped pin D3
-			pins_g |= (0x10u & p[16]) << 1; // x= 4, y= 8, mapped pin D4
-			pins_h |= (0x20u & p[ 9]) << 1; // x=13, y= 4, mapped pin D9
-			pins_h |= (0x20u & p[11]);      // x=13, y= 5, mapped pin D8
-			pins_h |= (0x20u & p[13]) >> 1; // x=13, y= 6, mapped pin D7
-			pins_h |= (0x20u & p[15]) >> 2; // x=13, y= 7, mapped pin D6
+			if (0x01u & p[16]) pins_e |= 0x10; // x= 0, y= 8, mapped pin D2
+			if (0x04u & p[16]) pins_e |= 0x20; // x= 2, y= 8, mapped pin D3
+			if (0x10u & p[16]) pins_g |= 0x20; // x= 4, y= 8, mapped pin D4
+			if (0x20u & p[ 1]) pins_b |= 0x80; // x=13, y= 0, mapped pin D13
+			if (0x20u & p[ 3]) pins_b |= 0x40; // x=13, y= 1, mapped pin D12
+			if (0x20u & p[ 7]) pins_b |= 0x10; // x=13, y= 3, mapped pin D10
+			if (0x20u & p[ 9]) pins_h |= 0x40; // x=13, y= 4, mapped pin D9
+			if (0x20u & p[13]) pins_h |= 0x10; // x=13, y= 6, mapped pin D7
+			if (0x20u & p[15]) pins_h |= 0x08; // x=13, y= 7, mapped pin D6
+			pins_b |= (0x20u & p[ 5]);         // x=13, y= 2, mapped pin D11
+			pins_h |= (0x20u & p[11]);         // x=13, y= 5, mapped pin D8
 			break;
 		case 4:
-			pins_b |= (0x10u & p[ 1]) << 3; // x=12, y= 0, mapped pin D13
-			pins_b |= (0x10u & p[ 3]) << 2; // x=12, y= 1, mapped pin D12
-			pins_b |= (0x10u & p[ 5]) << 1; // x=12, y= 2, mapped pin D11
-			pins_b |= (0x10u & p[ 7]);      // x=12, y= 3, mapped pin D10
-			pins_e |= (0x01u & p[14]) << 4; // x= 0, y= 7, mapped pin D2
-			pins_e |= (0x04u & p[14]) << 3; // x= 2, y= 7, mapped pin D3
-			pins_e |= (0x20u & p[17]) >> 2; // x=13, y= 8, mapped pin D5
-			pins_g |= (0x10u & p[14]) << 1; // x= 4, y= 7, mapped pin D4
-			pins_h |= (0x10u & p[ 9]) << 2; // x=12, y= 4, mapped pin D9
-			pins_h |= (0x10u & p[11]) << 1; // x=12, y= 5, mapped pin D8
-			pins_h |= (0x10u & p[13]);      // x=12, y= 6, mapped pin D7
+			if (0x01u & p[14]) pins_e |= 0x10; // x= 0, y= 7, mapped pin D2
+			if (0x04u & p[14]) pins_e |= 0x20; // x= 2, y= 7, mapped pin D3
+			if (0x10u & p[ 1]) pins_b |= 0x80; // x=12, y= 0, mapped pin D13
+			if (0x10u & p[ 3]) pins_b |= 0x40; // x=12, y= 1, mapped pin D12
+			if (0x10u & p[ 5]) pins_b |= 0x20; // x=12, y= 2, mapped pin D11
+			if (0x10u & p[ 9]) pins_h |= 0x40; // x=12, y= 4, mapped pin D9
+			if (0x10u & p[11]) pins_h |= 0x20; // x=12, y= 5, mapped pin D8
+			if (0x10u & p[14]) pins_g |= 0x20; // x= 4, y= 7, mapped pin D4
+			if (0x20u & p[17]) pins_e |= 0x08; // x=13, y= 8, mapped pin D5
+			pins_b |= (0x10u & p[ 7]);         // x=12, y= 3, mapped pin D10
+			pins_h |= (0x10u & p[13]);         // x=12, y= 6, mapped pin D7
 			break;
 		case 5:
-			pins_b |= (0x08u & p[ 1]) << 4; // x=11, y= 0, mapped pin D13
-			pins_b |= (0x08u & p[ 3]) << 3; // x=11, y= 1, mapped pin D12
-			pins_b |= (0x08u & p[ 5]) << 2; // x=11, y= 2, mapped pin D11
-			pins_b |= (0x08u & p[ 7]) << 1; // x=11, y= 3, mapped pin D10
-			pins_e |= (0x01u & p[12]) << 4; // x= 0, y= 6, mapped pin D2
-			pins_e |= (0x04u & p[12]) << 3; // x= 2, y= 6, mapped pin D3
-			pins_e |= (0x10u & p[17]) >> 1; // x=12, y= 8, mapped pin D5
-			pins_g |= (0x10u & p[12]) << 1; // x= 4, y= 6, mapped pin D4
-			pins_h |= (0x08u & p[ 9]) << 3; // x=11, y= 4, mapped pin D9
-			pins_h |= (0x08u & p[11]) << 2; // x=11, y= 5, mapped pin D8
-			pins_h |= (0x10u & p[15]) >> 1; // x=12, y= 7, mapped pin D6
+			if (0x01u & p[12]) pins_e |= 0x10; // x= 0, y= 6, mapped pin D2
+			if (0x04u & p[12]) pins_e |= 0x20; // x= 2, y= 6, mapped pin D3
+			if (0x08u & p[ 1]) pins_b |= 0x80; // x=11, y= 0, mapped pin D13
+			if (0x08u & p[ 3]) pins_b |= 0x40; // x=11, y= 1, mapped pin D12
+			if (0x08u & p[ 5]) pins_b |= 0x20; // x=11, y= 2, mapped pin D11
+			if (0x08u & p[ 7]) pins_b |= 0x10; // x=11, y= 3, mapped pin D10
+			if (0x08u & p[ 9]) pins_h |= 0x40; // x=11, y= 4, mapped pin D9
+			if (0x08u & p[11]) pins_h |= 0x20; // x=11, y= 5, mapped pin D8
+			if (0x10u & p[12]) pins_g |= 0x20; // x= 4, y= 6, mapped pin D4
+			if (0x10u & p[15]) pins_h |= 0x08; // x=12, y= 7, mapped pin D6
+			if (0x10u & p[17]) pins_e |= 0x08; // x=12, y= 8, mapped pin D5
 			break;
 		case 6:
-			pins_b |= (0x04u & p[ 1]) << 5; // x=10, y= 0, mapped pin D13
-			pins_b |= (0x04u & p[ 3]) << 4; // x=10, y= 1, mapped pin D12
-			pins_b |= (0x04u & p[ 5]) << 3; // x=10, y= 2, mapped pin D11
-			pins_b |= (0x04u & p[ 7]) << 2; // x=10, y= 3, mapped pin D10
-			pins_e |= (0x01u & p[10]) << 4; // x= 0, y= 5, mapped pin D2
-			pins_e |= (0x04u & p[10]) << 3; // x= 2, y= 5, mapped pin D3
-			pins_e |= (0x08u & p[17]);      // x=11, y= 8, mapped pin D5
-			pins_g |= (0x10u & p[10]) << 1; // x= 4, y= 5, mapped pin D4
-			pins_h |= (0x04u & p[ 9]) << 4; // x=10, y= 4, mapped pin D9
-			pins_h |= (0x08u & p[13]) << 1; // x=11, y= 6, mapped pin D7
-			pins_h |= (0x08u & p[15]);      // x=11, y= 7, mapped pin D6
+			if (0x01u & p[10]) pins_e |= 0x10; // x= 0, y= 5, mapped pin D2
+			if (0x04u & p[ 1]) pins_b |= 0x80; // x=10, y= 0, mapped pin D13
+			if (0x04u & p[ 3]) pins_b |= 0x40; // x=10, y= 1, mapped pin D12
+			if (0x04u & p[ 5]) pins_b |= 0x20; // x=10, y= 2, mapped pin D11
+			if (0x04u & p[ 7]) pins_b |= 0x10; // x=10, y= 3, mapped pin D10
+			if (0x04u & p[ 9]) pins_h |= 0x40; // x=10, y= 4, mapped pin D9
+			if (0x04u & p[10]) pins_e |= 0x20; // x= 2, y= 5, mapped pin D3
+			if (0x08u & p[13]) pins_h |= 0x10; // x=11, y= 6, mapped pin D7
+			if (0x10u & p[10]) pins_g |= 0x20; // x= 4, y= 5, mapped pin D4
+			pins_e |= (0x08u & p[17]);         // x=11, y= 8, mapped pin D5
+			pins_h |= (0x08u & p[15]);         // x=11, y= 7, mapped pin D6
 			break;
 		case 7:
-			pins_b |= (0x02u & p[ 1]) << 6; // x= 9, y= 0, mapped pin D13
-			pins_b |= (0x02u & p[ 3]) << 5; // x= 9, y= 1, mapped pin D12
-			pins_b |= (0x02u & p[ 5]) << 4; // x= 9, y= 2, mapped pin D11
-			pins_b |= (0x02u & p[ 7]) << 3; // x= 9, y= 3, mapped pin D10
-			pins_e |= (0x01u & p[ 8]) << 4; // x= 0, y= 4, mapped pin D2
-			pins_e |= (0x04u & p[ 8]) << 3; // x= 2, y= 4, mapped pin D3
-			pins_e |= (0x04u & p[17]) << 1; // x=10, y= 8, mapped pin D5
-			pins_g |= (0x10u & p[ 8]) << 1; // x= 4, y= 4, mapped pin D4
-			pins_h |= (0x04u & p[11]) << 3; // x=10, y= 5, mapped pin D8
-			pins_h |= (0x04u & p[13]) << 2; // x=10, y= 6, mapped pin D7
-			pins_h |= (0x04u & p[15]) << 1; // x=10, y= 7, mapped pin D6
+			if (0x01u & p[ 8]) pins_e |= 0x10; // x= 0, y= 4, mapped pin D2
+			if (0x02u & p[ 1]) pins_b |= 0x80; // x= 9, y= 0, mapped pin D13
+			if (0x02u & p[ 3]) pins_b |= 0x40; // x= 9, y= 1, mapped pin D12
+			if (0x02u & p[ 5]) pins_b |= 0x20; // x= 9, y= 2, mapped pin D11
+			if (0x02u & p[ 7]) pins_b |= 0x10; // x= 9, y= 3, mapped pin D10
+			if (0x04u & p[ 8]) pins_e |= 0x20; // x= 2, y= 4, mapped pin D3
+			if (0x04u & p[11]) pins_h |= 0x20; // x=10, y= 5, mapped pin D8
+			if (0x04u & p[13]) pins_h |= 0x10; // x=10, y= 6, mapped pin D7
+			if (0x04u & p[15]) pins_h |= 0x08; // x=10, y= 7, mapped pin D6
+			if (0x04u & p[17]) pins_e |= 0x08; // x=10, y= 8, mapped pin D5
+			if (0x10u & p[ 8]) pins_g |= 0x20; // x= 4, y= 4, mapped pin D4
 			break;
 		case 8:
-			pins_b |= (0x01u & p[ 1]) << 7; // x= 8, y= 0, mapped pin D13
-			pins_b |= (0x01u & p[ 3]) << 6; // x= 8, y= 1, mapped pin D12
-			pins_b |= (0x01u & p[ 5]) << 5; // x= 8, y= 2, mapped pin D11
-			pins_e |= (0x01u & p[ 6]) << 4; // x= 0, y= 3, mapped pin D2
-			pins_e |= (0x02u & p[17]) << 2; // x= 9, y= 8, mapped pin D5
-			pins_e |= (0x04u & p[ 6]) << 3; // x= 2, y= 3, mapped pin D3
-			pins_g |= (0x10u & p[ 6]) << 1; // x= 4, y= 3, mapped pin D4
-			pins_h |= (0x02u & p[ 9]) << 5; // x= 9, y= 4, mapped pin D9
-			pins_h |= (0x02u & p[11]) << 4; // x= 9, y= 5, mapped pin D8
-			pins_h |= (0x02u & p[13]) << 3; // x= 9, y= 6, mapped pin D7
-			pins_h |= (0x02u & p[15]) << 2; // x= 9, y= 7, mapped pin D6
+			if (0x01u & p[ 1]) pins_b |= 0x80; // x= 8, y= 0, mapped pin D13
+			if (0x01u & p[ 3]) pins_b |= 0x40; // x= 8, y= 1, mapped pin D12
+			if (0x01u & p[ 5]) pins_b |= 0x20; // x= 8, y= 2, mapped pin D11
+			if (0x01u & p[ 6]) pins_e |= 0x10; // x= 0, y= 3, mapped pin D2
+			if (0x02u & p[ 9]) pins_h |= 0x40; // x= 9, y= 4, mapped pin D9
+			if (0x02u & p[11]) pins_h |= 0x20; // x= 9, y= 5, mapped pin D8
+			if (0x02u & p[13]) pins_h |= 0x10; // x= 9, y= 6, mapped pin D7
+			if (0x02u & p[15]) pins_h |= 0x08; // x= 9, y= 7, mapped pin D6
+			if (0x02u & p[17]) pins_e |= 0x08; // x= 9, y= 8, mapped pin D5
+			if (0x04u & p[ 6]) pins_e |= 0x20; // x= 2, y= 3, mapped pin D3
+			if (0x10u & p[ 6]) pins_g |= 0x20; // x= 4, y= 3, mapped pin D4
 			break;
 		case 9:
-			pins_b |= (0x01u & p[ 7]) << 4; // x= 8, y= 3, mapped pin D10
-			pins_b |= (0x80u & p[ 0]);      // x= 7, y= 0, mapped pin D13
-			pins_b |= (0x80u & p[ 2]) >> 1; // x= 7, y= 1, mapped pin D12
-			pins_e |= (0x01u & p[ 4]) << 4; // x= 0, y= 2, mapped pin D2
-			pins_e |= (0x01u & p[17]) << 3; // x= 8, y= 8, mapped pin D5
-			pins_e |= (0x04u & p[ 4]) << 3; // x= 2, y= 2, mapped pin D3
-			pins_g |= (0x10u & p[ 4]) << 1; // x= 4, y= 2, mapped pin D4
-			pins_h |= (0x01u & p[ 9]) << 6; // x= 8, y= 4, mapped pin D9
-			pins_h |= (0x01u & p[11]) << 5; // x= 8, y= 5, mapped pin D8
-			pins_h |= (0x01u & p[13]) << 4; // x= 8, y= 6, mapped pin D7
-			pins_h |= (0x01u & p[15]) << 3; // x= 8, y= 7, mapped pin D6
+			if (0x01u & p[ 4]) pins_e |= 0x10; // x= 0, y= 2, mapped pin D2
+			if (0x01u & p[ 7]) pins_b |= 0x10; // x= 8, y= 3, mapped pin D10
+			if (0x01u & p[ 9]) pins_h |= 0x40; // x= 8, y= 4, mapped pin D9
+			if (0x01u & p[11]) pins_h |= 0x20; // x= 8, y= 5, mapped pin D8
+			if (0x01u & p[13]) pins_h |= 0x10; // x= 8, y= 6, mapped pin D7
+			if (0x01u & p[15]) pins_h |= 0x08; // x= 8, y= 7, mapped pin D6
+			if (0x01u & p[17]) pins_e |= 0x08; // x= 8, y= 8, mapped pin D5
+			if (0x04u & p[ 4]) pins_e |= 0x20; // x= 2, y= 2, mapped pin D3
+			if (0x10u & p[ 4]) pins_g |= 0x20; // x= 4, y= 2, mapped pin D4
+			if (0x80u & p[ 2]) pins_b |= 0x40; // x= 7, y= 1, mapped pin D12
+			pins_b |= (0x80u & p[ 0]);         // x= 7, y= 0, mapped pin D13
 			break;
 		case 10:
-			pins_b |= (0x40u & p[ 0]) << 1; // x= 6, y= 0, mapped pin D13
-			pins_b |= (0x80u & p[ 4]) >> 2; // x= 7, y= 2, mapped pin D11
-			pins_b |= (0x80u & p[ 6]) >> 3; // x= 7, y= 3, mapped pin D10
-			pins_e |= (0x01u & p[ 2]) << 4; // x= 0, y= 1, mapped pin D2
-			pins_e |= (0x04u & p[ 2]) << 3; // x= 2, y= 1, mapped pin D3
-			pins_e |= (0x80u & p[16]) >> 4; // x= 7, y= 8, mapped pin D5
-			pins_g |= (0x10u & p[ 2]) << 1; // x= 4, y= 1, mapped pin D4
-			pins_h |= (0x80u & p[ 8]) >> 1; // x= 7, y= 4, mapped pin D9
-			pins_h |= (0x80u & p[10]) >> 2; // x= 7, y= 5, mapped pin D8
-			pins_h |= (0x80u & p[12]) >> 3; // x= 7, y= 6, mapped pin D7
-			pins_h |= (0x80u & p[14]) >> 4; // x= 7, y= 7, mapped pin D6
+			if (0x01u & p[ 2]) pins_e |= 0x10; // x= 0, y= 1, mapped pin D2
+			if (0x04u & p[ 2]) pins_e |= 0x20; // x= 2, y= 1, mapped pin D3
+			if (0x10u & p[ 2]) pins_g |= 0x20; // x= 4, y= 1, mapped pin D4
+			if (0x40u & p[ 0]) pins_b |= 0x80; // x= 6, y= 0, mapped pin D13
+			if (0x80u & p[ 4]) pins_b |= 0x20; // x= 7, y= 2, mapped pin D11
+			if (0x80u & p[ 6]) pins_b |= 0x10; // x= 7, y= 3, mapped pin D10
+			if (0x80u & p[ 8]) pins_h |= 0x40; // x= 7, y= 4, mapped pin D9
+			if (0x80u & p[10]) pins_h |= 0x20; // x= 7, y= 5, mapped pin D8
+			if (0x80u & p[12]) pins_h |= 0x10; // x= 7, y= 6, mapped pin D7
+			if (0x80u & p[14]) pins_h |= 0x08; // x= 7, y= 7, mapped pin D6
+			if (0x80u & p[16]) pins_e |= 0x08; // x= 7, y= 8, mapped pin D5
 			break;
 		case 11:
-			pins_b |= (0x40u & p[ 2]);      // x= 6, y= 1, mapped pin D12
-			pins_b |= (0x40u & p[ 4]) >> 1; // x= 6, y= 2, mapped pin D11
-			pins_b |= (0x40u & p[ 6]) >> 2; // x= 6, y= 3, mapped pin D10
-			pins_e |= (0x01u & p[ 0]) << 4; // x= 0, y= 0, mapped pin D2
-			pins_e |= (0x04u & p[ 0]) << 3; // x= 2, y= 0, mapped pin D3
-			pins_e |= (0x40u & p[16]) >> 3; // x= 6, y= 8, mapped pin D5
-			pins_g |= (0x10u & p[ 0]) << 1; // x= 4, y= 0, mapped pin D4
-			pins_h |= (0x40u & p[ 8]);      // x= 6, y= 4, mapped pin D9
-			pins_h |= (0x40u & p[10]) >> 1; // x= 6, y= 5, mapped pin D8
-			pins_h |= (0x40u & p[12]) >> 2; // x= 6, y= 6, mapped pin D7
-			pins_h |= (0x40u & p[14]) >> 3; // x= 6, y= 7, mapped pin D6
+			if (0x01u & p[ 0]) pins_e |= 0x10; // x= 0, y= 0, mapped pin D2
+			if (0x04u & p[ 0]) pins_e |= 0x20; // x= 2, y= 0, mapped pin D3
+			if (0x10u & p[ 0]) pins_g |= 0x20; // x= 4, y= 0, mapped pin D4
+			if (0x40u & p[ 4]) pins_b |= 0x20; // x= 6, y= 2, mapped pin D11
+			if (0x40u & p[ 6]) pins_b |= 0x10; // x= 6, y= 3, mapped pin D10
+			if (0x40u & p[10]) pins_h |= 0x20; // x= 6, y= 5, mapped pin D8
+			if (0x40u & p[12]) pins_h |= 0x10; // x= 6, y= 6, mapped pin D7
+			if (0x40u & p[14]) pins_h |= 0x08; // x= 6, y= 7, mapped pin D6
+			if (0x40u & p[16]) pins_e |= 0x08; // x= 6, y= 8, mapped pin D5
+			pins_b |= (0x40u & p[ 2]);         // x= 6, y= 1, mapped pin D12
+			pins_h |= (0x40u & p[ 8]);         // x= 6, y= 4, mapped pin D9
 			break;
 		}
 	}
@@ -501,154 +499,154 @@ static void compose_cycle(uint8_t const cycle, uint8_t plane) {
 	if (plane < NUMPLANE) {
 		switch(cycle) {
 		case 0:
-			pins_b |= (0x02u & p[ 4]) << 6; // x= 1, y= 2, mapped pin D11
-			pins_b |= (0x02u & p[ 6]) << 5; // x= 1, y= 3, mapped pin D10
-			pins_b |= (0x02u & p[ 8]) << 4; // x= 1, y= 4, mapped pin D9
-			pins_b |= (0x02u & p[10]) << 3; // x= 1, y= 5, mapped pin D8
-			pins_c |= (0x02u & p[ 0]) << 6; // x= 1, y= 0, mapped pin D13
-			pins_c |= (0x02u & p[16]) << 5; // x= 1, y= 8, mapped pin D5
-			pins_d |= (0x02u & p[ 2]) << 5; // x= 1, y= 1, mapped pin D12
-			pins_d |= (0x02u & p[14]) << 6; // x= 1, y= 7, mapped pin D6
-			pins_e |= (0x02u & p[12]) << 5; // x= 1, y= 6, mapped pin D7
+			if (0x02u & p[ 0]) pins_c |= 0x80; // x= 1, y= 0, mapped pin D13
+			if (0x02u & p[ 2]) pins_d |= 0x40; // x= 1, y= 1, mapped pin D12
+			if (0x02u & p[ 4]) pins_b |= 0x80; // x= 1, y= 2, mapped pin D11
+			if (0x02u & p[ 6]) pins_b |= 0x40; // x= 1, y= 3, mapped pin D10
+			if (0x02u & p[ 8]) pins_b |= 0x20; // x= 1, y= 4, mapped pin D9
+			if (0x02u & p[10]) pins_b |= 0x10; // x= 1, y= 5, mapped pin D8
+			if (0x02u & p[12]) pins_e |= 0x40; // x= 1, y= 6, mapped pin D7
+			if (0x02u & p[14]) pins_d |= 0x80; // x= 1, y= 7, mapped pin D6
+			if (0x02u & p[16]) pins_c |= 0x40; // x= 1, y= 8, mapped pin D5
 			break;
 		case 1:
-			pins_b |= (0x08u & p[ 4]) << 4; // x= 3, y= 2, mapped pin D11
-			pins_b |= (0x08u & p[ 6]) << 3; // x= 3, y= 3, mapped pin D10
-			pins_b |= (0x08u & p[ 8]) << 2; // x= 3, y= 4, mapped pin D9
-			pins_b |= (0x08u & p[10]) << 1; // x= 3, y= 5, mapped pin D8
-			pins_c |= (0x08u & p[ 0]) << 4; // x= 3, y= 0, mapped pin D13
-			pins_c |= (0x08u & p[16]) << 3; // x= 3, y= 8, mapped pin D5
-			pins_d |= (0x08u & p[ 2]) << 3; // x= 3, y= 1, mapped pin D12
-			pins_d |= (0x08u & p[14]) << 4; // x= 3, y= 7, mapped pin D6
-			pins_e |= (0x08u & p[12]) << 3; // x= 3, y= 6, mapped pin D7
+			if (0x08u & p[ 0]) pins_c |= 0x80; // x= 3, y= 0, mapped pin D13
+			if (0x08u & p[ 2]) pins_d |= 0x40; // x= 3, y= 1, mapped pin D12
+			if (0x08u & p[ 4]) pins_b |= 0x80; // x= 3, y= 2, mapped pin D11
+			if (0x08u & p[ 6]) pins_b |= 0x40; // x= 3, y= 3, mapped pin D10
+			if (0x08u & p[ 8]) pins_b |= 0x20; // x= 3, y= 4, mapped pin D9
+			if (0x08u & p[10]) pins_b |= 0x10; // x= 3, y= 5, mapped pin D8
+			if (0x08u & p[12]) pins_e |= 0x40; // x= 3, y= 6, mapped pin D7
+			if (0x08u & p[14]) pins_d |= 0x80; // x= 3, y= 7, mapped pin D6
+			if (0x08u & p[16]) pins_c |= 0x40; // x= 3, y= 8, mapped pin D5
 			break;
 		case 2:
-			pins_b |= (0x20u & p[ 4]) << 2; // x= 5, y= 2, mapped pin D11
-			pins_b |= (0x20u & p[ 6]) << 1; // x= 5, y= 3, mapped pin D10
-			pins_b |= (0x20u & p[ 8]);      // x= 5, y= 4, mapped pin D9
-			pins_b |= (0x20u & p[10]) >> 1; // x= 5, y= 5, mapped pin D8
-			pins_c |= (0x20u & p[ 0]) << 2; // x= 5, y= 0, mapped pin D13
-			pins_c |= (0x20u & p[16]) << 1; // x= 5, y= 8, mapped pin D5
-			pins_d |= (0x20u & p[ 2]) << 1; // x= 5, y= 1, mapped pin D12
-			pins_d |= (0x20u & p[14]) << 2; // x= 5, y= 7, mapped pin D6
-			pins_e |= (0x20u & p[12]) << 1; // x= 5, y= 6, mapped pin D7
+			if (0x20u & p[ 0]) pins_c |= 0x80; // x= 5, y= 0, mapped pin D13
+			if (0x20u & p[ 2]) pins_d |= 0x40; // x= 5, y= 1, mapped pin D12
+			if (0x20u & p[ 4]) pins_b |= 0x80; // x= 5, y= 2, mapped pin D11
+			if (0x20u & p[ 6]) pins_b |= 0x40; // x= 5, y= 3, mapped pin D10
+			if (0x20u & p[10]) pins_b |= 0x10; // x= 5, y= 5, mapped pin D8
+			if (0x20u & p[12]) pins_e |= 0x40; // x= 5, y= 6, mapped pin D7
+			if (0x20u & p[14]) pins_d |= 0x80; // x= 5, y= 7, mapped pin D6
+			if (0x20u & p[16]) pins_c |= 0x40; // x= 5, y= 8, mapped pin D5
+			pins_b |= (0x20u & p[ 8]);         // x= 5, y= 4, mapped pin D9
 			break;
 		case 3:
-			pins_b |= (0x20u & p[ 5]) << 2; // x=13, y= 2, mapped pin D11
-			pins_b |= (0x20u & p[ 7]) << 1; // x=13, y= 3, mapped pin D10
-			pins_b |= (0x20u & p[ 9]);      // x=13, y= 4, mapped pin D9
-			pins_b |= (0x20u & p[11]) >> 1; // x=13, y= 5, mapped pin D8
-			pins_c |= (0x20u & p[ 1]) << 2; // x=13, y= 0, mapped pin D13
-			pins_d |= (0x01u & p[16]) << 1; // x= 0, y= 8, mapped pin D2
-			pins_d |= (0x04u & p[16]) >> 2; // x= 2, y= 8, mapped pin D3
-			pins_d |= (0x10u & p[16]);      // x= 4, y= 8, mapped pin D4
-			pins_d |= (0x20u & p[ 3]) << 1; // x=13, y= 1, mapped pin D12
-			pins_d |= (0x20u & p[15]) << 2; // x=13, y= 7, mapped pin D6
-			pins_e |= (0x20u & p[13]) << 1; // x=13, y= 6, mapped pin D7
+			if (0x01u & p[16]) pins_d |= 0x02; // x= 0, y= 8, mapped pin D2
+			if (0x04u & p[16]) pins_d |= 0x01; // x= 2, y= 8, mapped pin D3
+			if (0x20u & p[ 1]) pins_c |= 0x80; // x=13, y= 0, mapped pin D13
+			if (0x20u & p[ 3]) pins_d |= 0x40; // x=13, y= 1, mapped pin D12
+			if (0x20u & p[ 5]) pins_b |= 0x80; // x=13, y= 2, mapped pin D11
+			if (0x20u & p[ 7]) pins_b |= 0x40; // x=13, y= 3, mapped pin D10
+			if (0x20u & p[11]) pins_b |= 0x10; // x=13, y= 5, mapped pin D8
+			if (0x20u & p[13]) pins_e |= 0x40; // x=13, y= 6, mapped pin D7
+			if (0x20u & p[15]) pins_d |= 0x80; // x=13, y= 7, mapped pin D6
+			pins_b |= (0x20u & p[ 9]);         // x=13, y= 4, mapped pin D9
+			pins_d |= (0x10u & p[16]);         // x= 4, y= 8, mapped pin D4
 			break;
 		case 4:
-			pins_b |= (0x10u & p[ 5]) << 3; // x=12, y= 2, mapped pin D11
-			pins_b |= (0x10u & p[ 7]) << 2; // x=12, y= 3, mapped pin D10
-			pins_b |= (0x10u & p[ 9]) << 1; // x=12, y= 4, mapped pin D9
-			pins_b |= (0x10u & p[11]);      // x=12, y= 5, mapped pin D8
-			pins_c |= (0x10u & p[ 1]) << 3; // x=12, y= 0, mapped pin D13
-			pins_c |= (0x20u & p[17]) << 1; // x=13, y= 8, mapped pin D5
-			pins_d |= (0x01u & p[14]) << 1; // x= 0, y= 7, mapped pin D2
-			pins_d |= (0x04u & p[14]) >> 2; // x= 2, y= 7, mapped pin D3
-			pins_d |= (0x10u & p[ 3]) << 2; // x=12, y= 1, mapped pin D12
-			pins_d |= (0x10u & p[14]);      // x= 4, y= 7, mapped pin D4
-			pins_e |= (0x10u & p[13]) << 2; // x=12, y= 6, mapped pin D7
+			if (0x01u & p[14]) pins_d |= 0x02; // x= 0, y= 7, mapped pin D2
+			if (0x04u & p[14]) pins_d |= 0x01; // x= 2, y= 7, mapped pin D3
+			if (0x10u & p[ 1]) pins_c |= 0x80; // x=12, y= 0, mapped pin D13
+			if (0x10u & p[ 3]) pins_d |= 0x40; // x=12, y= 1, mapped pin D12
+			if (0x10u & p[ 5]) pins_b |= 0x80; // x=12, y= 2, mapped pin D11
+			if (0x10u & p[ 7]) pins_b |= 0x40; // x=12, y= 3, mapped pin D10
+			if (0x10u & p[ 9]) pins_b |= 0x20; // x=12, y= 4, mapped pin D9
+			if (0x10u & p[13]) pins_e |= 0x40; // x=12, y= 6, mapped pin D7
+			if (0x20u & p[17]) pins_c |= 0x40; // x=13, y= 8, mapped pin D5
+			pins_b |= (0x10u & p[11]);         // x=12, y= 5, mapped pin D8
+			pins_d |= (0x10u & p[14]);         // x= 4, y= 7, mapped pin D4
 			break;
 		case 5:
-			pins_b |= (0x08u & p[ 5]) << 4; // x=11, y= 2, mapped pin D11
-			pins_b |= (0x08u & p[ 7]) << 3; // x=11, y= 3, mapped pin D10
-			pins_b |= (0x08u & p[ 9]) << 2; // x=11, y= 4, mapped pin D9
-			pins_b |= (0x08u & p[11]) << 1; // x=11, y= 5, mapped pin D8
-			pins_c |= (0x08u & p[ 1]) << 4; // x=11, y= 0, mapped pin D13
-			pins_c |= (0x10u & p[17]) << 2; // x=12, y= 8, mapped pin D5
-			pins_d |= (0x01u & p[12]) << 1; // x= 0, y= 6, mapped pin D2
-			pins_d |= (0x04u & p[12]) >> 2; // x= 2, y= 6, mapped pin D3
-			pins_d |= (0x08u & p[ 3]) << 3; // x=11, y= 1, mapped pin D12
-			pins_d |= (0x10u & p[12]);      // x= 4, y= 6, mapped pin D4
-			pins_d |= (0x10u & p[15]) << 3; // x=12, y= 7, mapped pin D6
+			if (0x01u & p[12]) pins_d |= 0x02; // x= 0, y= 6, mapped pin D2
+			if (0x04u & p[12]) pins_d |= 0x01; // x= 2, y= 6, mapped pin D3
+			if (0x08u & p[ 1]) pins_c |= 0x80; // x=11, y= 0, mapped pin D13
+			if (0x08u & p[ 3]) pins_d |= 0x40; // x=11, y= 1, mapped pin D12
+			if (0x08u & p[ 5]) pins_b |= 0x80; // x=11, y= 2, mapped pin D11
+			if (0x08u & p[ 7]) pins_b |= 0x40; // x=11, y= 3, mapped pin D10
+			if (0x08u & p[ 9]) pins_b |= 0x20; // x=11, y= 4, mapped pin D9
+			if (0x08u & p[11]) pins_b |= 0x10; // x=11, y= 5, mapped pin D8
+			if (0x10u & p[15]) pins_d |= 0x80; // x=12, y= 7, mapped pin D6
+			if (0x10u & p[17]) pins_c |= 0x40; // x=12, y= 8, mapped pin D5
+			pins_d |= (0x10u & p[12]);         // x= 4, y= 6, mapped pin D4
 			break;
 		case 6:
-			pins_b |= (0x04u & p[ 5]) << 5; // x=10, y= 2, mapped pin D11
-			pins_b |= (0x04u & p[ 7]) << 4; // x=10, y= 3, mapped pin D10
-			pins_b |= (0x04u & p[ 9]) << 3; // x=10, y= 4, mapped pin D9
-			pins_c |= (0x04u & p[ 1]) << 5; // x=10, y= 0, mapped pin D13
-			pins_c |= (0x08u & p[17]) << 3; // x=11, y= 8, mapped pin D5
-			pins_d |= (0x01u & p[10]) << 1; // x= 0, y= 5, mapped pin D2
-			pins_d |= (0x04u & p[ 3]) << 4; // x=10, y= 1, mapped pin D12
-			pins_d |= (0x04u & p[10]) >> 2; // x= 2, y= 5, mapped pin D3
-			pins_d |= (0x08u & p[15]) << 4; // x=11, y= 7, mapped pin D6
-			pins_d |= (0x10u & p[10]);      // x= 4, y= 5, mapped pin D4
-			pins_e |= (0x08u & p[13]) << 3; // x=11, y= 6, mapped pin D7
+			if (0x01u & p[10]) pins_d |= 0x02; // x= 0, y= 5, mapped pin D2
+			if (0x04u & p[ 1]) pins_c |= 0x80; // x=10, y= 0, mapped pin D13
+			if (0x04u & p[ 3]) pins_d |= 0x40; // x=10, y= 1, mapped pin D12
+			if (0x04u & p[ 5]) pins_b |= 0x80; // x=10, y= 2, mapped pin D11
+			if (0x04u & p[ 7]) pins_b |= 0x40; // x=10, y= 3, mapped pin D10
+			if (0x04u & p[ 9]) pins_b |= 0x20; // x=10, y= 4, mapped pin D9
+			if (0x04u & p[10]) pins_d |= 0x01; // x= 2, y= 5, mapped pin D3
+			if (0x08u & p[13]) pins_e |= 0x40; // x=11, y= 6, mapped pin D7
+			if (0x08u & p[15]) pins_d |= 0x80; // x=11, y= 7, mapped pin D6
+			if (0x08u & p[17]) pins_c |= 0x40; // x=11, y= 8, mapped pin D5
+			pins_d |= (0x10u & p[10]);         // x= 4, y= 5, mapped pin D4
 			break;
 		case 7:
-			pins_b |= (0x02u & p[ 5]) << 6; // x= 9, y= 2, mapped pin D11
-			pins_b |= (0x02u & p[ 7]) << 5; // x= 9, y= 3, mapped pin D10
-			pins_b |= (0x04u & p[11]) << 2; // x=10, y= 5, mapped pin D8
-			pins_c |= (0x02u & p[ 1]) << 6; // x= 9, y= 0, mapped pin D13
-			pins_c |= (0x04u & p[17]) << 4; // x=10, y= 8, mapped pin D5
-			pins_d |= (0x01u & p[ 8]) << 1; // x= 0, y= 4, mapped pin D2
-			pins_d |= (0x02u & p[ 3]) << 5; // x= 9, y= 1, mapped pin D12
-			pins_d |= (0x04u & p[ 8]) >> 2; // x= 2, y= 4, mapped pin D3
-			pins_d |= (0x04u & p[15]) << 5; // x=10, y= 7, mapped pin D6
-			pins_d |= (0x10u & p[ 8]);      // x= 4, y= 4, mapped pin D4
-			pins_e |= (0x04u & p[13]) << 4; // x=10, y= 6, mapped pin D7
+			if (0x01u & p[ 8]) pins_d |= 0x02; // x= 0, y= 4, mapped pin D2
+			if (0x02u & p[ 1]) pins_c |= 0x80; // x= 9, y= 0, mapped pin D13
+			if (0x02u & p[ 3]) pins_d |= 0x40; // x= 9, y= 1, mapped pin D12
+			if (0x02u & p[ 5]) pins_b |= 0x80; // x= 9, y= 2, mapped pin D11
+			if (0x02u & p[ 7]) pins_b |= 0x40; // x= 9, y= 3, mapped pin D10
+			if (0x04u & p[ 8]) pins_d |= 0x01; // x= 2, y= 4, mapped pin D3
+			if (0x04u & p[11]) pins_b |= 0x10; // x=10, y= 5, mapped pin D8
+			if (0x04u & p[13]) pins_e |= 0x40; // x=10, y= 6, mapped pin D7
+			if (0x04u & p[15]) pins_d |= 0x80; // x=10, y= 7, mapped pin D6
+			if (0x04u & p[17]) pins_c |= 0x40; // x=10, y= 8, mapped pin D5
+			pins_d |= (0x10u & p[ 8]);         // x= 4, y= 4, mapped pin D4
 			break;
 		case 8:
-			pins_b |= (0x01u & p[ 5]) << 7; // x= 8, y= 2, mapped pin D11
-			pins_b |= (0x02u & p[ 9]) << 4; // x= 9, y= 4, mapped pin D9
-			pins_b |= (0x02u & p[11]) << 3; // x= 9, y= 5, mapped pin D8
-			pins_c |= (0x01u & p[ 1]) << 7; // x= 8, y= 0, mapped pin D13
-			pins_c |= (0x02u & p[17]) << 5; // x= 9, y= 8, mapped pin D5
-			pins_d |= (0x01u & p[ 3]) << 6; // x= 8, y= 1, mapped pin D12
-			pins_d |= (0x01u & p[ 6]) << 1; // x= 0, y= 3, mapped pin D2
-			pins_d |= (0x02u & p[15]) << 6; // x= 9, y= 7, mapped pin D6
-			pins_d |= (0x04u & p[ 6]) >> 2; // x= 2, y= 3, mapped pin D3
-			pins_d |= (0x10u & p[ 6]);      // x= 4, y= 3, mapped pin D4
-			pins_e |= (0x02u & p[13]) << 5; // x= 9, y= 6, mapped pin D7
+			if (0x01u & p[ 1]) pins_c |= 0x80; // x= 8, y= 0, mapped pin D13
+			if (0x01u & p[ 3]) pins_d |= 0x40; // x= 8, y= 1, mapped pin D12
+			if (0x01u & p[ 5]) pins_b |= 0x80; // x= 8, y= 2, mapped pin D11
+			if (0x01u & p[ 6]) pins_d |= 0x02; // x= 0, y= 3, mapped pin D2
+			if (0x02u & p[ 9]) pins_b |= 0x20; // x= 9, y= 4, mapped pin D9
+			if (0x02u & p[11]) pins_b |= 0x10; // x= 9, y= 5, mapped pin D8
+			if (0x02u & p[13]) pins_e |= 0x40; // x= 9, y= 6, mapped pin D7
+			if (0x02u & p[15]) pins_d |= 0x80; // x= 9, y= 7, mapped pin D6
+			if (0x02u & p[17]) pins_c |= 0x40; // x= 9, y= 8, mapped pin D5
+			if (0x04u & p[ 6]) pins_d |= 0x01; // x= 2, y= 3, mapped pin D3
+			pins_d |= (0x10u & p[ 6]);         // x= 4, y= 3, mapped pin D4
 			break;
 		case 9:
-			pins_b |= (0x01u & p[ 7]) << 6; // x= 8, y= 3, mapped pin D10
-			pins_b |= (0x01u & p[ 9]) << 5; // x= 8, y= 4, mapped pin D9
-			pins_b |= (0x01u & p[11]) << 4; // x= 8, y= 5, mapped pin D8
-			pins_c |= (0x01u & p[17]) << 6; // x= 8, y= 8, mapped pin D5
-			pins_c |= (0x80u & p[ 0]);      // x= 7, y= 0, mapped pin D13
-			pins_d |= (0x01u & p[ 4]) << 1; // x= 0, y= 2, mapped pin D2
-			pins_d |= (0x01u & p[15]) << 7; // x= 8, y= 7, mapped pin D6
-			pins_d |= (0x04u & p[ 4]) >> 2; // x= 2, y= 2, mapped pin D3
-			pins_d |= (0x10u & p[ 4]);      // x= 4, y= 2, mapped pin D4
-			pins_d |= (0x80u & p[ 2]) >> 1; // x= 7, y= 1, mapped pin D12
-			pins_e |= (0x01u & p[13]) << 6; // x= 8, y= 6, mapped pin D7
+			if (0x01u & p[ 4]) pins_d |= 0x02; // x= 0, y= 2, mapped pin D2
+			if (0x01u & p[ 7]) pins_b |= 0x40; // x= 8, y= 3, mapped pin D10
+			if (0x01u & p[ 9]) pins_b |= 0x20; // x= 8, y= 4, mapped pin D9
+			if (0x01u & p[11]) pins_b |= 0x10; // x= 8, y= 5, mapped pin D8
+			if (0x01u & p[13]) pins_e |= 0x40; // x= 8, y= 6, mapped pin D7
+			if (0x01u & p[15]) pins_d |= 0x80; // x= 8, y= 7, mapped pin D6
+			if (0x01u & p[17]) pins_c |= 0x40; // x= 8, y= 8, mapped pin D5
+			if (0x04u & p[ 4]) pins_d |= 0x01; // x= 2, y= 2, mapped pin D3
+			if (0x80u & p[ 2]) pins_d |= 0x40; // x= 7, y= 1, mapped pin D12
+			pins_c |= (0x80u & p[ 0]);         // x= 7, y= 0, mapped pin D13
+			pins_d |= (0x10u & p[ 4]);         // x= 4, y= 2, mapped pin D4
 			break;
 		case 10:
-			pins_b |= (0x80u & p[ 4]);      // x= 7, y= 2, mapped pin D11
-			pins_b |= (0x80u & p[ 6]) >> 1; // x= 7, y= 3, mapped pin D10
-			pins_b |= (0x80u & p[ 8]) >> 2; // x= 7, y= 4, mapped pin D9
-			pins_b |= (0x80u & p[10]) >> 3; // x= 7, y= 5, mapped pin D8
-			pins_c |= (0x40u & p[ 0]) << 1; // x= 6, y= 0, mapped pin D13
-			pins_c |= (0x80u & p[16]) >> 1; // x= 7, y= 8, mapped pin D5
-			pins_d |= (0x01u & p[ 2]) << 1; // x= 0, y= 1, mapped pin D2
-			pins_d |= (0x04u & p[ 2]) >> 2; // x= 2, y= 1, mapped pin D3
-			pins_d |= (0x10u & p[ 2]);      // x= 4, y= 1, mapped pin D4
-			pins_d |= (0x80u & p[14]);      // x= 7, y= 7, mapped pin D6
-			pins_e |= (0x80u & p[12]) >> 1; // x= 7, y= 6, mapped pin D7
+			if (0x01u & p[ 2]) pins_d |= 0x02; // x= 0, y= 1, mapped pin D2
+			if (0x04u & p[ 2]) pins_d |= 0x01; // x= 2, y= 1, mapped pin D3
+			if (0x40u & p[ 0]) pins_c |= 0x80; // x= 6, y= 0, mapped pin D13
+			if (0x80u & p[ 6]) pins_b |= 0x40; // x= 7, y= 3, mapped pin D10
+			if (0x80u & p[ 8]) pins_b |= 0x20; // x= 7, y= 4, mapped pin D9
+			if (0x80u & p[10]) pins_b |= 0x10; // x= 7, y= 5, mapped pin D8
+			if (0x80u & p[12]) pins_e |= 0x40; // x= 7, y= 6, mapped pin D7
+			if (0x80u & p[16]) pins_c |= 0x40; // x= 7, y= 8, mapped pin D5
+			pins_b |= (0x80u & p[ 4]);         // x= 7, y= 2, mapped pin D11
+			pins_d |= (0x10u & p[ 2]);         // x= 4, y= 1, mapped pin D4
+			pins_d |= (0x80u & p[14]);         // x= 7, y= 7, mapped pin D6
 			break;
 		case 11:
-			pins_b |= (0x40u & p[ 4]) << 1; // x= 6, y= 2, mapped pin D11
-			pins_b |= (0x40u & p[ 6]);      // x= 6, y= 3, mapped pin D10
-			pins_b |= (0x40u & p[ 8]) >> 1; // x= 6, y= 4, mapped pin D9
-			pins_b |= (0x40u & p[10]) >> 2; // x= 6, y= 5, mapped pin D8
-			pins_c |= (0x40u & p[16]);      // x= 6, y= 8, mapped pin D5
-			pins_d |= (0x01u & p[ 0]) << 1; // x= 0, y= 0, mapped pin D2
-			pins_d |= (0x04u & p[ 0]) >> 2; // x= 2, y= 0, mapped pin D3
-			pins_d |= (0x10u & p[ 0]);      // x= 4, y= 0, mapped pin D4
-			pins_d |= (0x40u & p[ 2]);      // x= 6, y= 1, mapped pin D12
-			pins_d |= (0x40u & p[14]) << 1; // x= 6, y= 7, mapped pin D6
-			pins_e |= (0x40u & p[12]);      // x= 6, y= 6, mapped pin D7
+			if (0x01u & p[ 0]) pins_d |= 0x02; // x= 0, y= 0, mapped pin D2
+			if (0x04u & p[ 0]) pins_d |= 0x01; // x= 2, y= 0, mapped pin D3
+			if (0x40u & p[ 4]) pins_b |= 0x80; // x= 6, y= 2, mapped pin D11
+			if (0x40u & p[ 8]) pins_b |= 0x20; // x= 6, y= 4, mapped pin D9
+			if (0x40u & p[10]) pins_b |= 0x10; // x= 6, y= 5, mapped pin D8
+			if (0x40u & p[14]) pins_d |= 0x80; // x= 6, y= 7, mapped pin D6
+			pins_b |= (0x40u & p[ 6]);         // x= 6, y= 3, mapped pin D10
+			pins_c |= (0x40u & p[16]);         // x= 6, y= 8, mapped pin D5
+			pins_d |= (0x10u & p[ 0]);         // x= 4, y= 0, mapped pin D4
+			pins_d |= (0x40u & p[ 2]);         // x= 6, y= 1, mapped pin D12
+			pins_e |= (0x40u & p[12]);         // x= 6, y= 6, mapped pin D7
 			break;
 		}
 	}
@@ -689,160 +687,158 @@ static void compose_cycle(uint8_t const cycle, uint8_t plane) {
 	uint8_t pins_b = sink_b = pgm_read_byte(&sink_b_cycle[cycle]);
 
 	// convert Borgware-2D framebuffer to LoL Shield cycles on Diavolino
-	// (I could have done this with a lookup table, but that would be slower as
-	// non-constant bit shifts are quite expensive on AVR)
 	// NOTE: (0,0) is UPPER RIGHT in the Borgware realm
 	if (plane < NUMPLANE) {
 		switch(cycle) {
 		case 0:
-			pins_b |= (0x02u & p[ 0]) << 4; // x= 1, y= 0, mapped pin D13
-			pins_b |= (0x02u & p[ 2]) << 3; // x= 1, y= 1, mapped pin D12
-			pins_b |= (0x02u & p[ 4]) << 2; // x= 1, y= 2, mapped pin D11
-			pins_b |= (0x02u & p[ 6]) << 1; // x= 1, y= 3, mapped pin D10
-			pins_b |= (0x02u & p[ 8]);      // x= 1, y= 4, mapped pin D9
-			pins_b |= (0x02u & p[10]) >> 1; // x= 1, y= 5, mapped pin D8
-			pins_d |= (0x02u & p[12]) << 6; // x= 1, y= 6, mapped pin D7
-			pins_d |= (0x02u & p[14]) << 5; // x= 1, y= 7, mapped pin D6
-			pins_d |= (0x02u & p[16]) << 4; // x= 1, y= 8, mapped pin D5
+			if (0x02u & p[ 0]) pins_b |= 0x20; // x= 1, y= 0, mapped pin D13
+			if (0x02u & p[ 2]) pins_b |= 0x10; // x= 1, y= 1, mapped pin D12
+			if (0x02u & p[ 4]) pins_b |= 0x08; // x= 1, y= 2, mapped pin D11
+			if (0x02u & p[ 6]) pins_b |= 0x04; // x= 1, y= 3, mapped pin D10
+			if (0x02u & p[10]) pins_b |= 0x01; // x= 1, y= 5, mapped pin D8
+			if (0x02u & p[12]) pins_d |= 0x80; // x= 1, y= 6, mapped pin D7
+			if (0x02u & p[14]) pins_d |= 0x40; // x= 1, y= 7, mapped pin D6
+			if (0x02u & p[16]) pins_d |= 0x20; // x= 1, y= 8, mapped pin D5
+			pins_b |= (0x02u & p[ 8]);         // x= 1, y= 4, mapped pin D9
 			break;
 		case 1:
-			pins_b |= (0x08u & p[ 0]) << 2; // x= 3, y= 0, mapped pin D13
-			pins_b |= (0x08u & p[ 2]) << 1; // x= 3, y= 1, mapped pin D12
-			pins_b |= (0x08u & p[ 4]);      // x= 3, y= 2, mapped pin D11
-			pins_b |= (0x08u & p[ 6]) >> 1; // x= 3, y= 3, mapped pin D10
-			pins_b |= (0x08u & p[ 8]) >> 2; // x= 3, y= 4, mapped pin D9
-			pins_b |= (0x08u & p[10]) >> 3; // x= 3, y= 5, mapped pin D8
-			pins_d |= (0x08u & p[12]) << 4; // x= 3, y= 6, mapped pin D7
-			pins_d |= (0x08u & p[14]) << 3; // x= 3, y= 7, mapped pin D6
-			pins_d |= (0x08u & p[16]) << 2; // x= 3, y= 8, mapped pin D5
+			if (0x08u & p[ 0]) pins_b |= 0x20; // x= 3, y= 0, mapped pin D13
+			if (0x08u & p[ 2]) pins_b |= 0x10; // x= 3, y= 1, mapped pin D12
+			if (0x08u & p[ 6]) pins_b |= 0x04; // x= 3, y= 3, mapped pin D10
+			if (0x08u & p[ 8]) pins_b |= 0x02; // x= 3, y= 4, mapped pin D9
+			if (0x08u & p[10]) pins_b |= 0x01; // x= 3, y= 5, mapped pin D8
+			if (0x08u & p[12]) pins_d |= 0x80; // x= 3, y= 6, mapped pin D7
+			if (0x08u & p[14]) pins_d |= 0x40; // x= 3, y= 7, mapped pin D6
+			if (0x08u & p[16]) pins_d |= 0x20; // x= 3, y= 8, mapped pin D5
+			pins_b |= (0x08u & p[ 4]);         // x= 3, y= 2, mapped pin D11
 			break;
 		case 2:
-			pins_b |= (0x20u & p[ 0]);      // x= 5, y= 0, mapped pin D13
-			pins_b |= (0x20u & p[ 2]) >> 1; // x= 5, y= 1, mapped pin D12
-			pins_b |= (0x20u & p[ 4]) >> 2; // x= 5, y= 2, mapped pin D11
-			pins_b |= (0x20u & p[ 6]) >> 3; // x= 5, y= 3, mapped pin D10
-			pins_b |= (0x20u & p[ 8]) >> 4; // x= 5, y= 4, mapped pin D9
-			pins_b |= (0x20u & p[10]) >> 5; // x= 5, y= 5, mapped pin D8
-			pins_d |= (0x20u & p[12]) << 2; // x= 5, y= 6, mapped pin D7
-			pins_d |= (0x20u & p[14]) << 1; // x= 5, y= 7, mapped pin D6
-			pins_d |= (0x20u & p[16]);      // x= 5, y= 8, mapped pin D5
+			if (0x20u & p[ 2]) pins_b |= 0x10; // x= 5, y= 1, mapped pin D12
+			if (0x20u & p[ 4]) pins_b |= 0x08; // x= 5, y= 2, mapped pin D11
+			if (0x20u & p[ 6]) pins_b |= 0x04; // x= 5, y= 3, mapped pin D10
+			if (0x20u & p[ 8]) pins_b |= 0x02; // x= 5, y= 4, mapped pin D9
+			if (0x20u & p[10]) pins_b |= 0x01; // x= 5, y= 5, mapped pin D8
+			if (0x20u & p[12]) pins_d |= 0x80; // x= 5, y= 6, mapped pin D7
+			if (0x20u & p[14]) pins_d |= 0x40; // x= 5, y= 7, mapped pin D6
+			pins_b |= (0x20u & p[ 0]);         // x= 5, y= 0, mapped pin D13
+			pins_d |= (0x20u & p[16]);         // x= 5, y= 8, mapped pin D5
 			break;
 		case 3:
-			pins_b |= (0x20u & p[ 1]);      // x=13, y= 0, mapped pin D13
-			pins_b |= (0x20u & p[ 3]) >> 1; // x=13, y= 1, mapped pin D12
-			pins_b |= (0x20u & p[ 5]) >> 2; // x=13, y= 2, mapped pin D11
-			pins_b |= (0x20u & p[ 7]) >> 3; // x=13, y= 3, mapped pin D10
-			pins_b |= (0x20u & p[ 9]) >> 4; // x=13, y= 4, mapped pin D9
-			pins_b |= (0x20u & p[11]) >> 5; // x=13, y= 5, mapped pin D8
-			pins_d |= (0x01u & p[16]) << 2; // x= 0, y= 8, mapped pin D2
-			pins_d |= (0x04u & p[16]) << 1; // x= 2, y= 8, mapped pin D3
-			pins_d |= (0x10u & p[16]);      // x= 4, y= 8, mapped pin D4
-			pins_d |= (0x20u & p[13]) << 2; // x=13, y= 6, mapped pin D7
-			pins_d |= (0x20u & p[15]) << 1; // x=13, y= 7, mapped pin D6
+			if (0x01u & p[16]) pins_d |= 0x04; // x= 0, y= 8, mapped pin D2
+			if (0x04u & p[16]) pins_d |= 0x08; // x= 2, y= 8, mapped pin D3
+			if (0x20u & p[ 3]) pins_b |= 0x10; // x=13, y= 1, mapped pin D12
+			if (0x20u & p[ 5]) pins_b |= 0x08; // x=13, y= 2, mapped pin D11
+			if (0x20u & p[ 7]) pins_b |= 0x04; // x=13, y= 3, mapped pin D10
+			if (0x20u & p[ 9]) pins_b |= 0x02; // x=13, y= 4, mapped pin D9
+			if (0x20u & p[11]) pins_b |= 0x01; // x=13, y= 5, mapped pin D8
+			if (0x20u & p[13]) pins_d |= 0x80; // x=13, y= 6, mapped pin D7
+			if (0x20u & p[15]) pins_d |= 0x40; // x=13, y= 7, mapped pin D6
+			pins_b |= (0x20u & p[ 1]);         // x=13, y= 0, mapped pin D13
+			pins_d |= (0x10u & p[16]);         // x= 4, y= 8, mapped pin D4
 			break;
 		case 4:
-			pins_b |= (0x10u & p[ 1]) << 1; // x=12, y= 0, mapped pin D13
-			pins_b |= (0x10u & p[ 3]);      // x=12, y= 1, mapped pin D12
-			pins_b |= (0x10u & p[ 5]) >> 1; // x=12, y= 2, mapped pin D11
-			pins_b |= (0x10u & p[ 7]) >> 2; // x=12, y= 3, mapped pin D10
-			pins_b |= (0x10u & p[ 9]) >> 3; // x=12, y= 4, mapped pin D9
-			pins_b |= (0x10u & p[11]) >> 4; // x=12, y= 5, mapped pin D8
-			pins_d |= (0x01u & p[14]) << 2; // x= 0, y= 7, mapped pin D2
-			pins_d |= (0x04u & p[14]) << 1; // x= 2, y= 7, mapped pin D3
-			pins_d |= (0x10u & p[13]) << 3; // x=12, y= 6, mapped pin D7
-			pins_d |= (0x10u & p[14]);      // x= 4, y= 7, mapped pin D4
-			pins_d |= (0x20u & p[17]);      // x=13, y= 8, mapped pin D5
+			if (0x01u & p[14]) pins_d |= 0x04; // x= 0, y= 7, mapped pin D2
+			if (0x04u & p[14]) pins_d |= 0x08; // x= 2, y= 7, mapped pin D3
+			if (0x10u & p[ 1]) pins_b |= 0x20; // x=12, y= 0, mapped pin D13
+			if (0x10u & p[ 5]) pins_b |= 0x08; // x=12, y= 2, mapped pin D11
+			if (0x10u & p[ 7]) pins_b |= 0x04; // x=12, y= 3, mapped pin D10
+			if (0x10u & p[ 9]) pins_b |= 0x02; // x=12, y= 4, mapped pin D9
+			if (0x10u & p[11]) pins_b |= 0x01; // x=12, y= 5, mapped pin D8
+			if (0x10u & p[13]) pins_d |= 0x80; // x=12, y= 6, mapped pin D7
+			pins_b |= (0x10u & p[ 3]);         // x=12, y= 1, mapped pin D12
+			pins_d |= (0x10u & p[14]);         // x= 4, y= 7, mapped pin D4
+			pins_d |= (0x20u & p[17]);         // x=13, y= 8, mapped pin D5
 			break;
 		case 5:
-			pins_b |= (0x08u & p[ 1]) << 2; // x=11, y= 0, mapped pin D13
-			pins_b |= (0x08u & p[ 3]) << 1; // x=11, y= 1, mapped pin D12
-			pins_b |= (0x08u & p[ 5]);      // x=11, y= 2, mapped pin D11
-			pins_b |= (0x08u & p[ 7]) >> 1; // x=11, y= 3, mapped pin D10
-			pins_b |= (0x08u & p[ 9]) >> 2; // x=11, y= 4, mapped pin D9
-			pins_b |= (0x08u & p[11]) >> 3; // x=11, y= 5, mapped pin D8
-			pins_d |= (0x01u & p[12]) << 2; // x= 0, y= 6, mapped pin D2
-			pins_d |= (0x04u & p[12]) << 1; // x= 2, y= 6, mapped pin D3
-			pins_d |= (0x10u & p[12]);      // x= 4, y= 6, mapped pin D4
-			pins_d |= (0x10u & p[15]) << 2; // x=12, y= 7, mapped pin D6
-			pins_d |= (0x10u & p[17]) << 1; // x=12, y= 8, mapped pin D5
+			if (0x01u & p[12]) pins_d |= 0x04; // x= 0, y= 6, mapped pin D2
+			if (0x04u & p[12]) pins_d |= 0x08; // x= 2, y= 6, mapped pin D3
+			if (0x08u & p[ 1]) pins_b |= 0x20; // x=11, y= 0, mapped pin D13
+			if (0x08u & p[ 3]) pins_b |= 0x10; // x=11, y= 1, mapped pin D12
+			if (0x08u & p[ 7]) pins_b |= 0x04; // x=11, y= 3, mapped pin D10
+			if (0x08u & p[ 9]) pins_b |= 0x02; // x=11, y= 4, mapped pin D9
+			if (0x08u & p[11]) pins_b |= 0x01; // x=11, y= 5, mapped pin D8
+			if (0x10u & p[15]) pins_d |= 0x40; // x=12, y= 7, mapped pin D6
+			if (0x10u & p[17]) pins_d |= 0x20; // x=12, y= 8, mapped pin D5
+			pins_b |= (0x08u & p[ 5]);         // x=11, y= 2, mapped pin D11
+			pins_d |= (0x10u & p[12]);         // x= 4, y= 6, mapped pin D4
 			break;
 		case 6:
-			pins_b |= (0x04u & p[ 1]) << 3; // x=10, y= 0, mapped pin D13
-			pins_b |= (0x04u & p[ 3]) << 2; // x=10, y= 1, mapped pin D12
-			pins_b |= (0x04u & p[ 5]) << 1; // x=10, y= 2, mapped pin D11
-			pins_b |= (0x04u & p[ 7]);      // x=10, y= 3, mapped pin D10
-			pins_b |= (0x04u & p[ 9]) >> 1; // x=10, y= 4, mapped pin D9
-			pins_d |= (0x01u & p[10]) << 2; // x= 0, y= 5, mapped pin D2
-			pins_d |= (0x04u & p[10]) << 1; // x= 2, y= 5, mapped pin D3
-			pins_d |= (0x08u & p[13]) << 4; // x=11, y= 6, mapped pin D7
-			pins_d |= (0x08u & p[15]) << 3; // x=11, y= 7, mapped pin D6
-			pins_d |= (0x08u & p[17]) << 2; // x=11, y= 8, mapped pin D5
-			pins_d |= (0x10u & p[10]);      // x= 4, y= 5, mapped pin D4
+			if (0x01u & p[10]) pins_d |= 0x04; // x= 0, y= 5, mapped pin D2
+			if (0x04u & p[ 1]) pins_b |= 0x20; // x=10, y= 0, mapped pin D13
+			if (0x04u & p[ 3]) pins_b |= 0x10; // x=10, y= 1, mapped pin D12
+			if (0x04u & p[ 5]) pins_b |= 0x08; // x=10, y= 2, mapped pin D11
+			if (0x04u & p[ 9]) pins_b |= 0x02; // x=10, y= 4, mapped pin D9
+			if (0x04u & p[10]) pins_d |= 0x08; // x= 2, y= 5, mapped pin D3
+			if (0x08u & p[13]) pins_d |= 0x80; // x=11, y= 6, mapped pin D7
+			if (0x08u & p[15]) pins_d |= 0x40; // x=11, y= 7, mapped pin D6
+			if (0x08u & p[17]) pins_d |= 0x20; // x=11, y= 8, mapped pin D5
+			pins_b |= (0x04u & p[ 7]);         // x=10, y= 3, mapped pin D10
+			pins_d |= (0x10u & p[10]);         // x= 4, y= 5, mapped pin D4
 			break;
 		case 7:
-			pins_b |= (0x02u & p[ 1]) << 4; // x= 9, y= 0, mapped pin D13
-			pins_b |= (0x02u & p[ 3]) << 3; // x= 9, y= 1, mapped pin D12
-			pins_b |= (0x02u & p[ 5]) << 2; // x= 9, y= 2, mapped pin D11
-			pins_b |= (0x02u & p[ 7]) << 1; // x= 9, y= 3, mapped pin D10
-			pins_b |= (0x04u & p[11]) >> 2; // x=10, y= 5, mapped pin D8
-			pins_d |= (0x01u & p[ 8]) << 2; // x= 0, y= 4, mapped pin D2
-			pins_d |= (0x04u & p[ 8]) << 1; // x= 2, y= 4, mapped pin D3
-			pins_d |= (0x04u & p[13]) << 5; // x=10, y= 6, mapped pin D7
-			pins_d |= (0x04u & p[15]) << 4; // x=10, y= 7, mapped pin D6
-			pins_d |= (0x04u & p[17]) << 3; // x=10, y= 8, mapped pin D5
-			pins_d |= (0x10u & p[ 8]);      // x= 4, y= 4, mapped pin D4
+			if (0x01u & p[ 8]) pins_d |= 0x04; // x= 0, y= 4, mapped pin D2
+			if (0x02u & p[ 1]) pins_b |= 0x20; // x= 9, y= 0, mapped pin D13
+			if (0x02u & p[ 3]) pins_b |= 0x10; // x= 9, y= 1, mapped pin D12
+			if (0x02u & p[ 5]) pins_b |= 0x08; // x= 9, y= 2, mapped pin D11
+			if (0x02u & p[ 7]) pins_b |= 0x04; // x= 9, y= 3, mapped pin D10
+			if (0x04u & p[ 8]) pins_d |= 0x08; // x= 2, y= 4, mapped pin D3
+			if (0x04u & p[11]) pins_b |= 0x01; // x=10, y= 5, mapped pin D8
+			if (0x04u & p[13]) pins_d |= 0x80; // x=10, y= 6, mapped pin D7
+			if (0x04u & p[15]) pins_d |= 0x40; // x=10, y= 7, mapped pin D6
+			if (0x04u & p[17]) pins_d |= 0x20; // x=10, y= 8, mapped pin D5
+			pins_d |= (0x10u & p[ 8]);         // x= 4, y= 4, mapped pin D4
 			break;
 		case 8:
-			pins_b |= (0x01u & p[ 1]) << 5; // x= 8, y= 0, mapped pin D13
-			pins_b |= (0x01u & p[ 3]) << 4; // x= 8, y= 1, mapped pin D12
-			pins_b |= (0x01u & p[ 5]) << 3; // x= 8, y= 2, mapped pin D11
-			pins_b |= (0x02u & p[ 9]);      // x= 9, y= 4, mapped pin D9
-			pins_b |= (0x02u & p[11]) >> 1; // x= 9, y= 5, mapped pin D8
-			pins_d |= (0x01u & p[ 6]) << 2; // x= 0, y= 3, mapped pin D2
-			pins_d |= (0x02u & p[13]) << 6; // x= 9, y= 6, mapped pin D7
-			pins_d |= (0x02u & p[15]) << 5; // x= 9, y= 7, mapped pin D6
-			pins_d |= (0x02u & p[17]) << 4; // x= 9, y= 8, mapped pin D5
-			pins_d |= (0x04u & p[ 6]) << 1; // x= 2, y= 3, mapped pin D3
-			pins_d |= (0x10u & p[ 6]);      // x= 4, y= 3, mapped pin D4
+			if (0x01u & p[ 1]) pins_b |= 0x20; // x= 8, y= 0, mapped pin D13
+			if (0x01u & p[ 3]) pins_b |= 0x10; // x= 8, y= 1, mapped pin D12
+			if (0x01u & p[ 5]) pins_b |= 0x08; // x= 8, y= 2, mapped pin D11
+			if (0x01u & p[ 6]) pins_d |= 0x04; // x= 0, y= 3, mapped pin D2
+			if (0x02u & p[11]) pins_b |= 0x01; // x= 9, y= 5, mapped pin D8
+			if (0x02u & p[13]) pins_d |= 0x80; // x= 9, y= 6, mapped pin D7
+			if (0x02u & p[15]) pins_d |= 0x40; // x= 9, y= 7, mapped pin D6
+			if (0x02u & p[17]) pins_d |= 0x20; // x= 9, y= 8, mapped pin D5
+			if (0x04u & p[ 6]) pins_d |= 0x08; // x= 2, y= 3, mapped pin D3
+			pins_b |= (0x02u & p[ 9]);         // x= 9, y= 4, mapped pin D9
+			pins_d |= (0x10u & p[ 6]);         // x= 4, y= 3, mapped pin D4
 			break;
 		case 9:
-			pins_b |= (0x01u & p[ 7]) << 2; // x= 8, y= 3, mapped pin D10
-			pins_b |= (0x01u & p[ 9]) << 1; // x= 8, y= 4, mapped pin D9
-			pins_b |= (0x01u & p[11]);      // x= 8, y= 5, mapped pin D8
-			pins_b |= (0x80u & p[ 0]) >> 2; // x= 7, y= 0, mapped pin D13
-			pins_b |= (0x80u & p[ 2]) >> 3; // x= 7, y= 1, mapped pin D12
-			pins_d |= (0x01u & p[ 4]) << 2; // x= 0, y= 2, mapped pin D2
-			pins_d |= (0x01u & p[13]) << 7; // x= 8, y= 6, mapped pin D7
-			pins_d |= (0x01u & p[15]) << 6; // x= 8, y= 7, mapped pin D6
-			pins_d |= (0x01u & p[17]) << 5; // x= 8, y= 8, mapped pin D5
-			pins_d |= (0x04u & p[ 4]) << 1; // x= 2, y= 2, mapped pin D3
-			pins_d |= (0x10u & p[ 4]);      // x= 4, y= 2, mapped pin D4
+			if (0x01u & p[ 4]) pins_d |= 0x04; // x= 0, y= 2, mapped pin D2
+			if (0x01u & p[ 7]) pins_b |= 0x04; // x= 8, y= 3, mapped pin D10
+			if (0x01u & p[ 9]) pins_b |= 0x02; // x= 8, y= 4, mapped pin D9
+			if (0x01u & p[13]) pins_d |= 0x80; // x= 8, y= 6, mapped pin D7
+			if (0x01u & p[15]) pins_d |= 0x40; // x= 8, y= 7, mapped pin D6
+			if (0x01u & p[17]) pins_d |= 0x20; // x= 8, y= 8, mapped pin D5
+			if (0x04u & p[ 4]) pins_d |= 0x08; // x= 2, y= 2, mapped pin D3
+			if (0x80u & p[ 0]) pins_b |= 0x20; // x= 7, y= 0, mapped pin D13
+			if (0x80u & p[ 2]) pins_b |= 0x10; // x= 7, y= 1, mapped pin D12
+			pins_b |= (0x01u & p[11]);         // x= 8, y= 5, mapped pin D8
+			pins_d |= (0x10u & p[ 4]);         // x= 4, y= 2, mapped pin D4
 			break;
 		case 10:
-			pins_b |= (0x40u & p[ 0]) >> 1; // x= 6, y= 0, mapped pin D13
-			pins_b |= (0x80u & p[ 4]) >> 4; // x= 7, y= 2, mapped pin D11
-			pins_b |= (0x80u & p[ 6]) >> 5; // x= 7, y= 3, mapped pin D10
-			pins_b |= (0x80u & p[ 8]) >> 6; // x= 7, y= 4, mapped pin D9
-			pins_b |= (0x80u & p[10]) >> 7; // x= 7, y= 5, mapped pin D8
-			pins_d |= (0x01u & p[ 2]) << 2; // x= 0, y= 1, mapped pin D2
-			pins_d |= (0x04u & p[ 2]) << 1; // x= 2, y= 1, mapped pin D3
-			pins_d |= (0x10u & p[ 2]);      // x= 4, y= 1, mapped pin D4
-			pins_d |= (0x80u & p[12]);      // x= 7, y= 6, mapped pin D7
-			pins_d |= (0x80u & p[14]) >> 1; // x= 7, y= 7, mapped pin D6
-			pins_d |= (0x80u & p[16]) >> 2; // x= 7, y= 8, mapped pin D5
+			if (0x01u & p[ 2]) pins_d |= 0x04; // x= 0, y= 1, mapped pin D2
+			if (0x04u & p[ 2]) pins_d |= 0x08; // x= 2, y= 1, mapped pin D3
+			if (0x40u & p[ 0]) pins_b |= 0x20; // x= 6, y= 0, mapped pin D13
+			if (0x80u & p[ 4]) pins_b |= 0x08; // x= 7, y= 2, mapped pin D11
+			if (0x80u & p[ 6]) pins_b |= 0x04; // x= 7, y= 3, mapped pin D10
+			if (0x80u & p[ 8]) pins_b |= 0x02; // x= 7, y= 4, mapped pin D9
+			if (0x80u & p[10]) pins_b |= 0x01; // x= 7, y= 5, mapped pin D8
+			if (0x80u & p[14]) pins_d |= 0x40; // x= 7, y= 7, mapped pin D6
+			if (0x80u & p[16]) pins_d |= 0x20; // x= 7, y= 8, mapped pin D5
+			pins_d |= (0x10u & p[ 2]);         // x= 4, y= 1, mapped pin D4
+			pins_d |= (0x80u & p[12]);         // x= 7, y= 6, mapped pin D7
 			break;
 		case 11:
-			pins_b |= (0x40u & p[ 2]) >> 2; // x= 6, y= 1, mapped pin D12
-			pins_b |= (0x40u & p[ 4]) >> 3; // x= 6, y= 2, mapped pin D11
-			pins_b |= (0x40u & p[ 6]) >> 4; // x= 6, y= 3, mapped pin D10
-			pins_b |= (0x40u & p[ 8]) >> 5; // x= 6, y= 4, mapped pin D9
-			pins_b |= (0x40u & p[10]) >> 6; // x= 6, y= 5, mapped pin D8
-			pins_d |= (0x01u & p[ 0]) << 2; // x= 0, y= 0, mapped pin D2
-			pins_d |= (0x04u & p[ 0]) << 1; // x= 2, y= 0, mapped pin D3
-			pins_d |= (0x10u & p[ 0]);      // x= 4, y= 0, mapped pin D4
-			pins_d |= (0x40u & p[12]) << 1; // x= 6, y= 6, mapped pin D7
-			pins_d |= (0x40u & p[14]);      // x= 6, y= 7, mapped pin D6
-			pins_d |= (0x40u & p[16]) >> 1; // x= 6, y= 8, mapped pin D5
+			if (0x01u & p[ 0]) pins_d |= 0x04; // x= 0, y= 0, mapped pin D2
+			if (0x04u & p[ 0]) pins_d |= 0x08; // x= 2, y= 0, mapped pin D3
+			if (0x40u & p[ 2]) pins_b |= 0x10; // x= 6, y= 1, mapped pin D12
+			if (0x40u & p[ 4]) pins_b |= 0x08; // x= 6, y= 2, mapped pin D11
+			if (0x40u & p[ 6]) pins_b |= 0x04; // x= 6, y= 3, mapped pin D10
+			if (0x40u & p[ 8]) pins_b |= 0x02; // x= 6, y= 4, mapped pin D9
+			if (0x40u & p[10]) pins_b |= 0x01; // x= 6, y= 5, mapped pin D8
+			if (0x40u & p[12]) pins_d |= 0x80; // x= 6, y= 6, mapped pin D7
+			if (0x40u & p[16]) pins_d |= 0x20; // x= 6, y= 8, mapped pin D5
+			pins_d |= (0x10u & p[ 0]);         // x= 4, y= 0, mapped pin D4
+			pins_d |= (0x40u & p[14]);         // x= 6, y= 7, mapped pin D6
 			break;
 		}
 	}
