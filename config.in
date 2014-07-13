@@ -64,7 +64,6 @@ source src/can/config.in
 
 ### Borg Menu #################################################################
 dep_bool "Menu Support" MENU_SUPPORT $JOYSTICK_SUPPORT
-depends on JOYSTICK_SUPPORT
 ###############################################################################
 
 
