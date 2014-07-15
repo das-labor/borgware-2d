@@ -27,6 +27,13 @@
 #include "../display_loop.h"
 #include "trackball.h"
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
+int sockfd;
+struct addrinfo *servinfo, *p;
+
 /** Number of bytes per row. */
 #define LINEBYTES (((NUM_COLS - 1) / 8) + 1)
 
@@ -115,6 +122,19 @@ void display(void) {
 	}
 	glPopMatrix();
 	glutSwapBuffers();
+
+	static uint8_t buffer[160] = {0};
+	static unsigned int divider = 0;
+	if (++divider == 10) {
+		for (unsigned int y = 0; y < NUM_ROWS; ++y) {
+			for (unsigned int lb = 0; lb < LINEBYTES; ++lb) {
+				unsigned int offset = y * 10 + LINEBYTES - lb - 1;
+				buffer[offset] = pixmap[0][y][lb];
+			}
+		}
+		sendto(sockfd, buffer, 160, 0, p->ai_addr, p->ai_addrlen);
+		divider = 0;
+	}
 
 	usleep(20000);
 }
@@ -251,6 +271,38 @@ static void special(int k, int x, int y) {
 	glutPostRedisplay();
 }
 
+int init_socket() {
+    struct addrinfo hints = {.ai_family = AF_UNSPEC, .ai_socktype = SOCK_DGRAM};
+    int rv;
+    int numbytes;
+
+    if ((rv = getaddrinfo("flipdot", "2323", &hints, &servinfo)) != 0) {
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+        return 1;
+    }
+
+    // loop through all the results and make a socket
+    for(p = servinfo; p != NULL; p = p->ai_next) {
+        if ((sockfd = socket(p->ai_family, p->ai_socktype,
+                p->ai_protocol)) == -1) {
+            perror("talker: socket");
+            continue;
+        }
+        break;
+    }
+
+    if (p == NULL) {
+        fprintf(stderr, "talker: failed to bind socket\n");
+        return 2;
+    }
+
+    return 0;
+}
+
+void free_socket() {
+    freeaddrinfo(servinfo);
+    close(sockfd);
+}
 
 /**
  * Entry point for starting the display loop thread.
@@ -269,6 +321,7 @@ void *display_loop_run(void * unused) {
  * @return Exit codem, always zero.
  */
 int main(int argc, char **argv) {
+	init_socket();
 	WindHeight = 700;
 	WindWidth = 700;
 	glutInit(&argc, argv);
@@ -318,6 +371,8 @@ int main(int argc, char **argv) {
 	pthread_create(&simthread, NULL, display_loop_run, NULL);
 
 	glutMainLoop();
+
+	free_socket();
 	return 0;
 }
 
