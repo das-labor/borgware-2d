@@ -20,18 +20,20 @@
 
 #ifdef DOXYGEN
 	/**
-	 * Low precision means that we use Q10.5 values and 16 bit types for almost
-	 * every calculation (with multiplication and division as notable exceptions
-	 * as they and their interim results utilize 32 bit).
+	 * Low precision means that we use Q9.6 values and 16 bit types for almost
+	 * every calculation (with multiplication being a notable exception as its
+	 * interim results utilize 32 bit types).
 	 *
-	 * Use this precision mode with care as image quality will suffer
-	 * noticeably. It produces leaner and faster code, though. This mode should
-	 * not be used with resolutions higher than 16x16 as overflows are likely to
-	 * occur in interim calculations.
+	 * Use this precision mode with care as image quality will suffer noticeably
+	 * at higher resolutions. This mode should not be used with resolutions
+	 * higher than 16x16 as overflows are likely to occur in interim
+	 * calculations. It produces leaner and faster code, though.
 	 *
-	 * Normal precision (i.e. #undef LOW_PRECISION) conforms to Q7.8 with the
-	 * ability to store every interim result as Q23.8. Most operations like
-	 * square root, sine, cosine, multiplication etc. utilize 32 bit types.
+	 * Normal precision (i.e. #undef LOW_PRECISION) conforms to Q23.8 for actual
+	 * values and interim results. Operations like square root, sine, cosine,
+	 * multiplication etc. utilize 32 bit types. It's extremly slow on AVR, but
+	 * it's your only chance to run those animations on devices with resolutions
+	 * higher than 16x16.
 	 */
 	#define FP_LOW_PRECISION
 #endif /* DOXYGEN */
@@ -66,18 +68,18 @@
 	// lookup table as well!
 
 	/** Multiply a number by this factor to convert it to a fixed-point value.*/
-	#define FIX           32
+	#define FIX           64
 	/**	Number of fractional bits of a value (i.e. ceil(log_2(FIX))). */
-	#define FIX_FRACBITS  5
+	#define FIX_FRACBITS  6
 	/**
 	 * The number of temporal quantization steps of the sine lookup table. It
 	 * must be a divisor of (FIX * 2 * pi) and this divisor must be divisable by
 	 * 4 itself. Approximate this value as close as possible to keep rounding
 	 * errors at a minimum.
 	 */
-	#define FIX_SIN_COUNT  200
+	#define FIX_SIN_COUNT  200u
 	/** The rounded down quotient of (FIX * 2 * pi) and FIX_SIN_COUNT */
-	#define FIX_SIN_DIVIDER 1
+	#define FIX_SIN_DIVIDER 2u
 
 	/** Type of the lookup table elements. */
 	typedef uint8_t lut_t;
@@ -85,26 +87,26 @@
 	/**
 	 * Lookup table of fractional parts which model the first quarter of a
 	 * sine period. The rest of that period is calculated by mirroring those
-	 * values. These values are intended for Q5 types.
+	 * values. These values are intended for Q6 types.
 	 */
 	static lut_t const fix_sine_lut[FIX_SIN_COUNT / 4] =
-		{  0,   1,   2,   3,   4,   5,   6,   7,
-		   8,   9,  10,  11,  12,  13,  14,  14,
-		  15,  16,  17,  18,  19,  20,  20,  21,
-		  22,  23,  23,  24,  25,  25,  26,  26,
-		  27,  27,  28,  28,  29,  29,  30,  30,
-		  30,  31,  31,  31,  31,  32,  32,  32,
-		  32,  32};
+		{  0,   2,   4,   6,   8,  10,  12,  14,
+		  16,  18,  20,  22,  24,  25,  27,  29,
+		  31,  33,  34,  36,  38,  39,  41,  42,
+		  44,  45,  47,  48,  49,  51,  52,  53,
+		  54,  55,  56,  57,  58,  59,  60,  60,
+		  61,  61,  62,  62,  63,  63,  63,  64,
+		  64,  64};
 
 #else
 	/** This is the type we expect ordinary integers to be. */
 	typedef int16_t  ordinary_int_t;
 	/** This is the type which we use for fixed-point values. */
-	typedef int16_t  fixp_t;
+	typedef int32_t  fixp_t;
 	/** This type covers arguments of fixSin() and fixCos(). */
 	typedef int32_t  fixp_trig_t;
 	/** This type covers interim results of fixed-point operations. */
-	typedef int32_t  fixp_interim_t;
+	typedef uint32_t  fixp_interim_t;
 	/** This type covers interim results of the fixSqrt() function. */
 	typedef uint32_t ufixp_interim_t;
 	/** Number of bits the fixSqrt() function can handle. */
@@ -123,12 +125,12 @@
 	 * 4 itself. Approximate this value as close as possible to keep rounding
 	 * errors at a minimum.
 	 */
-	#define FIX_SIN_COUNT  200
+	#define FIX_SIN_COUNT  200u
 	/** The rounded down quotient of (FIX * 2 * pi) and FIX_SIN_COUNT */
-	#define FIX_SIN_DIVIDER 8
+	#define FIX_SIN_DIVIDER 8u
 
 	/** Type of the lookup table elements. */
-	typedef uint8_t lut_t;
+	typedef int16_t lut_t;
 
 	/**
 	 * Lookup table of fractional parts which model the first quarter of a
@@ -142,7 +144,7 @@
 			 175, 181, 186, 192, 197, 202, 207, 211,
 			 216, 220, 224, 228, 231, 235, 238, 240,
 			 243, 245, 247, 249, 251, 252, 253, 254,
-			 255, 255};
+			 255, 256};
 
 #endif
 
@@ -252,14 +254,14 @@ static fixp_t fixSin(fixp_trig_t fAngle)
 
 /**
  * Fixed-point variant of the cosine function which takes a fixed-point angle
- * (radian). It adds FIX_PI_2 to the given angle and consults the fixSin()
- * function for the final result.
+ * (radian). It substracts FIX_PI_2 from the given angle and consults the
+ * fixSin() function for the final result.
  * @param fAngle A fixed-point value in radian.
  * @return Result of the cosine function normalized to a range from -FIX to FIX.
  */
-static fixp_t fixCos(fixp_trig_t const fAngle)
+static inline fixp_t fixCos(fixp_trig_t const fAngle)
 {
-	return fixSin(fAngle + FIX_PI_2);
+	return fixSin(fAngle - FIX_PI_2);
 }
 
 
@@ -275,11 +277,11 @@ static fixp_t fixSqrt(ufixp_interim_t const a)
 	nRoot = 0;  // clear root
 	nRemainingHigh = 0; // clear high part of partial remainder
 	nRemainingLow = a; // get argument into low part of partial remainder
-	nCount = (SQRT_BITS / 2 - 1) + (FIX_FRACBITS >> 1); // load loop counter
+	nCount = ((SQRT_BITS - 1) + FIX_FRACBITS) / 2; // load loop counter
 	do
 	{
 		nRemainingHigh =
-				(nRemainingHigh << 2) | (nRemainingLow >> (SQRT_BITS - 2));
+			(nRemainingHigh << 2) | (nRemainingLow >> (SQRT_BITS - 2));
 		nRemainingLow <<= 2; // get 2 bits of the argument
 		nRoot <<= 1;  // get ready for the next bit in the root
 		nTestDiv = (nRoot << 1) + 1; // test radical
@@ -451,16 +453,16 @@ static unsigned char fixAnimPlasma(unsigned char const x,
 	assert(x < (LINEBYTES * 8));
 	assert(y < NUM_ROWS);
 
-	// scaling factor
-	static fixp_t const fPlasmaX = (2 * PI * FIX) / NUM_COLS;
-
 	// reentrant data
 	fixp_plasma_t *const p = (fixp_plasma_t *)r;
 
+	// scaling factor
+	static fixp_t const fPlasmaX = FIX / 3.7;
+
 	if (x == 0 && y == 0)
 	{
-		p->fFunc2CosArg = NUM_ROWS * fixCos(t) + fixScaleUp(NUM_ROWS);
-		p->fFunc2SinArg = NUM_COLS * fixSin(t) + fixScaleUp(NUM_COLS);
+		p->fFunc2CosArg = NUM_COLS * (fixCos(t) + FIX);
+		p->fFunc2SinArg = NUM_ROWS * (fixSin(t) + FIX);
 		for (unsigned char i = LINEBYTES * 8u; i--;)
 		{
 			p->fFunc1[i] = fixSin(fixMul(fixScaleUp(i), fPlasmaX) + t);
@@ -470,8 +472,8 @@ static unsigned char fixAnimPlasma(unsigned char const x,
 	fixp_t const fFunc2 = fixSin(fixMul(fixDist(fixScaleUp(x), fixScaleUp(y),
 			p->fFunc2SinArg, p->fFunc2CosArg), fPlasmaX));
 
-	unsigned char const nRes = (unsigned char)(fixMul(p->fFunc1[x] + fFunc2 +
-			fixScaleUp(2), ((NUMPLANE + 1) / 4.0 - 0.05) * FIX)) / FIX;
+	unsigned char const nRes = (fixMul(p->fFunc1[x] + fFunc2 +
+			2 * FIX, ((NUMPLANE + 1) / 4.0 - 0.05) * FIX)) / FIX;
 	assert (nRes <= NUMPLANE);
 
 	return nRes;
@@ -484,12 +486,12 @@ void plasma(void)
 {
 	fixp_plasma_t r;
 #ifndef __AVR__
-	fixDrawPattern(0, fixScaleUp(75), 0.1 * FIX, 15, fixAnimPlasma, &r);
+	fixDrawPattern(0, fixScaleUp(75), 0.05 * FIX, 15, fixAnimPlasma, &r);
 #else
 	#ifndef FP_PLASMA_DELAY
 		#define FP_PLASMA_DELAY 1
 	#endif
-	fixDrawPattern(0, fixScaleUp(60), 0.1 * FIX,
+	fixDrawPattern(0, fixScaleUp(60), 0.05 * FIX,
 			FP_PLASMA_DELAY, fixAnimPlasma, &r);
 #endif /* __AVR__ */
 }
@@ -505,9 +507,9 @@ void plasma(void)
  */
 typedef struct fixp_psychedelic_s
 {
-	fixp_t fCos;         /**< One of the column factors of the curl. */
-	fixp_t fSin;         /**< One of the row factors of the curl. */
-	fixp_interim_t ft10; /**< A value involved in rotating the curl's center. */
+	fixp_t fCos;        /**< X-coordinate of the curl's center. */
+	fixp_t fSin;        /**< Y-coordinate of the curl's center. */
+	fixp_t fPhaseShift; /**< Phase-shift for the flow effect. */
 } fixp_psychedelic_t;
 
 
@@ -530,15 +532,15 @@ static unsigned char fixAnimPsychedelic(unsigned char const x,
 
 	if (x == 0 && y == 0)
 	{
-		p->fCos = NUM_COLS/2 * fixCos(t);
-		p->fSin = NUM_ROWS/2 * fixSin(t);
-		p->ft10 = fixMul(t, fixScaleUp(10));
+		p->fCos = (fixp_t)(NUM_COLS * 0.72) * (fixCos(t) + FIX);
+		p->fSin = (fixp_t)(NUM_ROWS * 0.72) * (fixSin(t) + FIX);
+		p->fPhaseShift = t * 8;
 	}
 
 	unsigned char const nResult =
-			(unsigned char)(fixMul(fixSin(fixDist(fixScaleUp(x), fixScaleUp(y),
-			p->fCos, p->fSin) - p->ft10) + fixScaleUp(1),
-			(fixp_t)((NUMPLANE - 1.05) * FIX))) / FIX;
+		fixMul(fixSin(fixDist(fixScaleUp(x), fixScaleUp(y),
+		p->fSin, p->fCos) - p->fPhaseShift) + FIX,
+		(fixp_t)((NUMPLANE - 1.05) * FIX)) / FIX;
 	assert(nResult <= NUMPLANE);
 
 	return nResult;
