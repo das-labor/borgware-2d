@@ -77,11 +77,13 @@ void dna(){
 	uint8_t top_color = 3;
 	uint8_t bottom_color = 2;
 
-	uint32_t c = 10000;
+	uint32_t c = 600;
 
 	uint8_t sinpos = 0;
 
 	uint8_t direction = 1;
+
+	clear_screen(0);
 
 	while(c--){
 		top = mid - sintab[sinpos];
@@ -98,7 +100,7 @@ void dna(){
 		}
 
 		if(draw_line == 0){
-			if(top <= 1){
+			if(top <= 0){
 				direction = 1;
 			}
 			if(bottom >= NUM_ROWS-1){
@@ -116,9 +118,8 @@ void dna(){
 			bottom_color = tmp_color;
 		}
 
+		wait(50);
 		move();
-
-		wait(40);
 	}
 
 
@@ -130,8 +131,8 @@ void dna(){
 void move(){
 		unsigned char plane, row, byte;
 
-		for(plane=0; plane<=NUMPLANE; plane++){
-			for(row=NUM_COLS;row>0; row--){
+		for(plane=0; plane<NUMPLANE; plane++){
+			for(row=NUM_ROWS; row--;){
 				for(byte=0; byte < LINEBYTES; byte++){
 					pixmap[plane][row][byte] = pixmap[plane][row][byte] >> 1;
 					if(byte < LINEBYTES-1){
