@@ -9,6 +9,5 @@
 #define DNA_H_
 
 void dna();
-void move();
 
 #endif /* DNA_H_ */
