@@ -68,7 +68,7 @@ void dna(){
 
 	uint8_t sinpos = 0;
 
-	uint8_t direction = 1;
+	int8_t direction = 1;
 
 	clear_screen(0);
 
