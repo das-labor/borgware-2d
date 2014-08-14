@@ -58,6 +58,11 @@ ifeq ($(ANIMATION_TIME),y)
   SRC += borg_time.c
 endif
 
+ifeq ($(ANIMATION_DNA),y)
+SRC += dna.c
+endif
+
+
 include $(MAKETOPDIR)/rules.mk
 
 include $(MAKETOPDIR)/depend.mk

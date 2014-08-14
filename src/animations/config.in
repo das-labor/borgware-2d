@@ -63,6 +63,8 @@ comment "Animations"
 	endmenu
 
 	bool     "Black Hole"       ANIMATION_BLACKHOLE
+	
+	bool     "DNA"       ANIMATION_DNA	$RANDOM_SUPPORT
 
 	dep_bool "Squares"          ANIMATION_SQUARES       $RANDOM_SUPPORT
 

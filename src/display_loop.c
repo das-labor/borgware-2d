@@ -7,6 +7,7 @@
 #include "animations/snake.h"
 #include "animations/program.h"
 #include "animations/matrix.h"
+#include "animations/dna.h"
 #include "animations/gameoflife.h"
 #include "animations/stonefly.h"
 #include "animations/flyingdots.h"
@@ -289,6 +290,12 @@ void display_loop(){
 		case 39:
 		  rowbounce(SMALLANIMATION_ROWBOUNCE_COUNT,SMALLANIMATION_ROWBOUNCE_SPEED);
 		  break;
+#endif
+
+#ifdef ANIMATION_DNA
+		case 40:
+			dna();
+			break;
 #endif
 
 #ifdef MENU_SUPPORT
