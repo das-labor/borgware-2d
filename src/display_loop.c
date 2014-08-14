@@ -251,6 +251,12 @@ void display_loop(){
 			break;
 #endif
 
+#ifdef ANIMATION_DNA
+		case 26:
+			dna();
+			break;
+#endif
+
 #ifdef ANIMATION_TESTS
 		case 31:
 			test_level(1);
@@ -290,12 +296,6 @@ void display_loop(){
 		case 39:
 		  rowbounce(SMALLANIMATION_ROWBOUNCE_COUNT,SMALLANIMATION_ROWBOUNCE_SPEED);
 		  break;
-#endif
-
-#ifdef ANIMATION_DNA
-		case 40:
-			dna();
-			break;
 #endif
 
 #ifdef MENU_SUPPORT
