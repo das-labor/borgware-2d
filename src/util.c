@@ -19,6 +19,9 @@ extern jmp_buf newmode_jmpbuf;
 #  include "can/borg_can.h"
 #endif
 
+#ifdef UART_SUPPORT
+#  include "uart/uart_commands.h"
+#endif
 
 void wait(int ms){
 /* Always use Timer1 except for the Arduino/LoL Shield platform. */
@@ -39,6 +42,10 @@ void wait(int ms){
 
 #ifdef CAN_SUPPORT
 		bcan_process_messages();
+#endif
+
+#ifdef UART_SUPPORT
+		uartcmd_process();
 #endif
 
 #ifdef RFM12_SUPPORT

@@ -1,6 +1,7 @@
 
 #include <setjmp.h>
 #include <avr/interrupt.h>
+#include <avr/pgmspace.h>
 #include <stdio.h>
 
 #include "config.h"
@@ -17,6 +18,10 @@
 
 #ifdef CAN_SUPPORT
 	#include "can/borg_can.h"
+#endif
+
+#ifdef UART_SUPPORT
+#    include "uart/uart.h"
 #endif
 
 #ifdef RFM12_SUPPORT
@@ -41,12 +46,12 @@ int main (void){
 	bcan_init();
 #endif
 
-#ifdef JOYSTICK_SUPPORT
-	joy_init();	
+#ifdef UART_SUPPORT
+	uart_init(UART_BAUD_SELECT(UART_BAUDRATE_SETTING, F_CPU));
 #endif
 
-#ifdef UART_SUPPORT
-	uart_init();
+#ifdef JOYSTICK_SUPPORT
+	joy_init();	
 #endif
 
 	sei();
