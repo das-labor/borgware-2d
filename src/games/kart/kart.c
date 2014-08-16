@@ -224,7 +224,7 @@ void kart_game(){
 		wait(WAIT);
 	}
 
-	snprintf(game_over, sizeof(game_over), "</#Game Over, Score: %i",  cycle);
+	snprintf(game_over, sizeof(game_over), "</#Game Over, Score: %lu",  cycle);
 	scrolltext(game_over);
 }
 
