@@ -6,6 +6,10 @@
 #include <avr/pgmspace.h>
 #include "../config.h"
 #include "../borg_hw/borg_hw.h"
+#ifdef JOYSTICK_SUPPORT
+	#include "../joystick/joystick.h"
+	extern unsigned char waitForFire;
+#endif
 #include "../scrolltext/scrolltext.h"
 #include "uart.h"
 #include "uart_commands.h"
@@ -91,12 +95,18 @@ void uartcmd_process(void) {
 		} else if (!strncmp_P(g_rx_buffer, UART_CMD_NEXT, 4)) {
 			uart_puts_p(UART_STR_PROMPT);
 			uartcmd_clear_buffer();
-			longjmp(newmode_jmpbuf, mode);
+#ifdef JOYSTICK_SUPPORT
+			if (waitForFire)
+#endif
+				longjmp(newmode_jmpbuf, mode);
 		} else if (!strncmp_P(g_rx_buffer, UART_CMD_PREV, 4)) {
 			uart_puts_p(UART_STR_PROMPT);
 			uartcmd_clear_buffer();
 			if (mode > 1) {
-				longjmp(newmode_jmpbuf, mode - 2);
+#ifdef JOYSTICK_SUPPORT
+				if (waitForFire)
+#endif
+					longjmp(newmode_jmpbuf, mode - 2);
 			}
 		} else if (!strncmp_P(g_rx_buffer, UART_CMD_RESET,
 				UART_SCROLL_BUFFER_SIZE)) {
