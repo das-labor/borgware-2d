@@ -69,14 +69,9 @@ static void clear_text_pixmap(){
 	memset(text_pixmap, 0, NUM_ROWS * LINEBYTES);
 }
 
-void update_pixmap(){
-	unsigned char x, y, z;
-	for(x=NUMPLANE;x--;){
-		for(y=NUM_ROWS;y--;){
-			for(z=LINEBYTES;z--;){
-				pixmap[x][y][z] = (*text_pixmap)[y][z];
-			}
-		}
+static void update_pixmap(){
+	for(unsigned char p = NUMPLANE; p--;){
+		memcpy(&pixmap[p][0][0], text_pixmap, NUM_ROWS * LINEBYTES);
 	}
 }
 
