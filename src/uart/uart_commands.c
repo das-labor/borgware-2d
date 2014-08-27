@@ -22,7 +22,8 @@ char g_rx_buffer[UART_BUFFER_SIZE];
 uint8_t g_rx_index;
 
 extern jmp_buf newmode_jmpbuf;
-volatile unsigned char mode;
+extern volatile unsigned char mode;
+extern volatile unsigned char reverseMode;
 
 #if !(defined(eeprom_update_block) && \
 	((E2PAGESIZE == 2) || (E2PAGESIZE == 4) || (E2PAGESIZE == 8)))
@@ -138,12 +139,14 @@ static void uartcmd_next_anim(void) {
 static void uartcmd_prev_anim(void) {
 	uart_puts_p(UART_STR_PROMPT);
 	uartcmd_clear_buffer();
-	if (mode > 1) {
 #ifdef JOYSTICK_SUPPORT
-		if (waitForFire)
+	if (waitForFire) {
+		reverseMode = mode - 2;
 #endif
-			longjmp(newmode_jmpbuf, mode - 2);
+		longjmp(newmode_jmpbuf, mode - 2);
+#ifdef JOYSTICK_SUPPORT
 	}
+#endif
 }
 
 

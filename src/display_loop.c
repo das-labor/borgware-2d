@@ -1,5 +1,6 @@
 
 #include <setjmp.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 #include "config.h"
@@ -49,7 +50,7 @@
 #  include "joystick/joystick.h"
 #endif
 
-volatile unsigned char oldMode, oldOldmode, mode;
+volatile unsigned char oldMode, oldOldmode, reverseMode, mode;
 
 jmp_buf newmode_jmpbuf;
 
@@ -77,6 +78,7 @@ void display_loop(){
 		clear_screen(0);
 #endif
 		oldMode = mode;
+
 		switch(mode++) {
 
 #ifdef ANIMATION_SCROLLTEXT
@@ -365,6 +367,14 @@ void display_loop(){
 			off();
 			break;
 #endif
+		default:
+			if (reverseMode) {
+				if (reverseMode-- == (mode - 1)) {
+					mode -= 2;
+				} else {
+					reverseMode = 0;
+				}
+			}
 		}
 	}
 }
