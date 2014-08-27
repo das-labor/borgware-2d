@@ -29,20 +29,21 @@ volatile unsigned char mode;
 char const UART_STR_NOTIMPL[] PROGMEM = "\r\nnot implemented";
 #endif
 
-char const UART_STR_PROMPT[]  PROGMEM = "\r\n> ";
-char const UART_STR_ERROR[]   PROGMEM = "\r\ntransmission error";
-char const UART_STR_UNKNOWN[] PROGMEM = "\r\nunknown command";
-char const UART_STR_TOOLONG[] PROGMEM = "\r\ncommand to long";
-char const UART_STR_HELP[]    PROGMEM = "\r\nallowed commands: "
-                                        "erase help msg next prev reset scroll";
+char const UART_STR_BACKSPACE[] PROGMEM = "\033[D \033[D";
+char const UART_STR_PROMPT[]    PROGMEM = "\r\n> ";
+char const UART_STR_ERROR[]     PROGMEM = "\r\ntransmission error";
+char const UART_STR_UNKNOWN[]   PROGMEM = "\r\nunknown command";
+char const UART_STR_TOOLONG[]   PROGMEM = "\r\ncommand to long";
+char const UART_STR_HELP[]      PROGMEM = "\r\nallowed commands: erase help "
+                                          "msg next prev reset scroll";
 
-char const UART_CMD_ERASE[]   PROGMEM = "erase";
-char const UART_CMD_HELP[]    PROGMEM = "help";
-char const UART_CMD_MSG[]     PROGMEM = "msg ";
-char const UART_CMD_NEXT[]    PROGMEM = "next";
-char const UART_CMD_PREV[]    PROGMEM = "prev";
-char const UART_CMD_RESET[]   PROGMEM = "reset";
-char const UART_CMD_SCROLL[]  PROGMEM = "scroll ";
+char const UART_CMD_ERASE[]     PROGMEM = "erase";
+char const UART_CMD_HELP[]      PROGMEM = "help";
+char const UART_CMD_MSG[]       PROGMEM = "msg ";
+char const UART_CMD_NEXT[]      PROGMEM = "next";
+char const UART_CMD_PREV[]      PROGMEM = "prev";
+char const UART_CMD_RESET[]     PROGMEM = "reset";
+char const UART_CMD_SCROLL[]    PROGMEM = "scroll ";
 
 
 bool g_uartcmd_permit_processing = 1;
@@ -164,12 +165,27 @@ static bool uartcmd_read_until_enter(void) {
 
 		switch (uart_result & 0xFF00u) {
 		case 0:
-			if (!(uart_result == '\r' || uart_result == '\n')) {
+			switch ((char)uart_result) {
+			case '\r': // carriage return
+			case '\n': // line feed
+				if (g_rx_index != 0) {
+					g_rx_buffer[g_rx_index++] = 0;
+					return true;
+				}
+				break;
+			case '\b':   // BS
+			case '\177': // DEL
+				if (g_rx_index != 0) {
+					g_rx_buffer[--g_rx_index] = 0;
+					uart_puts_p(UART_STR_BACKSPACE);
+				}
+				break;
+			case 27: // ignore Esc
+				break;
+			default:
 				g_rx_buffer[g_rx_index++] = uart_result;
 				uart_putc(uart_result);
-			} else {
-				g_rx_buffer[g_rx_index++] = 0;
-				return true;
+				break;
 			}
 			break;
 
@@ -202,7 +218,7 @@ static bool uartcmd_read_until_enter(void) {
  */
 void uartcmd_process(void) {
 	if (uartcmd_processing_allowed() && uartcmd_read_until_enter()) {
-		if (!strncmp_P(g_rx_buffer, UART_CMD_ERASE, 5)) {
+		if (!strncmp_P(g_rx_buffer, UART_CMD_ERASE, UART_BUFFER_SIZE)) {
 			uartcmd_erase_eeprom();
 		} else if (!strncmp_P(g_rx_buffer, UART_CMD_HELP, UART_BUFFER_SIZE)) {
 			uart_puts_p(UART_STR_HELP);
