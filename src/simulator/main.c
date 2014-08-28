@@ -62,7 +62,7 @@ int win;
 void wait(unsigned int ms) {
 	if (waitForFire) {
 		if (fakeport & 0x01) {
-			longjmp(newmode_jmpbuf, 43);
+			longjmp(newmode_jmpbuf, 0xFEu);
 		}
 	}
 

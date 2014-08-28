@@ -67,6 +67,12 @@ void display_loop(){
 //	mcuf_serial_mode();
 
 	mode = setjmp(newmode_jmpbuf);
+
+#ifdef JOYSTICK_SUPPORT
+	// in case we get here via mode jump, we (re)enable joystick queries
+	waitForFire = 1;
+#endif
+
 	oldOldmode = oldMode;
 
 #ifdef JOYSTICK_SUPPORT
@@ -301,26 +307,26 @@ void display_loop(){
 #endif
 
 #ifdef MENU_SUPPORT
-		case 42:
+		case 0xFDu:
 			mode = 1;
 			break;
 
-		case 43:
+		case 0xFEu:
 			menu();
 			mode = oldOldmode;
 			break;
 #else
 
-		case 42:
+		case 0xFDu:
 #ifdef JOYSTICK_SUPPORT
 			if (JOYISFIRE)
-				mode = 43;
+				mode = 0xFEu;
 			else
 #endif
 				mode = 1;
 			break;
 
-		case 43:
+		case 0xFEu:
 #ifdef JOYSTICK_SUPPORT
 			waitForFire = 0;   // avoid circular jumps
 			while (JOYISFIRE); // wait until user released the fire button
@@ -363,7 +369,7 @@ void display_loop(){
 #endif
 
 #ifdef ANIMATION_OFF
-		case 0xFF:
+		case 0xFFu:
 			off();
 			break;
 #endif
@@ -375,6 +381,7 @@ void display_loop(){
 					reverseMode = 0;
 				}
 			}
+			break;
 		}
 	}
 }

@@ -57,7 +57,7 @@ void wait(int ms){
 			//PORTJOYGND &= ~(1<<BITJOY0);
 			//PORTJOYGND &= ~(1<<BITJOY1);
 			if (JOYISFIRE) {
-				longjmp(newmode_jmpbuf, 43);
+				longjmp(newmode_jmpbuf, 0xFEu);
 			}
 		}
 #endif

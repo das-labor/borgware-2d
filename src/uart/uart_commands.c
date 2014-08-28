@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
@@ -30,21 +31,27 @@ extern volatile unsigned char reverseMode;
 char const UART_STR_NOTIMPL[] PROGMEM = "\r\nnot implemented";
 #endif
 
-char const UART_STR_BACKSPACE[] PROGMEM = "\033[D \033[D";
-char const UART_STR_PROMPT[]    PROGMEM = "\r\n> ";
-char const UART_STR_ERROR[]     PROGMEM = "\r\ntransmission error";
-char const UART_STR_UNKNOWN[]   PROGMEM = "\r\nunknown command";
-char const UART_STR_TOOLONG[]   PROGMEM = "\r\ncommand to long";
-char const UART_STR_HELP[]      PROGMEM = "\r\nallowed commands: erase help "
-                                          "msg next prev reset scroll";
+char const UART_STR_BACKSPACE[]  PROGMEM = "\033[D \033[D";
+char const UART_STR_PROMPT[]     PROGMEM = "\r\n> ";
+char const UART_STR_MODE[]       PROGMEM = "\r\n%d";
+char const UART_STR_MODE_ERROR[] PROGMEM = "\r\nRange is between 0 and 255.";
+char const UART_STR_GAME_ERROR[] PROGMEM = "\r\nNo mode change during games.";
+char const UART_STR_UART_ERROR[] PROGMEM = "\r\nTransmission error.";
+char const UART_STR_UNKNOWN[]    PROGMEM = "\r\nUnknown command or syntax "
+                                           "error.";
+char const UART_STR_TOOLONG[]    PROGMEM = "\r\nCommand is to long.";
+char const UART_STR_HELP[]       PROGMEM = "\r\nAllowed commands: erase help "
+                                           "mode msg next prev reset scroll";
 
-char const UART_CMD_ERASE[]     PROGMEM = "erase";
-char const UART_CMD_HELP[]      PROGMEM = "help";
-char const UART_CMD_MSG[]       PROGMEM = "msg ";
-char const UART_CMD_NEXT[]      PROGMEM = "next";
-char const UART_CMD_PREV[]      PROGMEM = "prev";
-char const UART_CMD_RESET[]     PROGMEM = "reset";
-char const UART_CMD_SCROLL[]    PROGMEM = "scroll ";
+char const UART_CMD_ERASE[]      PROGMEM = "erase";
+char const UART_CMD_HELP[]       PROGMEM = "help";
+char const UART_CMD_MODE[]       PROGMEM = "mode";
+char const UART_CMD_MODE_ARG[]   PROGMEM = "mode ";
+char const UART_CMD_MSG[]        PROGMEM = "msg ";
+char const UART_CMD_NEXT[]       PROGMEM = "next";
+char const UART_CMD_PREV[]       PROGMEM = "prev";
+char const UART_CMD_RESET[]      PROGMEM = "reset";
+char const UART_CMD_SCROLL[]     PROGMEM = "scroll ";
 
 
 bool g_uartcmd_permit_processing = 1;
@@ -124,12 +131,17 @@ static void uartcmd_scroll_message(void) {
  * As long there's no game active, jump to the next animation.
  */
 static void uartcmd_next_anim(void) {
-	uart_puts_p(UART_STR_PROMPT);
-	uartcmd_clear_buffer();
 #ifdef JOYSTICK_SUPPORT
-	if (waitForFire)
+	if (waitForFire) {
 #endif
+		uart_puts_p(UART_STR_PROMPT);
+		uartcmd_clear_buffer();
 		longjmp(newmode_jmpbuf, mode);
+#ifdef JOYSTICK_SUPPORT
+	} else {
+		uart_puts_p(UART_STR_GAME_ERROR);
+	}
+#endif
 }
 
 
@@ -137,16 +149,60 @@ static void uartcmd_next_anim(void) {
  * As long there's no game active, jump to the previous animation.
  */
 static void uartcmd_prev_anim(void) {
-	uart_puts_p(UART_STR_PROMPT);
-	uartcmd_clear_buffer();
 #ifdef JOYSTICK_SUPPORT
 	if (waitForFire) {
-		reverseMode = mode - 2;
 #endif
+		reverseMode = mode - 2;
+		uart_puts_p(UART_STR_PROMPT);
+		uartcmd_clear_buffer();
 		longjmp(newmode_jmpbuf, mode - 2);
 #ifdef JOYSTICK_SUPPORT
+	} else {
+		uart_puts_p(UART_STR_GAME_ERROR);
 	}
 #endif
+}
+
+
+/**
+ * Outputs current mode number via UART.
+ */
+static void uartcmd_print_mode(void) {
+	char mode_output[6] = "";
+	snprintf_P(mode_output, 6, UART_STR_MODE, mode - 1);
+	uart_puts(mode_output);
+}
+
+
+/**
+ * Retrieves desired mode number from command line and switches to that mode.
+ */
+static void uartcmd_read_mode(void) {
+	int res = 0;
+	for (uint8_t i = 5; (i < 8) && (g_rx_buffer[i] != 0); ++i) {
+		if (isdigit(g_rx_buffer[i])) {
+			res = res * 10 + g_rx_buffer[i] - '0';
+		} else {
+			res = UINT8_MAX + 1;
+			break;
+		}
+	}
+
+	if ((res <= UINT8_MAX) && (g_rx_buffer[8] == 0)) {
+#ifdef JOYSTICK_SUPPORT
+		if (waitForFire) {
+#endif
+			uart_puts_p(UART_STR_PROMPT);
+			uartcmd_clear_buffer();
+			longjmp(newmode_jmpbuf, res);
+#ifdef JOYSTICK_SUPPORT
+		} else {
+			uart_puts_p(UART_STR_GAME_ERROR);
+		}
+#endif
+	} else {
+		uart_puts_p(UART_STR_MODE_ERROR);
+	}
 }
 
 
@@ -197,7 +253,7 @@ static bool uartcmd_read_until_enter(void) {
 		case UART_PARITY_ERROR:
 		case UART_BUFFER_OVERFLOW:
 			uartcmd_clear_buffer();
-			uart_puts_p(UART_STR_ERROR);
+			uart_puts_p(UART_STR_UART_ERROR);
 			uart_puts_p(UART_STR_PROMPT);
 			break;
 
@@ -225,6 +281,11 @@ void uartcmd_process(void) {
 			uartcmd_erase_eeprom();
 		} else if (!strncmp_P(g_rx_buffer, UART_CMD_HELP, UART_BUFFER_SIZE)) {
 			uart_puts_p(UART_STR_HELP);
+		} else if (!strncmp_P(g_rx_buffer, UART_CMD_MODE, UART_BUFFER_SIZE) ||
+				!strncmp_P(g_rx_buffer, UART_CMD_MODE_ARG, UART_BUFFER_SIZE)) {
+			uartcmd_print_mode();
+		} else if (!strncmp_P(g_rx_buffer, UART_CMD_MODE_ARG, 5)) {
+			uartcmd_read_mode();
 		} else if (!strncmp_P(g_rx_buffer, UART_CMD_MSG, 4)) {
 			uartcmd_simple_message();
 		} else if (!strncmp_P(g_rx_buffer, UART_CMD_NEXT, UART_BUFFER_SIZE)) {

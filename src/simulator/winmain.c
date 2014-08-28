@@ -455,7 +455,7 @@ void wait(int ms)
 	{
 		if (fakeport & 0x01)
 		{
-			longjmp(newmode_jmpbuf, 43);
+			longjmp(newmode_jmpbuf, 0xFEu);
 		}
 	}
 
