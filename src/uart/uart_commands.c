@@ -240,8 +240,7 @@ static bool uartcmd_read_until_enter(void) {
 	while (g_rx_index < (UART_BUFFER_SIZE - 1)) {
 		int uart_result = uart_getc();
 
-		switch (uart_result & 0xFF00u) {
-		case 0:
+		if (uart_result < 0x100u) {
 			switch ((char)uart_result) {
 			case '\r': // carriage return
 			case '\n': // line feed
@@ -264,20 +263,12 @@ static bool uartcmd_read_until_enter(void) {
 				uart_putc(uart_result);
 				break;
 			}
-			break;
-
-		case UART_FRAME_ERROR:
-		case UART_OVERRUN_ERROR:
-		case UART_PARITY_ERROR:
-		case UART_BUFFER_OVERFLOW:
+		} else if ((uart_result & 0xFF00u) != UART_NO_DATA) {
 			uartcmd_clear_buffer();
 			uart_puts_p(UART_STR_UART_ERR);
 			uart_puts_p(UART_STR_PROMPT);
 			break;
-
-		case UART_NO_DATA:
-		default:
-			return false;
+		} else {
 			break;
 		}
 	}
