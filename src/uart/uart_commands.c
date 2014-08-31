@@ -34,9 +34,10 @@ char const UART_STR_NOTIMPL[] PROGMEM = "\r\nnot implemented";
 char const UART_STR_BACKSPACE[]  PROGMEM = "\033[D \033[D";
 char const UART_STR_PROMPT[]     PROGMEM = "\r\n> ";
 char const UART_STR_MODE[]       PROGMEM = "\r\n%d";
-char const UART_STR_MODE_ERROR[] PROGMEM = "\r\nRange is between 0 and 255.";
-char const UART_STR_GAME_ERROR[] PROGMEM = "\r\nNo mode change during games.";
-char const UART_STR_UART_ERROR[] PROGMEM = "\r\nTransmission error.";
+char const UART_STR_MODE_ERR[]   PROGMEM = "\r\nRange is between 0 and 255.";
+char const UART_STR_GAMEMO_ERR[] PROGMEM = "\r\nNo mode change during games.";
+char const UART_STR_GAMETX_ERR[] PROGMEM = "\r\nNo text messages during games.";
+char const UART_STR_UART_ERR[]   PROGMEM = "\r\nTransmission error.";
 char const UART_STR_UNKNOWN[]    PROGMEM = "\r\nUnknown command or syntax "
                                            "error.";
 char const UART_STR_TOOLONG[]    PROGMEM = "\r\nCommand is to long.";
@@ -108,12 +109,21 @@ static void uartcmd_erase_eeprom(void) {
  * Displays a simple message without the need to prefix a scrolltext command.
  */
 static void uartcmd_simple_message(void) {
-	g_rx_buffer[1] = '<';
-	g_rx_buffer[2] = '/';
-	g_rx_buffer[3] = '#';
-	// text must not be longer than the scroll text buffer
-	g_rx_buffer[1 + SCROLLTEXT_BUFFER_SIZE - 1] = 0;
-	scrolltext(&g_rx_buffer[1]);
+#ifdef JOYSTICK_SUPPORT
+	if (waitForFire) {
+#endif
+		g_rx_buffer[1] = '<';
+		g_rx_buffer[2] = '/';
+		g_rx_buffer[3] = '#';
+		// text must not be longer than the scroll text buffer
+		g_rx_buffer[1 + SCROLLTEXT_BUFFER_SIZE - 1] = 0;
+		scrolltext(&g_rx_buffer[1]);
+#ifdef JOYSTICK_SUPPORT
+	} else {
+		uart_puts_p(UART_STR_GAMETX_ERR);
+	}
+#endif
+
 }
 
 
@@ -121,9 +131,17 @@ static void uartcmd_simple_message(void) {
  * Displays a message which may use the complete range of scrolltext commands.
  */
 static void uartcmd_scroll_message(void) {
-	// text must not be longer than the scroll text buffer
-	g_rx_buffer[7 + SCROLLTEXT_BUFFER_SIZE - 1] = 0;
-	scrolltext(&g_rx_buffer[7]);
+#ifdef JOYSTICK_SUPPORT
+	if (waitForFire) {
+#endif
+		// text must not be longer than the scroll text buffer
+		g_rx_buffer[7 + SCROLLTEXT_BUFFER_SIZE - 1] = 0;
+		scrolltext(&g_rx_buffer[7]);
+#ifdef JOYSTICK_SUPPORT
+	} else {
+		uart_puts_p(UART_STR_GAMETX_ERR);
+	}
+#endif
 }
 
 
@@ -139,7 +157,7 @@ static void uartcmd_next_anim(void) {
 		longjmp(newmode_jmpbuf, mode);
 #ifdef JOYSTICK_SUPPORT
 	} else {
-		uart_puts_p(UART_STR_GAME_ERROR);
+		uart_puts_p(UART_STR_GAMEMO_ERR);
 	}
 #endif
 }
@@ -158,7 +176,7 @@ static void uartcmd_prev_anim(void) {
 		longjmp(newmode_jmpbuf, mode - 2);
 #ifdef JOYSTICK_SUPPORT
 	} else {
-		uart_puts_p(UART_STR_GAME_ERROR);
+		uart_puts_p(UART_STR_GAMEMO_ERR);
 	}
 #endif
 }
@@ -197,11 +215,11 @@ static void uartcmd_read_mode(void) {
 			longjmp(newmode_jmpbuf, res);
 #ifdef JOYSTICK_SUPPORT
 		} else {
-			uart_puts_p(UART_STR_GAME_ERROR);
+			uart_puts_p(UART_STR_GAMEMO_ERR);
 		}
 #endif
 	} else {
-		uart_puts_p(UART_STR_MODE_ERROR);
+		uart_puts_p(UART_STR_MODE_ERR);
 	}
 }
 
@@ -253,7 +271,7 @@ static bool uartcmd_read_until_enter(void) {
 		case UART_PARITY_ERROR:
 		case UART_BUFFER_OVERFLOW:
 			uartcmd_clear_buffer();
-			uart_puts_p(UART_STR_UART_ERROR);
+			uart_puts_p(UART_STR_UART_ERR);
 			uart_puts_p(UART_STR_PROMPT);
 			break;
 
