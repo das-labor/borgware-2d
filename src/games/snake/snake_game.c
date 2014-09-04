@@ -12,6 +12,7 @@
 
 #include <assert.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include "../../config.h"
 #include "../../compat/pgmspace.h"
 #include "../../pixel.h"
@@ -102,6 +103,8 @@ typedef struct snake_protagonist_s
 	uint8_t nHeadIndex;                 /**< Index of the head segment. */
 	uint8_t nTailIndex;                 /**< Index of the tail segment. */
 	snake_dir_t dir;                    /**< Direction of the snake.    */
+	bool bJoystickLocked;               /**< Avoid double joytick queries
+	                                         between movements. */
 } snake_protagonist_t;
 
 
@@ -213,6 +216,7 @@ static void snake_initGameProtagonist(snake_protagonist_t *pprotSnake)
 #endif
 	pprotSnake->nTailIndex = 0;
 	pprotSnake->nHeadIndex = 1;
+	pprotSnake->bJoystickLocked = false;
 }
 
 #ifdef GAME_SNAKE
@@ -229,10 +233,14 @@ static void snake_userControl(snake_protagonist_t *pprotSnake,
 	if (dirJoystick != SNAKE_DIR_NONE)
 	{
 		// valid transitions can only be uneven
-		if ((pprotSnake->dir + dirJoystick) & 0x01)
+		if (((pprotSnake->dir + dirJoystick) & 0x01) &&
+				!pprotSnake->bJoystickLocked)
 		{
 			pprotSnake->dir = dirJoystick;
 		}
+		// we query the joystick twice as fast as we move the snake, so we
+		// have to ensure that it does not bite its head with its head...uh
+		pprotSnake->bJoystickLocked = true;
 	}
 #else
 	if ((dirJoystick ^ *pdirLast) && (dirJoystick != SNAKE_DIR_NONE))
@@ -244,6 +252,9 @@ static void snake_userControl(snake_protagonist_t *pprotSnake,
 			pprotSnake->dir = (pprotSnake->dir +
 					(dirJoystick == SNAKE_DIR_LEFT ? 3 : 1)) % 4u;
 		}
+		// we query the joystick twice as fast as we move the snake, so we
+		// have to ensure that it does not bite its head with its head...uh
+		pprotSnake->bJoystickLocked = true;
 	}
 	*pdirLast = dirJoystick;
 #endif
@@ -362,9 +373,9 @@ static void snake_initApples(snake_apples_t *pApples)
  * Checks for an apple at a given position and removes it if there is one.
  * @param pApples The set of apples which are lying on the playing field.
  * @param pxHead The position to be tested.
- * @return 0 if no apples were found, 1 otherwise
+ * @return false if no apples were found, true otherwise
  */
-static uint8_t snake_checkForApple(snake_apples_t *pApples, pixel pxHead)
+static bool snake_checkForApple(snake_apples_t *pApples, pixel pxHead)
 {
 	for (uint8_t i = pApples->nAppleCount; i--;)
 	{
@@ -376,10 +387,10 @@ static uint8_t snake_checkForApple(snake_apples_t *pApples, pixel pxHead)
 				pApples->aApples[i] = pApples->aApples[i + 1];
 			}
 			--pApples->nAppleCount;
-			return 1;
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }
 
 
@@ -419,7 +430,7 @@ void snake_engine(uint8_t bDemoMode)
 	clear_screen(0);
 	snake_drawBorder();
 
-	for (uint8_t nTick = 0; 1; nTick ^= SNAKE_COLOR_APPLE)
+	for (uint8_t nTick = 0; true; nTick ^= SNAKE_COLOR_APPLE)
 	{
 		// determine new direction
 #if defined ANIMATION_SNAKE && defined GAME_SNAKE
@@ -439,6 +450,8 @@ void snake_engine(uint8_t bDemoMode)
 		snake_userControl(&protSnake, &dirLast);
 		if (nTick) {
 #endif
+			// release joystick lock
+			protSnake.bJoystickLocked = false;
 
 			// actually move head
 			pixel pxOldHead = protSnake.aSegments[protSnake.nHeadIndex];
