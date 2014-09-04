@@ -100,7 +100,7 @@ void initInvaders(Invaders * iv, unsigned char lv)
 			uint16_t mask = 0x0001;
 			for (x = 11; x--;)
 			{
-				iv->map[x][y] = (hansrow & mask) ? 3 : 1;
+				iv->map[x][y] = (hansrow & mask) ? 2 : 1;
 				mask <<= 1;
 			}
 		}
@@ -108,7 +108,7 @@ void initInvaders(Invaders * iv, unsigned char lv)
 		iv->pos.x = (NUM_COLS - 11) / 2;
 		iv->pos.y = SPACESHIP_LINE + 1;
 
-		iv->speed = MIN_SPEED + 2;
+		iv->speed = MIN_SPEED + 40;
 		iv->direction = 1;
 		break;
 
