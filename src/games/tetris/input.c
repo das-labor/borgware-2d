@@ -50,11 +50,11 @@
 #define TETRIS_INPUT_REPEAT_DELAY 5
 
 /** Number of loop cyles the left button is ignored */
-#define TETRIS_INPUT_CHATTER_TICKS_LEFT    12
+#define TETRIS_INPUT_CHATTER_TICKS_LEFT    24
 /** Number of loop cyles the right button is ignored */
-#define TETRIS_INPUT_CHATTER_TICKS_RIGHT   12
+#define TETRIS_INPUT_CHATTER_TICKS_RIGHT   24
 /** Number of loop cyles the down button is ignored */
-#define TETRIS_INPUT_CHATTER_TICKS_DOWN    12
+#define TETRIS_INPUT_CHATTER_TICKS_DOWN    24
 /** Number of loop cyles the clockwise rotation button is ignored */
 #define TETRIS_INPUT_CHATTER_TICKS_ROT_CW  24
 /** Number of loop cyles the counter clockwise rotation button is ignored */
