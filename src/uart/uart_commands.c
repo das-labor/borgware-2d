@@ -227,7 +227,7 @@ static void uartcmd_read_mode(void) {
 /**
  * Perform a MCU reset by triggering the watchdog.
  */
-static void uartcmd_reset_borg() {
+static void uartcmd_reset_borg(void) {
 	timer0_off();
 }
 

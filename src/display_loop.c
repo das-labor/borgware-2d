@@ -94,7 +94,8 @@ void display_loop(){
 	#ifdef RANDOM_SUPPORT
 			{
 				char a[28];
-				sprintf(a,"</# counter == %lu  ", (unsigned long) percnt_get());
+				sprintf(a,"</# counter == %lu  ",
+					(unsigned long)percnt_get(&g_reset_counter, &g_reset_counter_idx));
 				scrolltext(a);
 			}
 	#endif
