@@ -9,7 +9,6 @@ comment "Animations"
 	bool     "Joern1"        ANIMATION_JOERN1
 
 	dep_bool_menu "Snake"    ANIMATION_SNAKE         $RANDOM_SUPPORT
-		int  "Snake Game Round Delay"   SNAKE_GAME_DELAY        200
 		int  "Snake Anim Round Delay"   SNAKE_ANIM_DELAY        100
 		int  "Snake Termination Delay"  SNAKE_TERMINATION_DELAY  60
 		uint "Snake Max Length"         SNAKE_MAX_LENGTH         64

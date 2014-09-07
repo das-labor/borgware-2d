@@ -7,7 +7,13 @@ comment "Games"
 	endmenu
 	
 	dep_bool "Space Invaders" GAME_SPACE_INVADERS $JOYSTICK_SUPPORT $RANDOM_SUPPORT
-	dep_bool "Snake"          GAME_SNAKE          $JOYSTICK_SUPPORT $RANDOM_SUPPORT
+
+	dep_bool_menu "Snake"  GAME_SNAKE y $JOYSTICK_SUPPORT $RANDOM_SUPPORT
+		bool "POV Controls"           SNAKE_POV_CONTROL n
+		int  "Snake Game Round Delay" SNAKE_GAME_DELAY  200
+	endmenu
+
 	dep_bool "Breakout"       GAME_BREAKOUT       $JOYSTICK_SUPPORT $RANDOM_SUPPORT
+
 	dep_bool "Kart"       	  GAME_KART           $JOYSTICK_SUPPORT $RANDOM_SUPPORT
 endmenu

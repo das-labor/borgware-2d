@@ -37,11 +37,13 @@ game_descriptor_t snake_game_descriptor __attribute__((section(".game_descriptor
 #endif
 
 
-/**
- * If defined, joystick controls are NOT as "seen" by the snake but absolute,
- * that is, if pressing up, snake goes up, etc.
- */
-#define SNAKE_NEWCONTROL
+#ifdef DOXYGEN
+	/**
+	 * If defined, joystick controls are bound to the point of view of the
+	 * snake, i.e. only the left an right joystick direction can be used.
+	 */
+	#define SNAKE_POV_CONTROL
+#endif
 
 #if !defined USNAKE_MAX_LENGTH || defined DOXYGEN
 	/** The maximum length of the snake. */
@@ -229,21 +231,10 @@ static void snake_userControl(snake_protagonist_t *pprotSnake,
                               snake_dir_t *pdirLast)
 {
 	snake_dir_t dirJoystick = snake_queryJoystick();
-#ifdef SNAKE_NEWCONTROL
-	if (dirJoystick != SNAKE_DIR_NONE)
-	{
-		// valid transitions can only be uneven
-		if (((pprotSnake->dir + dirJoystick) & 0x01) &&
-				!pprotSnake->bJoystickLocked)
-		{
-			pprotSnake->dir = dirJoystick;
-		}
-		// we query the joystick twice as fast as we move the snake, so we
-		// have to ensure that it does not bite its head with its head...uh
-		pprotSnake->bJoystickLocked = true;
-	}
-#else
-	if ((dirJoystick ^ *pdirLast) && (dirJoystick != SNAKE_DIR_NONE))
+#	ifdef SNAKE_POV_CONTROL
+
+	if ((dirJoystick ^ *pdirLast) && (dirJoystick != SNAKE_DIR_NONE) &&
+			(!pprotSnake->bJoystickLocked))
 	{
 		// only left or right movements are valid
 		if (dirJoystick & 0x01)
@@ -257,7 +248,20 @@ static void snake_userControl(snake_protagonist_t *pprotSnake,
 		pprotSnake->bJoystickLocked = true;
 	}
 	*pdirLast = dirJoystick;
-#endif
+#	else
+	if (dirJoystick != SNAKE_DIR_NONE)
+	{
+		// valid transitions can only be uneven
+		if (((pprotSnake->dir + dirJoystick) & 0x01) &&
+				!pprotSnake->bJoystickLocked)
+		{
+			pprotSnake->dir = dirJoystick;
+		}
+		// we query the joystick twice as fast as we move the snake, so we
+		// have to ensure that it does not bite its head with its head...uh
+		pprotSnake->bJoystickLocked = true;
+	}
+#	endif
 }
 #endif
 
