@@ -97,6 +97,7 @@ static void uartcmd_erase_eeprom(void) {
 		{0xFF, 0xFF};
 #	endif
 	for (void *ee = 0; ee < (void *)E2END; ee += E2PAGESIZE) {
+		eeprom_busy_wait();
 		eeprom_update_block(eeclear, ee, E2PAGESIZE);
 	}
 #else

@@ -109,6 +109,7 @@ uint16_t tetris_highscore_inputName(void)
 
 uint16_t tetris_highscore_retrieveHighScore(tetris_highscore_index_t nIndex)
 {
+	eeprom_busy_wait();
 	uint16_t nHighScore =
 			eeprom_read_word(&g_highScoreTable.nHighScore[nIndex]);
 
