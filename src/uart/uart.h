@@ -50,6 +50,7 @@ LICENSE:
 
 /**@{*/
 
+#include "../config.h"
 
 #if (__GNUC__ * 100 + __GNUC_MINOR__) < 304
 #error "This library requires AVR-GCC 3.4 or later, update to newer AVR-GCC compiler !"
@@ -181,6 +182,7 @@ extern void uart_puts_p(const char *s );
 #define uart_puts_P(__s)       uart_puts_p(PSTR(__s))
 
 
+#if defined USE_UART1 || defined DOXYGEN
 
 /** @brief  Initialize USART1 (only available on selected ATmegas)
  *  @see    uart_init
@@ -215,5 +217,7 @@ extern void uart1_puts_p(const char *s );
 #define uart1_puts_P(__s) uart1_puts_p(PSTR(__s))
 
 /**@}*/
+
+#endif // defined USE_UART1 || defined DOXYGEN
 
 #endif // UART_H

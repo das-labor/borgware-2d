@@ -973,3 +973,27 @@ void borg_hw_init() {
 	wdt_reset();
 	wdt_enable(WDTO_15MS); // 15ms watchdog
 }
+
+void timer0_off() {
+	cli();
+#if defined (__AVR_ATmega48__)   || \
+    defined (__AVR_ATmega48P__)  || \
+    defined (__AVR_ATmega88__)   || \
+    defined (__AVR_ATmega88P__)  || \
+    defined (__AVR_ATmega168__)  || \
+    defined (__AVR_ATmega168P__) || \
+    defined (__AVR_ATmega328__)  || \
+    defined (__AVR_ATmega328P__) || \
+    defined (__AVR_ATmega1280__) || \
+    defined (__AVR_ATmega2560__)
+	TCCR2A = 0x00;
+	TCCR2B = 0x00;
+#elif defined (__AVR_ATmega8__) || \
+      defined (__AVR_ATmega128__)
+	TCCR2 = 0x00;
+#elif defined (__AVR_ATmega32U4__)
+	TCCR1A = 0x00;
+	TCCR1B = 0x00;
+#endif
+	sei();
+}

@@ -33,6 +33,8 @@
 
 #define INIT_EEPROM
 
-//#define UART_BAUD_RATE 115200L
+#if defined(UART_SUPPORT) && defined(LOLSHIELD) && defined(__AVR_ATmega32U4__)
+#	error UART not supported on Arduino Leonardo
+#endif
 
 #endif /* CONFIG_H_ */

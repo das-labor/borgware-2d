@@ -565,6 +565,9 @@ Purpose:  called when the UART1 is ready to transmit the next byte
 }
 
 
+
+#if defined USE_UART1 || defined DOXYGEN
+
 /*************************************************************************
 Function: uart1_init()
 Purpose:  initialize UART1 and set baudrate
@@ -685,5 +688,6 @@ void uart1_puts_p(const char *progmem_s )
 
 }/* uart1_puts_p */
 
+#endif // defined USE_UART1 || defined DOXYGEN
 
 #endif

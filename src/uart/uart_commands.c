@@ -17,6 +17,13 @@
 #include "uart.h"
 #include "uart_commands.h"
 
+#ifndef USE_UART1
+#	define UART_PUTS_P(STR) uart_puts_p(STR)
+#	define UART_GETC uart_getc
+#else
+#	define UART_PUTS_P(STR) uart1_puts_p(STR)
+#	define UART_GETC uart1_getc
+#endif
 
 #define UART_BUFFER_SIZE (SCROLLTEXT_BUFFER_SIZE + 8)
 char g_rx_buffer[UART_BUFFER_SIZE];
@@ -101,7 +108,7 @@ static void uartcmd_erase_eeprom(void) {
 		eeprom_update_block(eeclear, ee, E2PAGESIZE);
 	}
 #else
-	uart_puts_p(UART_STR_NOTIMPL);
+	UART_PUTS_P(UART_STR_NOTIMPL);
 #endif
 }
 
@@ -121,7 +128,7 @@ static void uartcmd_simple_message(void) {
 		scrolltext(&g_rx_buffer[1]);
 #ifdef JOYSTICK_SUPPORT
 	} else {
-		uart_puts_p(UART_STR_GAMETX_ERR);
+		UART_PUTS_P(UART_STR_GAMETX_ERR);
 	}
 #endif
 
@@ -140,7 +147,7 @@ static void uartcmd_scroll_message(void) {
 		scrolltext(&g_rx_buffer[7]);
 #ifdef JOYSTICK_SUPPORT
 	} else {
-		uart_puts_p(UART_STR_GAMETX_ERR);
+		UART_PUTS_P(UART_STR_GAMETX_ERR);
 	}
 #endif
 }
@@ -153,12 +160,12 @@ static void uartcmd_next_anim(void) {
 #ifdef JOYSTICK_SUPPORT
 	if (waitForFire) {
 #endif
-		uart_puts_p(UART_STR_PROMPT);
+		UART_PUTS_P(UART_STR_PROMPT);
 		uartcmd_clear_buffer();
 		longjmp(newmode_jmpbuf, mode);
 #ifdef JOYSTICK_SUPPORT
 	} else {
-		uart_puts_p(UART_STR_GAMEMO_ERR);
+		UART_PUTS_P(UART_STR_GAMEMO_ERR);
 	}
 #endif
 }
@@ -172,12 +179,12 @@ static void uartcmd_prev_anim(void) {
 	if (waitForFire) {
 #endif
 		reverseMode = mode - 2;
-		uart_puts_p(UART_STR_PROMPT);
+		UART_PUTS_P(UART_STR_PROMPT);
 		uartcmd_clear_buffer();
 		longjmp(newmode_jmpbuf, mode - 2);
 #ifdef JOYSTICK_SUPPORT
 	} else {
-		uart_puts_p(UART_STR_GAMEMO_ERR);
+		UART_PUTS_P(UART_STR_GAMEMO_ERR);
 	}
 #endif
 }
@@ -211,16 +218,16 @@ static void uartcmd_read_mode(void) {
 #ifdef JOYSTICK_SUPPORT
 		if (waitForFire) {
 #endif
-			uart_puts_p(UART_STR_PROMPT);
+			UART_PUTS_P(UART_STR_PROMPT);
 			uartcmd_clear_buffer();
 			longjmp(newmode_jmpbuf, res);
 #ifdef JOYSTICK_SUPPORT
 		} else {
-			uart_puts_p(UART_STR_GAMEMO_ERR);
+			UART_PUTS_P(UART_STR_GAMEMO_ERR);
 		}
 #endif
 	} else {
-		uart_puts_p(UART_STR_MODE_ERR);
+		UART_PUTS_P(UART_STR_MODE_ERR);
 	}
 }
 
@@ -254,7 +261,7 @@ static bool uartcmd_read_until_enter(void) {
 			case '\177': // DEL
 				if (g_rx_index != 0) {
 					g_rx_buffer[--g_rx_index] = 0;
-					uart_puts_p(UART_STR_BACKSPACE);
+					UART_PUTS_P(UART_STR_BACKSPACE);
 				}
 				break;
 			case 27: // ignore Esc
@@ -266,8 +273,8 @@ static bool uartcmd_read_until_enter(void) {
 			}
 		} else if ((uart_result & 0xFF00u) != UART_NO_DATA) {
 			uartcmd_clear_buffer();
-			uart_puts_p(UART_STR_UART_ERR);
-			uart_puts_p(UART_STR_PROMPT);
+			UART_PUTS_P(UART_STR_UART_ERR);
+			UART_PUTS_P(UART_STR_PROMPT);
 			break;
 		} else {
 			break;
@@ -276,8 +283,8 @@ static bool uartcmd_read_until_enter(void) {
 
 	if (g_rx_index >= (UART_BUFFER_SIZE - 1)) {
 		uartcmd_clear_buffer();
-		uart_puts_p(UART_STR_TOOLONG);
-		uart_puts_p(UART_STR_PROMPT);
+		UART_PUTS_P(UART_STR_TOOLONG);
+		UART_PUTS_P(UART_STR_PROMPT);
 	}
 	return false;
 }
@@ -290,7 +297,7 @@ void uartcmd_process(void) {
 		if (!strncmp_P(g_rx_buffer, UART_CMD_ERASE, UART_BUFFER_SIZE)) {
 			uartcmd_erase_eeprom();
 		} else if (!strncmp_P(g_rx_buffer, UART_CMD_HELP, UART_BUFFER_SIZE)) {
-			uart_puts_p(UART_STR_HELP);
+			UART_PUTS_P(UART_STR_HELP);
 		} else if (!strncmp_P(g_rx_buffer, UART_CMD_MODE, UART_BUFFER_SIZE) ||
 				!strncmp_P(g_rx_buffer, UART_CMD_MODE_ARG, UART_BUFFER_SIZE)) {
 			uartcmd_print_mode();
@@ -307,9 +314,9 @@ void uartcmd_process(void) {
 		} else if (!strncmp_P(g_rx_buffer, UART_CMD_SCROLL, 7)) {
 			uartcmd_scroll_message();
 		} else {
-			uart_puts_p(UART_STR_UNKNOWN);
+			UART_PUTS_P(UART_STR_UNKNOWN);
 		}
-		uart_puts_p(UART_STR_PROMPT);
+		UART_PUTS_P(UART_STR_PROMPT);
 		uartcmd_clear_buffer();
 	}
 }

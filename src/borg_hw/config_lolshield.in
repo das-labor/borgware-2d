@@ -2,8 +2,23 @@ mainmenu_option next_comment
 comment "lolshield setup"
 
 define_int USER_TIMER0_FOR_WAIT 1
+define_bool LOLSHIELD y
 
-uint "Brightness (0-127)"     BRIGHTNESS 127
+uint "Brightness (0-127)"     BRIGHTNESS 120
 uint "Framerate (default 80)" FRAMERATE   80
+
+bool "UART Support" UART_SUPPORT n
+choice 'Baud Rate'			\
+   "2400 2400 \
+    4800 4800 \
+    9600 9600 \
+    14400 14400 \
+    19200 19200 \
+    28800 28800 \
+    38400 38400 \
+    57600 57600 \
+    76800 76800 \
+    115200 115200" \
+   '19200' UART_BAUDRATE_SETTING
 
 endmenu
