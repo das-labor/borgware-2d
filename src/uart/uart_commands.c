@@ -117,21 +117,26 @@ static void uartcmd_erase_eeprom(void) {
  * Displays a simple message without the need to prefix a scrolltext command.
  */
 static void uartcmd_simple_message(void) {
+	if (uartcmd_processing_allowed()) {
+		uartcmd_forbid();
 #ifdef JOYSTICK_SUPPORT
-	if (waitForFire) {
+		if (waitForFire) {
+#else
+		{
 #endif
-		g_rx_buffer[1] = '<';
-		g_rx_buffer[2] = '/';
-		g_rx_buffer[3] = '#';
-		// text must not be longer than the scroll text buffer
-		g_rx_buffer[1 + SCROLLTEXT_BUFFER_SIZE - 1] = 0;
-		scrolltext(&g_rx_buffer[1]);
+			g_rx_buffer[1] = '<';
+			g_rx_buffer[2] = '/';
+			g_rx_buffer[3] = '#';
+			// text must not be longer than the scroll text buffer
+			g_rx_buffer[1 + SCROLLTEXT_BUFFER_SIZE - 1] = 0;
+			scrolltext(&g_rx_buffer[1]);
 #ifdef JOYSTICK_SUPPORT
-	} else {
-		UART_PUTS_P(UART_STR_GAMETX_ERR);
+		} else {
+#endif
+			UART_PUTS_P(UART_STR_GAMETX_ERR);
+		}
+		uartcmd_permit();
 	}
-#endif
-
 }
 
 
@@ -139,17 +144,23 @@ static void uartcmd_simple_message(void) {
  * Displays a message which may use the complete range of scrolltext commands.
  */
 static void uartcmd_scroll_message(void) {
+	if (uartcmd_processing_allowed()) {
+		uartcmd_forbid();
 #ifdef JOYSTICK_SUPPORT
-	if (waitForFire) {
+		if (waitForFire) {
+#else
+		{
 #endif
-		// text must not be longer than the scroll text buffer
-		g_rx_buffer[7 + SCROLLTEXT_BUFFER_SIZE - 1] = 0;
-		scrolltext(&g_rx_buffer[7]);
+			// text must not be longer than the scroll text buffer
+			g_rx_buffer[7 + SCROLLTEXT_BUFFER_SIZE - 1] = 0;
+			scrolltext(&g_rx_buffer[7]);
 #ifdef JOYSTICK_SUPPORT
-	} else {
-		UART_PUTS_P(UART_STR_GAMETX_ERR);
+		} else {
+#endif
+			UART_PUTS_P(UART_STR_GAMETX_ERR);
+		}
+		uartcmd_permit();
 	}
-#endif
 }
 
 
