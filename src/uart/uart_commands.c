@@ -18,9 +18,11 @@
 #include "uart_commands.h"
 
 #ifndef USE_UART1
+#	define UART_PUTS(STR) uart_puts(STR)
 #	define UART_PUTS_P(STR) uart_puts_p(STR)
 #	define UART_GETC uart_getc
 #else
+#	define UART_PUTS(STR) uart1_puts(STR)
 #	define UART_PUTS_P(STR) uart1_puts_p(STR)
 #	define UART_GETC uart1_getc
 #endif
@@ -33,23 +35,24 @@ extern jmp_buf newmode_jmpbuf;
 extern volatile unsigned char mode;
 extern volatile unsigned char reverseMode;
 
+#define CR "\r\n"
+
 #if !(defined(eeprom_update_block) && \
 	((E2PAGESIZE == 2) || (E2PAGESIZE == 4) || (E2PAGESIZE == 8)))
-char const UART_STR_NOTIMPL[] PROGMEM = "\r\nnot implemented";
+char const UART_STR_NOTIMPL[] PROGMEM = "Not implemented."CR;
 #endif
 
 char const UART_STR_BACKSPACE[]  PROGMEM = "\033[D \033[D";
-char const UART_STR_PROMPT[]     PROGMEM = "\r\n> ";
-char const UART_STR_MODE[]       PROGMEM = "\r\n%d";
-char const UART_STR_MODE_ERR[]   PROGMEM = "\r\nRange is between 0 and 255.";
-char const UART_STR_GAMEMO_ERR[] PROGMEM = "\r\nNo mode change during games.";
-char const UART_STR_GAMETX_ERR[] PROGMEM = "\r\nNo text messages during games.";
-char const UART_STR_UART_ERR[]   PROGMEM = "\r\nTransmission error.";
-char const UART_STR_UNKNOWN[]    PROGMEM = "\r\nUnknown command or syntax "
-                                           "error.";
-char const UART_STR_TOOLONG[]    PROGMEM = "\r\nCommand is to long.";
-char const UART_STR_HELP[]       PROGMEM = "\r\nAllowed commands: erase help "
-                                           "mode msg next prev reset scroll";
+char const UART_STR_PROMPT[]     PROGMEM = "> ";
+char const UART_STR_MODE[]       PROGMEM = "%d"CR;
+char const UART_STR_MODE_ERR[]   PROGMEM = "Range is between 0 and 255."CR;
+char const UART_STR_GAMEMO_ERR[] PROGMEM = "No mode change during games."CR;
+char const UART_STR_GAMETX_ERR[] PROGMEM = "No text messages during games."CR;
+char const UART_STR_UART_ERR[]   PROGMEM = "Transmission error."CR;
+char const UART_STR_UNKNOWN[]    PROGMEM = "Unknown command or syntax error."CR;
+char const UART_STR_TOOLONG[]    PROGMEM = "Command is to long."CR;
+char const UART_STR_HELP[]       PROGMEM = "Allowed commands: erase help mode "
+                                           "msg next prev reset scroll"CR;
 
 char const UART_CMD_ERASE[]      PROGMEM = "erase";
 char const UART_CMD_HELP[]       PROGMEM = "help";
@@ -256,21 +259,25 @@ static void uartcmd_reset_borg(void) {
  * @return true if a line break was entered, false otherwise.
  */
 static bool uartcmd_read_until_enter(void) {
+	static char last_line_break = '\n';
+
 	while (g_rx_index < (UART_BUFFER_SIZE - 1)) {
 		int uart_result = uart_getc();
 
 		if (uart_result < 0x100u) {
 			switch ((char)uart_result) {
-			case '\r': // carriage return
 			case '\n': // line feed
-				if (g_rx_index != 0) {
+			case '\r': // carriage return
+				if ((g_rx_index > 0) || (uart_result == last_line_break)) {
+					UART_PUTS(CR);
 					g_rx_buffer[g_rx_index++] = 0;
+					last_line_break = uart_result;
 					return true;
 				}
 				break;
 			case '\b':   // BS
 			case '\177': // DEL
-				if (g_rx_index != 0) {
+				if ((g_rx_index != 0) && (g_rx_buffer[g_rx_index - 1] >= 32)) {
 					g_rx_buffer[--g_rx_index] = 0;
 					UART_PUTS_P(UART_STR_BACKSPACE);
 				}
@@ -278,6 +285,10 @@ static bool uartcmd_read_until_enter(void) {
 			case 27: // ignore Esc
 				break;
 			default:
+				// only 7 bit ASCII can be processed
+				if (uart_result > 0x7f) {
+					uart_result = '?';
+				}
 				g_rx_buffer[g_rx_index++] = uart_result;
 				uart_putc(uart_result);
 				break;
@@ -324,7 +335,7 @@ void uartcmd_process(void) {
 			uartcmd_reset_borg();
 		} else if (!strncmp_P(g_rx_buffer, UART_CMD_SCROLL, 7)) {
 			uartcmd_scroll_message();
-		} else {
+		} else if (g_rx_buffer[0] != 0) {
 			UART_PUTS_P(UART_STR_UNKNOWN);
 		}
 		UART_PUTS_P(UART_STR_PROMPT);
