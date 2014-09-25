@@ -42,7 +42,7 @@ extern volatile unsigned char reverseMode;
 char const UART_STR_NOTIMPL[] PROGMEM = "Not implemented."CR;
 #endif
 
-char const UART_STR_BACKSPACE[]  PROGMEM = "\033[D \033[D";
+char const UART_STR_BACKSPACE[]  PROGMEM = "\b \b";
 char const UART_STR_PROMPT[]     PROGMEM = "> ";
 char const UART_STR_MODE[]       PROGMEM = "%d"CR;
 char const UART_STR_MODE_ERR[]   PROGMEM = "Range is between 0 and 255."CR;
