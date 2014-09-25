@@ -277,7 +277,7 @@ static bool uartcmd_read_until_enter(void) {
 				break;
 			case '\b':   // BS
 			case '\177': // DEL
-				if ((g_rx_index != 0) && (g_rx_buffer[g_rx_index - 1] >= 32)) {
+				if (g_rx_index != 0) {
 					g_rx_buffer[--g_rx_index] = 0;
 					UART_PUTS_P(UART_STR_BACKSPACE);
 				}
@@ -285,12 +285,14 @@ static bool uartcmd_read_until_enter(void) {
 			case 27: // ignore Esc
 				break;
 			default:
-				// only 7 bit ASCII can be processed
-				if (uart_result > 0x7f) {
-					uart_result = '?';
+				// We don't accept control characters (except for \r and \n) and
+				// we also limit the input to 7 bit ASCII.
+				if ((uart_result < 0x20) || (uart_result > 0x7f)) {
+					uart_putc('\007'); // complain via ASCII bell
+				} else {
+					g_rx_buffer[g_rx_index++] = uart_result; // accept input
+					uart_putc(uart_result); // echo input back to terminal
 				}
-				g_rx_buffer[g_rx_index++] = uart_result;
-				uart_putc(uart_result);
 				break;
 			}
 		} else if ((uart_result & 0xFF00u) != UART_NO_DATA) {
