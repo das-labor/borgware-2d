@@ -50,7 +50,7 @@ char const UART_STR_GAMEMO_ERR[] PROGMEM = "No mode change during games."CR;
 char const UART_STR_GAMETX_ERR[] PROGMEM = "No text messages during games."CR;
 char const UART_STR_UART_ERR[]   PROGMEM = "Transmission error."CR;
 char const UART_STR_UNKNOWN[]    PROGMEM = "Unknown command or syntax error."CR;
-char const UART_STR_TOOLONG[]    PROGMEM = "Command is to long."CR;
+char const UART_STR_TOOLONG[]    PROGMEM = CR"Command is too long."CR;
 char const UART_STR_HELP[]       PROGMEM = "Allowed commands: erase help mode "
                                            "msg next prev reset scroll"CR;
 
