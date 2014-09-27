@@ -245,7 +245,7 @@ static volatile unsigned char UART_RxHead;
 static volatile unsigned char UART_RxTail;
 static volatile unsigned char UART_LastRxError;
 
-#if defined( ATMEGA_USART1 )
+#if defined( ATMEGA_USART1 ) && defined (USE_UART1)
 static volatile unsigned char UART1_TxBuf[UART_TX_BUFFER_SIZE];
 static volatile unsigned char UART1_RxBuf[UART_RX_BUFFER_SIZE];
 static volatile unsigned char UART1_TxHead;
@@ -506,7 +506,7 @@ void uart_puts_p(const char *progmem_s )
 /*
  * these functions are only for ATmegas with two USART
  */
-#if defined( ATMEGA_USART1 )
+#if defined( ATMEGA_USART1 ) && defined (USE_UART1)
 
 ISR(UART1_RECEIVE_INTERRUPT)
 /*************************************************************************
@@ -564,9 +564,6 @@ Purpose:  called when the UART1 is ready to transmit the next byte
     }
 }
 
-
-
-#if defined USE_UART1 || defined DOXYGEN
 
 /*************************************************************************
 Function: uart1_init()
@@ -687,7 +684,5 @@ void uart1_puts_p(const char *progmem_s )
       uart1_putc(c);
 
 }/* uart1_puts_p */
-
-#endif // defined USE_UART1 || defined DOXYGEN
 
 #endif

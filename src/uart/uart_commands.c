@@ -285,10 +285,10 @@ static bool uartcmd_read_until_enter(void) {
 			case 27: // ignore Esc
 				break;
 			default:
-				// We don't accept control characters (except for \r and \n) and
-				// we also limit the input to 7 bit ASCII.
+				// We don't accept control characters except for \b, \r and \n.
+				// We also limit the input to 7 bit ASCII.
 				if ((uart_result < 0x20) || (uart_result > 0x7f)) {
-					uart_putc('\007'); // complain via ASCII bell
+					uart_putc('\a'); // complain via ASCII bell
 				} else {
 					g_rx_buffer[g_rx_index++] = uart_result; // accept input
 					uart_putc(uart_result); // echo input back to terminal
