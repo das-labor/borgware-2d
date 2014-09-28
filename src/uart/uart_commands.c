@@ -21,10 +21,12 @@
 #	define UART_PUTS(STR) uart_puts(STR)
 #	define UART_PUTS_P(STR) uart_puts_p(STR)
 #	define UART_GETC uart_getc
+#	define UART_PUTC uart_putc
 #else
 #	define UART_PUTS(STR) uart1_puts(STR)
 #	define UART_PUTS_P(STR) uart1_puts_p(STR)
 #	define UART_GETC uart1_getc
+#	define UART_PUTC uart1_putc
 #endif
 
 #define UART_BUFFER_SIZE (SCROLLTEXT_BUFFER_SIZE + 8)
@@ -42,6 +44,7 @@ extern volatile unsigned char reverseMode;
 char const UART_STR_NOTIMPL[] PROGMEM = "Not implemented."CR;
 #endif
 
+char const UART_STR_CLEARLINE[]  PROGMEM = "\033[1`\033[2K";
 char const UART_STR_BACKSPACE[]  PROGMEM = "\b \b";
 char const UART_STR_PROMPT[]     PROGMEM = "> ";
 char const UART_STR_MODE[]       PROGMEM = "%d"CR;
@@ -282,16 +285,22 @@ static bool uartcmd_read_until_enter(void) {
 					UART_PUTS_P(UART_STR_BACKSPACE);
 				}
 				break;
+			case '\f': // Form Feed (Ctrl-L), reprints the line buffer
+				UART_PUTS_P(UART_STR_CLEARLINE); // clear current line
+				UART_PUTS_P(UART_STR_PROMPT);    // prompt
+				g_rx_buffer[g_rx_index] = 0;     // terminate input buffer
+				UART_PUTS(g_rx_buffer);          // finally reprint it
+				break;
 			case 27: // ignore Esc
 				break;
 			default:
-				// We don't accept control characters except for \b, \r and \n.
+				// We don't accept control chars except for \f, \b, \r and \n.
 				// We also limit the input to 7 bit ASCII.
 				if ((uart_result < 0x20) || (uart_result > 0x7f)) {
-					uart_putc('\a'); // complain via ASCII bell
+					UART_PUTC('\a'); // complain via ASCII bell
 				} else {
 					g_rx_buffer[g_rx_index++] = uart_result; // accept input
-					uart_putc(uart_result); // echo input back to terminal
+					UART_PUTC(uart_result); // echo input back to terminal
 				}
 				break;
 			}
