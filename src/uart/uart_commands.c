@@ -44,7 +44,7 @@ extern volatile unsigned char reverseMode;
 char const UART_STR_NOTIMPL[] PROGMEM = "Not implemented."CR;
 #endif
 
-char const UART_STR_CLEARLINE[]  PROGMEM = "\033[1`\033[J";
+char const UART_STR_CLEARLINE[]  PROGMEM = "\r\033[J";
 char const UART_STR_BACKSPACE[]  PROGMEM = "\b \b";
 char const UART_STR_PROMPT[]     PROGMEM = "> ";
 char const UART_STR_MODE[]       PROGMEM = "%d"CR;
