@@ -17,6 +17,8 @@ comment "Borg16 port setup"
 #//das dier sind die individuellen Dateneingänge für die Schieberegister
 #define PIN_SHFT1 PD7
 
+bool "Higher Contrast" HIGH_CONTRAST n
+
 bool "UART Support" UART_SUPPORT n
 choice 'Baud Rate'			\
    "2400 2400 \

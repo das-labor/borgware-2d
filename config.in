@@ -6,19 +6,23 @@ comment "General Setup"
 	#bool 'Prompt for experimental code' CONFIG_EXPERIMENTAL
 
 	choice 'Target MCU'           \
- 	  "ATmega8        atmega8     \
- 	   ATmega16       atmega16    \
- 	   ATmega168      atmega168   \
- 	   ATmega168P     atmega168p  \
+	  "ATmega8        atmega8     \
+	   ATmega16       atmega16    \
+	   ATmega164      atmega164   \
+	   ATmega164P     atmega164p  \
+	   ATmega168      atmega168   \
+	   ATmega168P     atmega168p  \
 	   ATmega32       atmega32    \
+	   ATmega324      atmega324   \
+	   ATmega324P     atmega324p  \
 	   ATmega32U4     atmega32u4  \
 	   ATmega328      atmega328   \
-	   ATmega328p     atmega328p  \
+	   ATmega328P     atmega328p  \
 	   ATmega644      atmega644   \
-	   ATmega644p     atmega644p  \
+	   ATmega644P     atmega644p  \
 	   ATmega1280     atmega1280  \
 	   ATmega1284     atmega1284  \
-	   ATmega1284p    atmega1284p \
+	   ATmega1284P    atmega1284p \
 	   ATmega2560     atmega2560  \
 	   ATmega8515     atmega8515" \
 	   'ATmega32' MCU

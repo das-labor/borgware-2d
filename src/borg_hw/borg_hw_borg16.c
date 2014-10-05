@@ -33,7 +33,14 @@
 #define COLDDR2  DDR(COLPORT2)
 #define ROWDDR   DDR(ROWPORT)
 
-#if defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__) || (__AVR_ATmega1284P__) || defined (__AVR_ATmega1284__)
+#if defined(__AVR_ATmega164__)   || \
+    defined(__AVR_ATmega164P__)  || \
+    defined(__AVR_ATmega324__)   || \
+    defined(__AVR_ATmega324P__)  || \
+    defined(__AVR_ATmega644__)   || \
+    defined(__AVR_ATmega644P__)  || \
+    defined(__AVR_ATmega1284__)  || \
+    defined(__AVR_ATmega1284P__)
 /* more ifdef magic :-( */
 #define OCR0 OCR0A
 #define TIMER0_COMP_vect TIMER0_COMPA_vect
@@ -84,7 +91,11 @@ static void nextrow(uint8_t row) {
 static void rowshow(unsigned char row, unsigned char plane) {
 	// depending on the currently drawn plane, display the row for a specific
 	// amount of time
+#ifdef HIGH_CONTRAST
+	static unsigned char const ocr_table[] = {2, 5, 22};
+#else
 	static unsigned char const ocr_table[] = {3, 4, 22};
+#endif
 	OCR0 = ocr_table[plane];
 
 	// output data of the current row to the column drivers
@@ -153,7 +164,14 @@ void timer0_off() {
 	COLPORT2 = 0;
 	ROWPORT = 0;
 
-#if defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__) || (__AVR_ATmega1284P__) || defined (__AVR_ATmega1284__)
+#if defined(__AVR_ATmega164__)   || \
+    defined(__AVR_ATmega164P__)  || \
+    defined(__AVR_ATmega324__)   || \
+    defined(__AVR_ATmega324P__)  || \
+    defined(__AVR_ATmega644__)   || \
+    defined(__AVR_ATmega644P__)  || \
+    defined(__AVR_ATmega1284__)  || \
+    defined(__AVR_ATmega1284P__)
 	TCCR0A = 0x00;
 	TCCR0B = 0x00;
 #else
@@ -175,7 +193,14 @@ static void timer0_on() {
 	 1    0    1       clk/1024
 	 */
 
-#if defined (__AVR_ATmega644P__) || defined (__AVR_ATmega644__) || (__AVR_ATmega1284P__) || defined (__AVR_ATmega1284__)
+#if defined(__AVR_ATmega164__)   || \
+    defined(__AVR_ATmega164P__)  || \
+    defined(__AVR_ATmega324__)   || \
+    defined(__AVR_ATmega324P__)  || \
+    defined(__AVR_ATmega644__)   || \
+    defined(__AVR_ATmega644P__)  || \
+    defined(__AVR_ATmega1284__)  || \
+    defined(__AVR_ATmega1284P__)
 	TCCR0A = 0x02; // CTC Mode
 	TCCR0B = 0x04; // clk/256
 	TCNT0  = 0;    // reset timer
