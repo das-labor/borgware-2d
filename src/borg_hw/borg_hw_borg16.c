@@ -41,13 +41,25 @@
     defined(__AVR_ATmega644P__)  || \
     defined(__AVR_ATmega1284__)  || \
     defined(__AVR_ATmega1284P__)
-/* more ifdef magic :-( */
-#define OCR0 OCR0A
-#define TIMER0_COMP_vect TIMER0_COMPA_vect
+#	define TIMER0_OFF()        TCCR0A = 0; TCCR0B = 0
+#	define TIMER0_CTC_CS256()  TCCR0A = _BV(WGM01); TCCR0B = _BV(CS02)
+#	define TIMER0_RESET()      TCNT0  = 0
+#	define TIMER0_COMPARE(t)   OCR0A  = t
+#	define TIMER0_INT_ENABLE() TIMSK0 = _BV(OCIE0A)
+#	define TIMER0_ISR          TIMER0_COMPA_vect
+#else // ATmega16/32
+#	define TIMER0_OFF()        TCCR0 = 0
+#	define TIMER0_CTC_CS256()  TCCR0 = _BV(WGM01) | _BV(CS02)
+#	define TIMER0_RESET()      TCNT0 = 0
+#	define TIMER0_COMPARE(t)   OCR0  = t
+#	define TIMER0_INT_ENABLE() TIMSK = _BV(OCIE0)
+#	define TIMER0_ISR          TIMER0_COMP_vect
 #endif
+
 
 // buffer which holds the currently shown frame
 unsigned char pixmap[NUMPLANE][NUM_ROWS][LINEBYTES];
+
 
 // switch to next row
 static void nextrow(uint8_t row) {
@@ -87,6 +99,7 @@ static void nextrow(uint8_t row) {
 	}
 }
 
+
 // show a row
 static void rowshow(unsigned char row, unsigned char plane) {
 	// depending on the currently drawn plane, display the row for a specific
@@ -96,7 +109,8 @@ static void rowshow(unsigned char row, unsigned char plane) {
 #else
 	static unsigned char const ocr_table[] = {3, 4, 22};
 #endif
-	OCR0 = ocr_table[plane];
+
+	TIMER0_COMPARE(ocr_table[plane]);
 
 	// output data of the current row to the column drivers
 	uint8_t tmp, tmp1;
@@ -135,9 +149,9 @@ static void rowshow(unsigned char row, unsigned char plane) {
 
 }
 
-// depending on the plane this interrupt triggers at 50 kHz, 31.25 kHz or
-// 12.5 kHz
-ISR(TIMER0_COMP_vect) {
+
+// interrupt handler
+ISR(TIMER0_ISR) {
 	static unsigned char plane = 0;
 	static unsigned char row = 0;
 
@@ -157,62 +171,26 @@ ISR(TIMER0_COMP_vect) {
 	rowshow(row, plane);
 }
 
+
+// disables timer, causing the watchdog to reset the MCU
 void timer0_off() {
 	cli();
-
 	COLPORT1 = 0;
 	COLPORT2 = 0;
 	ROWPORT = 0;
-
-#if defined(__AVR_ATmega164__)   || \
-    defined(__AVR_ATmega164P__)  || \
-    defined(__AVR_ATmega324__)   || \
-    defined(__AVR_ATmega324P__)  || \
-    defined(__AVR_ATmega644__)   || \
-    defined(__AVR_ATmega644P__)  || \
-    defined(__AVR_ATmega1284__)  || \
-    defined(__AVR_ATmega1284P__)
-	TCCR0A = 0x00;
-	TCCR0B = 0x00;
-#else
-
-	TCCR0 = 0x00;
-#endif
+	TIMER0_OFF();
 	sei();
 }
 
+
 // initialize timer which triggers the interrupt
 static void timer0_on() {
-	/* 	TCCR0: FOC0 WGM00 COM01 COM00 WGM01 CS02 CS01 CS00
-	 CS02 CS01 CS00
-	 0    0    0       stop
-	 0    0    1       clk
-	 0    1    0       clk/8
-	 0    1    1       clk/64
-	 1    0    0       clk/256
-	 1    0    1       clk/1024
-	 */
-
-#if defined(__AVR_ATmega164__)   || \
-    defined(__AVR_ATmega164P__)  || \
-    defined(__AVR_ATmega324__)   || \
-    defined(__AVR_ATmega324P__)  || \
-    defined(__AVR_ATmega644__)   || \
-    defined(__AVR_ATmega644P__)  || \
-    defined(__AVR_ATmega1284__)  || \
-    defined(__AVR_ATmega1284P__)
-	TCCR0A = 0x02; // CTC Mode
-	TCCR0B = 0x04; // clk/256
-	TCNT0  = 0;    // reset timer
-	OCR0   = 20;   // compare with this value
-	TIMSK0 = 0x02; // compare match Interrupt on
-#else
-	TCCR0  = 0x0C; // CTC Mode, clk/256
-	TCNT0  = 0;    // reset timer
-	OCR0   = 20;   // compare with this value
-	TIMSK  = 0x02; // compare match Interrupt on
-#endif
+	TIMER0_CTC_CS256();  // CTC mode, prescaling conforms to clk/256
+	TIMER0_RESET();      // set counter to 0
+	TIMER0_COMPARE(20);  // compare with this value first
+	TIMER0_INT_ENABLE(); // enable Timer/Counter0 Output Compare Match (A) Int.
 }
+
 
 void borg_hw_init() {
 	// switch column ports to output mode
@@ -233,5 +211,5 @@ void borg_hw_init() {
 
 	// activate watchdog timer
 	wdt_reset();
-	wdt_enable(0x00); // 17ms watchdog
+	wdt_enable(WDTO_15MS); // 15ms watchdog
 }
