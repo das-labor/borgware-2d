@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <setjmp.h>
+#include <limits.h>
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 #include <avr/eeprom.h>
@@ -14,6 +15,7 @@
 	extern unsigned char waitForFire;
 #endif
 #include "../scrolltext/scrolltext.h"
+#include "../animations/program.h"
 #include "uart.h"
 #include "uart_commands.h"
 
@@ -39,8 +41,9 @@ extern volatile unsigned char reverseMode;
 
 #define CR "\r\n"
 
-#if !(defined(eeprom_update_block) && \
-	((E2PAGESIZE == 2) || (E2PAGESIZE == 4) || (E2PAGESIZE == 8)))
+#if (!(defined(eeprom_update_block) && \
+	((E2PAGESIZE == 2) || (E2PAGESIZE == 4) || (E2PAGESIZE == 8)))) || \
+	!(defined(ANIMATION_TESTS))
 char const UART_STR_NOTIMPL[] PROGMEM = "Not implemented."CR;
 #endif
 
@@ -55,17 +58,22 @@ char const UART_STR_UART_ERR[]   PROGMEM = "Transmission error."CR;
 char const UART_STR_UNKNOWN[]    PROGMEM = "Unknown command or syntax error."CR;
 char const UART_STR_TOOLONG[]    PROGMEM = CR"Command is too long."CR;
 char const UART_STR_HELP[]       PROGMEM = "Allowed commands: erase help mode "
-                                           "msg next prev reset scroll"CR;
+                                           "msg next prev reset scroll test"CR;
 
 char const UART_CMD_ERASE[]      PROGMEM = "erase";
 char const UART_CMD_HELP[]       PROGMEM = "help";
 char const UART_CMD_MODE[]       PROGMEM = "mode";
-char const UART_CMD_MODE_ARG[]   PROGMEM = "mode ";
 char const UART_CMD_MSG[]        PROGMEM = "msg ";
 char const UART_CMD_NEXT[]       PROGMEM = "next";
 char const UART_CMD_PREV[]       PROGMEM = "prev";
 char const UART_CMD_RESET[]      PROGMEM = "reset";
 char const UART_CMD_SCROLL[]     PROGMEM = "scroll ";
+char const UART_CMD_TEST[]       PROGMEM = "test";
+
+#ifdef ANIMATION_TESTS
+char const UART_STR_TEST_EXIT[]  PROGMEM = "Press ENTER to exit test."CR;
+char const UART_STR_TEST_ERR[]   PROGMEM = "Range is between 0 and %d."CR;
+#endif
 
 
 bool g_uartcmd_permit_processing = 1;
@@ -208,6 +216,33 @@ static void uartcmd_prev_anim(void) {
 
 
 /**
+ * Extracts a positive number from an ASCII string (up to INT_MAX).
+ * @param buffer String to be examined. Preceding whitespaces are skipped.
+ *               ASCII control characters and [Space] act as delimiters.
+ * @return The extracted number or -1 if a conversion error occurred.
+ */
+int uartcmd_extract_num_arg(char *buffer) {
+	int res = -1;
+	uint8_t i = 0;
+	while (buffer[i] <= ' ' && buffer[i] != 0) ++i; // skip whitespaces
+	for (; buffer[i] > 0x20; ++i) {
+		if (res < 0) {
+			res = 0;
+		}
+		int const d = buffer[i] - '0';
+		if (isdigit(buffer[i]) && (res <= (INT_MAX / 10)) &&
+				((res * 10) <= (INT_MAX - d))) {
+			res = res * 10 + d;
+		} else {
+			res = -1;
+			break;
+		}
+	}
+	return res;
+}
+
+
+/**
  * Outputs current mode number via UART.
  */
 static void uartcmd_print_mode(void) {
@@ -220,32 +255,56 @@ static void uartcmd_print_mode(void) {
 /**
  * Retrieves desired mode number from command line and switches to that mode.
  */
-static void uartcmd_read_mode(void) {
-	int res = 0;
-	for (uint8_t i = 5; (i < 8) && (g_rx_buffer[i] != 0); ++i) {
-		if (isdigit(g_rx_buffer[i])) {
-			res = res * 10 + g_rx_buffer[i] - '0';
-		} else {
-			res = UINT8_MAX + 1;
-			break;
-		}
-	}
-
-	if ((res <= UINT8_MAX) && (g_rx_buffer[8] == 0)) {
+static void uartcmd_mode(void) {
+	if (g_rx_buffer[4] != 0) {
+		int new_mode = uartcmd_extract_num_arg(&g_rx_buffer[4]);
+		if (new_mode <= UINT8_MAX) {
 #ifdef JOYSTICK_SUPPORT
-		if (waitForFire) {
+			if (waitForFire) {
 #endif
-			UART_PUTS_P(UART_STR_PROMPT);
-			uartcmd_clear_buffer();
-			longjmp(newmode_jmpbuf, res);
+				UART_PUTS_P(UART_STR_PROMPT);
+				uartcmd_clear_buffer();
+				longjmp(newmode_jmpbuf, new_mode);
 #ifdef JOYSTICK_SUPPORT
-		} else {
-			UART_PUTS_P(UART_STR_GAMEMO_ERR);
-		}
+			} else {
+				UART_PUTS_P(UART_STR_GAMEMO_ERR);
+			}
 #endif
+		} else {
+			UART_PUTS_P(UART_STR_MODE_ERR);
+		}
 	} else {
-		UART_PUTS_P(UART_STR_MODE_ERR);
+		uartcmd_print_mode();
 	}
+}
+
+
+/**
+ * Draws test patterns for display inspection.
+ */
+static void uartcmd_test(void) {
+#ifdef ANIMATION_TESTS
+	uartcmd_forbid();
+	int pattern_no = uartcmd_extract_num_arg(&g_rx_buffer[4]);
+	if (pattern_no >= 0 && pattern_no <= NUMPLANE + 2) {
+		UART_PUTS_P(UART_STR_TEST_EXIT);
+		if (pattern_no <= NUMPLANE) {
+			test_level(pattern_no, true);
+		} else if (pattern_no == (NUMPLANE + 1)) {
+			test_palette(true);
+		} else if (pattern_no == (NUMPLANE + 2)) {
+			test_palette2(true);
+		}
+		while (UART_GETC() >= 0x20); // wait for any control character
+	} else {
+		char msg[36] = "";
+		snprintf_P(msg, sizeof(msg), UART_STR_TEST_ERR, NUMPLANE + 2);
+		UART_PUTS(msg);
+	}
+	uartcmd_permit();
+#else
+	UART_PUTS_P(UART_STR_NOTIMPL);
+#endif
 }
 
 
@@ -327,6 +386,7 @@ static bool uartcmd_read_until_enter(void) {
 	return false;
 }
 
+
 /**
  * Checks for entered commands and dispatches them to the appropriate handler.
  */
@@ -336,11 +396,8 @@ void uartcmd_process(void) {
 			uartcmd_erase_eeprom();
 		} else if (!strncmp_P(g_rx_buffer, UART_CMD_HELP, UART_BUFFER_SIZE)) {
 			UART_PUTS_P(UART_STR_HELP);
-		} else if (!strncmp_P(g_rx_buffer, UART_CMD_MODE, UART_BUFFER_SIZE) ||
-				!strncmp_P(g_rx_buffer, UART_CMD_MODE_ARG, UART_BUFFER_SIZE)) {
-			uartcmd_print_mode();
-		} else if (!strncmp_P(g_rx_buffer, UART_CMD_MODE_ARG, 5)) {
-			uartcmd_read_mode();
+		} else if (!strncmp_P(g_rx_buffer, UART_CMD_MODE, 4)) {
+			uartcmd_mode();
 		} else if (!strncmp_P(g_rx_buffer, UART_CMD_MSG, 4)) {
 			uartcmd_simple_message();
 		} else if (!strncmp_P(g_rx_buffer, UART_CMD_NEXT, UART_BUFFER_SIZE)) {
@@ -351,6 +408,8 @@ void uartcmd_process(void) {
 			uartcmd_reset_borg();
 		} else if (!strncmp_P(g_rx_buffer, UART_CMD_SCROLL, 7)) {
 			uartcmd_scroll_message();
+		} else if (!strncmp_P(g_rx_buffer, UART_CMD_TEST, 4)) {
+			uartcmd_test();
 		} else if (g_rx_buffer[0] != 0) {
 			UART_PUTS_P(UART_STR_UNKNOWN);
 		}

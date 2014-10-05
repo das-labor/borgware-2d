@@ -268,20 +268,20 @@ void display_loop(){
 
 #ifdef ANIMATION_TESTS
 		case 31:
-			test_level(1);
+			test_level(1, false);
 			break;
 
 		case 32:
-			test_level(2);
+			test_level(2, false);
 			break;
 
 		case 33:
-			test_level(3);
+			test_level(3, false);
 			break;
 
 		case 35:
-			test_palette();
-			test_palette2();
+			test_palette(false);
+			test_palette2(false);
 			break;
 #endif
 

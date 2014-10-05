@@ -1,4 +1,5 @@
 
+#include <stdbool.h>
 #include "../config.h"
 #include "../compat/pgmspace.h"
 #include "../random/prng.h"
@@ -9,38 +10,43 @@
 
 
 #ifdef ANIMATION_TESTS
-void test_level(unsigned char level){
+void test_level(unsigned char level, bool debug){
 	for (unsigned char y=NUM_ROWS;y--;){
 		for (unsigned char x=NUM_COLS;x--;){
 			setpixel((pixel){x,y}, level);
 			wait(5);
 		}
 	}
-	wait(2000);
+	if (!debug) {
+		wait(2000);
+	}
 }
 
-void test_palette(){
+void test_palette(bool debug){
 	for (unsigned char y=NUM_ROWS;y--;){
 		for (unsigned char x=NUM_COLS;x--;){
 			setpixel((pixel){x,y}, y%4);
 			// wait(1);
 		}
 	}
-	wait(2000);
+	if (!debug) {
+		wait(2000);
+	}
 }
 
-void test_palette2(){
+void test_palette2(bool debug){
 	for (unsigned char x=NUM_COLS;x--;){
 		for (unsigned char y=NUM_ROWS;y--;){
 			setpixel((pixel){x,y}, x%4);
-			// wait(1);
 		}
 	}
-	wait(1000);
-	for (unsigned char x=NUM_COLS;x--;){
-		// shift image right
-		shift_pixmap_l();
-		wait(30);
+	if (!debug) {
+		wait(1000);
+		for (unsigned char x=NUM_COLS;x--;){
+			// shift image right
+			shift_pixmap_l();
+			wait(30);
+		}
 	}
 }
 #endif
