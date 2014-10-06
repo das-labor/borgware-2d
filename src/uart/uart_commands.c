@@ -73,6 +73,26 @@ char const UART_CMD_TEST[]       PROGMEM = "test";
 #ifdef ANIMATION_TESTS
 char const UART_STR_TEST_EXIT[]  PROGMEM = "Press ENTER to exit test."CR;
 char const UART_STR_TEST_ERR[]   PROGMEM = "Range is between 0 and %d."CR;
+char const UART_STR_GAMETS_ERR[] PROGMEM = "No display tests during games."CR;
+char const UART_STR_TEST_UP[]    PROGMEM = "UP ";
+char const UART_STR_TEST_DOWN[]  PROGMEM = "DOWN ";
+char const UART_STR_TEST_LEFT[]  PROGMEM = "LEFT ";
+char const UART_STR_TEST_RIGHT[] PROGMEM = "RIGHT ";
+char const UART_STR_TEST_FIRE[]  PROGMEM = "FIRE";
+
+enum uartcmd_joytest_e {
+	UARTCMD_JOY_UP    = 0x01,
+	UARTCMD_JOY_DOWN  = 0x02,
+	UARTCMD_JOY_LEFT  = 0x04,
+	UARTCMD_JOY_RIGHT = 0x08,
+	UARTCMD_JOY_FIRE  = 0x10
+};
+
+#	ifdef NDEBUG
+	typedef uint8_t uartcmd_joytest_t;
+#	else
+	typedef enum uartcmd_joytest_e uartcmd_joytest_t;
+#	endif
 #endif
 
 
@@ -135,8 +155,7 @@ static void uartcmd_simple_message(void) {
 		uartcmd_forbid();
 #ifdef JOYSTICK_SUPPORT
 		if (waitForFire) {
-#else
-		{
+			waitForFire = 0;
 #endif
 			g_rx_buffer[1] = '<';
 			g_rx_buffer[2] = '/';
@@ -144,11 +163,13 @@ static void uartcmd_simple_message(void) {
 			// text must not be longer than the scroll text buffer
 			g_rx_buffer[1 + SCROLLTEXT_BUFFER_SIZE - 1] = 0;
 			scrolltext(&g_rx_buffer[1]);
+
 #ifdef JOYSTICK_SUPPORT
+			waitForFire = 1;
 		} else {
-#endif
 			UART_PUTS_P(UART_STR_GAMETX_ERR);
 		}
+#endif
 		uartcmd_permit();
 	}
 }
@@ -162,17 +183,17 @@ static void uartcmd_scroll_message(void) {
 		uartcmd_forbid();
 #ifdef JOYSTICK_SUPPORT
 		if (waitForFire) {
-#else
-		{
+			waitForFire = 0;
 #endif
 			// text must not be longer than the scroll text buffer
 			g_rx_buffer[7 + SCROLLTEXT_BUFFER_SIZE - 1] = 0;
 			scrolltext(&g_rx_buffer[7]);
 #ifdef JOYSTICK_SUPPORT
+			waitForFire = 1;
 		} else {
-#endif
 			UART_PUTS_P(UART_STR_GAMETX_ERR);
 		}
+#endif
 		uartcmd_permit();
 	}
 }
@@ -279,29 +300,92 @@ static void uartcmd_mode(void) {
 }
 
 
+#if defined(ANIMATION_TESTS) && defined(JOYSTICK_SUPPORT)
+/**
+ * Prints current joystick status via UART.
+ */
+static void uartcmd_joy_test(uint8_t *last) {
+	uint8_t joy_value = 0;
+	if (JOYISUP) {
+		joy_value |= UARTCMD_JOY_UP;
+	}
+	if (JOYISDOWN) {
+		joy_value |= UARTCMD_JOY_DOWN;
+	}
+	if (JOYISLEFT) {
+		joy_value |= UARTCMD_JOY_LEFT;
+	}
+	if (JOYISRIGHT) {
+		joy_value |= UARTCMD_JOY_RIGHT;
+	}
+	if (JOYISFIRE) {
+		joy_value |= UARTCMD_JOY_FIRE;
+	}
+
+	if (joy_value != *last) {
+		UART_PUTS_P(UART_STR_CLEARLINE);
+		if (joy_value & UARTCMD_JOY_UP) {
+			UART_PUTS_P(UART_STR_TEST_UP);
+		}
+		if (joy_value & UARTCMD_JOY_DOWN) {
+			UART_PUTS_P(UART_STR_TEST_DOWN);
+		}
+		if (joy_value & UARTCMD_JOY_LEFT) {
+			UART_PUTS_P(UART_STR_TEST_LEFT);
+		}
+		if (joy_value & UARTCMD_JOY_RIGHT) {
+			UART_PUTS_P(UART_STR_TEST_RIGHT);
+		}
+		if (joy_value & UARTCMD_JOY_FIRE) {
+			UART_PUTS_P(UART_STR_TEST_FIRE);
+		}
+		*last = joy_value;
+	}
+}
+#endif
+
+
 /**
  * Draws test patterns for display inspection.
  */
 static void uartcmd_test(void) {
 #ifdef ANIMATION_TESTS
-	uartcmd_forbid();
-	int pattern_no = uartcmd_extract_num_arg(&g_rx_buffer[4]);
-	if (pattern_no >= 0 && pattern_no <= NUMPLANE + 2) {
-		UART_PUTS_P(UART_STR_TEST_EXIT);
-		if (pattern_no <= NUMPLANE) {
-			test_level(pattern_no, true);
-		} else if (pattern_no == (NUMPLANE + 1)) {
-			test_palette(true);
-		} else if (pattern_no == (NUMPLANE + 2)) {
-			test_palette2(true);
+#	ifdef JOYSTICK_SUPPORT
+	if (waitForFire) {
+		waitForFire = 0;
+#	endif
+		uartcmd_forbid();
+		int pattern_no = uartcmd_extract_num_arg(&g_rx_buffer[4]);
+		if (pattern_no >= 0 && pattern_no <= NUMPLANE + 2) {
+			UART_PUTS_P(UART_STR_TEST_EXIT);
+			if (pattern_no <= NUMPLANE) {
+				test_level(pattern_no, true);
+			} else if (pattern_no == (NUMPLANE + 1)) {
+				test_palette(true);
+			} else if (pattern_no == (NUMPLANE + 2)) {
+				test_palette2(true);
+			}
+#	ifdef JOYSTICK_SUPPORT
+			uint8_t last_joy_value = 0;
+#	endif
+			while (UART_GETC() >= 0x20){ // wait for any control character
+#	ifdef JOYSTICK_SUPPORT
+				uartcmd_joy_test(&last_joy_value);
+				wait(20);
+#	endif
+			}
+		} else {
+			char msg[36] = "";
+			snprintf_P(msg, sizeof(msg), UART_STR_TEST_ERR, NUMPLANE + 2);
+			UART_PUTS(msg);
 		}
-		while (UART_GETC() >= 0x20); // wait for any control character
+		uartcmd_permit();
+#	ifdef JOYSTICK_SUPPORT
+		waitForFire = 1;
 	} else {
-		char msg[36] = "";
-		snprintf_P(msg, sizeof(msg), UART_STR_TEST_ERR, NUMPLANE + 2);
-		UART_PUTS(msg);
+		UART_PUTS_P(UART_STR_GAMETS_ERR);
 	}
-	uartcmd_permit();
+#	endif
 #else
 	UART_PUTS_P(UART_STR_NOTIMPL);
 #endif
