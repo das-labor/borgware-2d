@@ -155,13 +155,13 @@ ISR(TIMER0_ISR) {
 	static unsigned char plane = 0;
 	static unsigned char row = 0;
 
-	// reset watchdog
-	wdt_reset();
-
 	// increment both row and plane
 	if (++plane == NUMPLANE) {
 		plane = 0;
 		if (++row == NUM_ROWS) {
+			// reset watchdog
+			wdt_reset();
+
 			row = 0;
 		}
 		nextrow(row);
