@@ -240,7 +240,8 @@ static void uartcmd_prev_anim(void) {
  * Extracts a positive number from an ASCII string (up to INT_MAX).
  * @param buffer String to be examined. Preceding whitespaces are skipped.
  *               ASCII control characters and [Space] act as delimiters.
- * @return The extracted number or -1 if a conversion error occurred.
+ * @return The extracted number or -1 if there's no input or -2 if a conversion
+ *         error occurred.
  */
 int uartcmd_extract_num_arg(char *buffer) {
 	int res = -1;
@@ -255,7 +256,7 @@ int uartcmd_extract_num_arg(char *buffer) {
 				((res * 10) <= (INT_MAX - d))) {
 			res = res * 10 + d;
 		} else {
-			res = -1;
+			res = -2;
 			break;
 		}
 	}
@@ -277,25 +278,23 @@ static void uartcmd_print_mode(void) {
  * Retrieves desired mode number from command line and switches to that mode.
  */
 static void uartcmd_mode(void) {
-	if (g_rx_buffer[4] != 0) {
-		int new_mode = uartcmd_extract_num_arg(&g_rx_buffer[4]);
-		if (new_mode <= UINT8_MAX) {
+	int new_mode = uartcmd_extract_num_arg(&g_rx_buffer[4]);
+	if (new_mode > 0 && new_mode <= UINT8_MAX) {
 #ifdef JOYSTICK_SUPPORT
-			if (waitForFire) {
+		if (waitForFire) {
 #endif
-				UART_PUTS_P(UART_STR_PROMPT);
-				uartcmd_clear_buffer();
-				longjmp(newmode_jmpbuf, new_mode);
+			UART_PUTS_P(UART_STR_PROMPT);
+			uartcmd_clear_buffer();
+			longjmp(newmode_jmpbuf, new_mode);
 #ifdef JOYSTICK_SUPPORT
-			} else {
-				UART_PUTS_P(UART_STR_GAMEMO_ERR);
-			}
-#endif
 		} else {
-			UART_PUTS_P(UART_STR_MODE_ERR);
+			UART_PUTS_P(UART_STR_GAMEMO_ERR);
 		}
-	} else {
+#endif
+	} else if (new_mode == -1) {
 		uartcmd_print_mode();
+	} else if (new_mode == -2) {
+		UART_PUTS_P(UART_STR_MODE_ERR);
 	}
 }
 
@@ -480,7 +479,8 @@ void uartcmd_process(void) {
 			uartcmd_erase_eeprom();
 		} else if (!strncmp_P(g_rx_buffer, UART_CMD_HELP, UART_BUFFER_SIZE)) {
 			UART_PUTS_P(UART_STR_HELP);
-		} else if (!strncmp_P(g_rx_buffer, UART_CMD_MODE, 4)) {
+		} else if ((!strncmp_P(g_rx_buffer, UART_CMD_MODE, 4)) &&
+				(g_rx_buffer[4] <= ' ')) {
 			uartcmd_mode();
 		} else if (!strncmp_P(g_rx_buffer, UART_CMD_MSG, 4)) {
 			uartcmd_simple_message();
@@ -492,7 +492,8 @@ void uartcmd_process(void) {
 			uartcmd_reset_borg();
 		} else if (!strncmp_P(g_rx_buffer, UART_CMD_SCROLL, 7)) {
 			uartcmd_scroll_message();
-		} else if (!strncmp_P(g_rx_buffer, UART_CMD_TEST, 4)) {
+		} else if ((!strncmp_P(g_rx_buffer, UART_CMD_TEST, 4)) &&
+				(g_rx_buffer[4] <= ' ')) {
 			uartcmd_test();
 		} else if (g_rx_buffer[0] != 0) {
 			UART_PUTS_P(UART_STR_UNKNOWN);
