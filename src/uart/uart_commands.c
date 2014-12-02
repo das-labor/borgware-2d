@@ -31,7 +31,12 @@
 #	define UART_PUTC uart1_putc
 #endif
 
-#define UART_BUFFER_SIZE (SCROLLTEXT_BUFFER_SIZE + 8)
+#ifdef SCROLLTEXT_BUFFER_SIZE
+#	define UART_BUFFER_SIZE (SCROLLTEXT_BUFFER_SIZE + 8)
+#else
+#	define UART_BUFFER_SIZE 136
+#endif
+
 char g_rx_buffer[UART_BUFFER_SIZE];
 uint8_t g_rx_index;
 
@@ -151,6 +156,7 @@ static void uartcmd_erase_eeprom(void) {
  * Displays a simple message without the need to prefix a scrolltext command.
  */
 static void uartcmd_simple_message(void) {
+#ifdef SCROLLTEXT_SUPPORT
 	if (uartcmd_processing_allowed()) {
 		uartcmd_forbid();
 #ifdef JOYSTICK_SUPPORT
@@ -172,6 +178,7 @@ static void uartcmd_simple_message(void) {
 #endif
 		uartcmd_permit();
 	}
+#endif
 }
 
 
@@ -179,6 +186,7 @@ static void uartcmd_simple_message(void) {
  * Displays a message which may use the complete range of scrolltext commands.
  */
 static void uartcmd_scroll_message(void) {
+#ifdef SCROLLTEXT_SUPPORT
 	if (uartcmd_processing_allowed()) {
 		uartcmd_forbid();
 #ifdef JOYSTICK_SUPPORT
@@ -196,6 +204,7 @@ static void uartcmd_scroll_message(void) {
 #endif
 		uartcmd_permit();
 	}
+#endif
 }
 
 

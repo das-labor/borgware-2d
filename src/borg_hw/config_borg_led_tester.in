@@ -1,0 +1,22 @@
+mainmenu_option next_comment
+comment "LED Tester Setup"
+
+bool "Higher Contrast" HIGH_CONTRAST n
+
+bool "UART Support" UART_SUPPORT n
+choice 'Baud Rate'			\
+   "2400 2400 \
+    4800 4800 \
+    9600 9600 \
+    14400 14400 \
+    19200 19200 \
+    28800 28800 \
+    38400 38400 \
+    57600 57600 \
+    76800 76800 \
+    115200 115200" \
+   '19200' UART_BAUDRATE_SETTING
+
+int  "Displayed row" LED_TESTER_DISPLAYED_ROW  0
+
+endmenu

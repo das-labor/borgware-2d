@@ -22,7 +22,8 @@ choice 'Hardware Driver'			\
     4xPD1165               HW_PD1165 \
     Ping-Pong              HW_PINGPONG \
     Giga-Borg              HW_GIGABORG \
-    Ancient-Borg           HW_ANCIENTBORG" \
+    Ancient-Borg           HW_ANCIENTBORG \
+    LED-Tester             HW_LED_TESTER" \
    'Borg-16' BORG_HW
 
 
@@ -84,6 +85,10 @@ fi
 
 if [ "$BORG_HW" == "HW_ANCIENTBORG" ] ; then
   source src/borg_hw/config_ancient.in
+fi
+
+if [ "$BORG_HW" == "HW_LED_TESTER" ] ; then
+  source src/borg_hw/config_borg_led_tester.in
 fi
 
 endmenu
