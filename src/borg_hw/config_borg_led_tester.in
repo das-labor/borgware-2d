@@ -1,6 +1,8 @@
 mainmenu_option next_comment
 comment "LED Tester Setup"
 
+define_int LED_TESTER  1
+
 bool "Higher Contrast" HIGH_CONTRAST n
 
 bool "UART Support" UART_SUPPORT n

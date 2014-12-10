@@ -19,6 +19,10 @@
 #include "uart.h"
 #include "uart_commands.h"
 
+#ifdef LED_TESTER
+	extern bool g_highpower;
+#endif
+
 #ifndef USE_UART1
 #	define UART_PUTS(STR) uart_puts(STR)
 #	define UART_PUTS_P(STR) uart_puts_p(STR)
@@ -34,7 +38,7 @@
 #ifdef SCROLLTEXT_BUFFER_SIZE
 #	define UART_BUFFER_SIZE (SCROLLTEXT_BUFFER_SIZE + 8)
 #else
-#	define UART_BUFFER_SIZE 136
+#	define UART_BUFFER_SIZE 32
 #endif
 
 char g_rx_buffer[UART_BUFFER_SIZE];
@@ -48,7 +52,7 @@ extern volatile unsigned char reverseMode;
 
 #if (!(defined(eeprom_update_block) && \
 	((E2PAGESIZE == 2) || (E2PAGESIZE == 4) || (E2PAGESIZE == 8)))) || \
-	!(defined(ANIMATION_TESTS))
+	!defined(ANIMATION_TESTS) || !(defined(SCROLLTEXT_SUPPORT))
 char const UART_STR_NOTIMPL[] PROGMEM = "Not implemented."CR;
 #endif
 
@@ -62,9 +66,14 @@ char const UART_STR_GAMETX_ERR[] PROGMEM = "No text messages during games."CR;
 char const UART_STR_UART_ERR[]   PROGMEM = "Transmission error."CR;
 char const UART_STR_UNKNOWN[]    PROGMEM = "Unknown command or syntax error."CR;
 char const UART_STR_TOOLONG[]    PROGMEM = CR"Command is too long."CR;
+#ifdef LED_TESTER
+char const UART_STR_HELP[]       PROGMEM = "Allowed commands: erase help mode "
+                                           "msg next power_lo power_hi prev "
+                                           "reset scroll test"CR;
+#else
 char const UART_STR_HELP[]       PROGMEM = "Allowed commands: erase help mode "
                                            "msg next prev reset scroll test"CR;
-
+#endif
 char const UART_CMD_ERASE[]      PROGMEM = "erase";
 char const UART_CMD_HELP[]       PROGMEM = "help";
 char const UART_CMD_MODE[]       PROGMEM = "mode";
@@ -74,6 +83,10 @@ char const UART_CMD_PREV[]       PROGMEM = "prev";
 char const UART_CMD_RESET[]      PROGMEM = "reset";
 char const UART_CMD_SCROLL[]     PROGMEM = "scroll ";
 char const UART_CMD_TEST[]       PROGMEM = "test";
+#ifdef LED_TESTER
+char const UART_CMD_PWRLO[]      PROGMEM = "power_lo";
+char const UART_CMD_PWRHI[]      PROGMEM = "power_hi";
+#endif
 
 #ifdef ANIMATION_TESTS
 char const UART_STR_TEST_EXIT[]  PROGMEM = "Press ENTER to exit test."CR;
@@ -178,6 +191,8 @@ static void uartcmd_simple_message(void) {
 #endif
 		uartcmd_permit();
 	}
+#else
+	UART_PUTS_P(UART_STR_NOTIMPL);
 #endif
 }
 
@@ -186,24 +201,26 @@ static void uartcmd_simple_message(void) {
  * Displays a message which may use the complete range of scrolltext commands.
  */
 static void uartcmd_scroll_message(void) {
-#ifdef SCROLLTEXT_SUPPORT
+#	ifdef SCROLLTEXT_SUPPORT
 	if (uartcmd_processing_allowed()) {
 		uartcmd_forbid();
-#ifdef JOYSTICK_SUPPORT
+#	ifdef JOYSTICK_SUPPORT
 		if (waitForFire) {
 			waitForFire = 0;
-#endif
+#	endif
 			// text must not be longer than the scroll text buffer
 			g_rx_buffer[7 + SCROLLTEXT_BUFFER_SIZE - 1] = 0;
 			scrolltext(&g_rx_buffer[7]);
-#ifdef JOYSTICK_SUPPORT
+#	ifdef JOYSTICK_SUPPORT
 			waitForFire = 1;
 		} else {
 			UART_PUTS_P(UART_STR_GAMETX_ERR);
 		}
-#endif
+#	endif
 		uartcmd_permit();
 	}
+#else
+	UART_PUTS_P(UART_STR_NOTIMPL);
 #endif
 }
 
@@ -504,6 +521,12 @@ void uartcmd_process(void) {
 		} else if ((!strncmp_P(g_rx_buffer, UART_CMD_TEST, 4)) &&
 				(g_rx_buffer[4] <= ' ')) {
 			uartcmd_test();
+#ifdef LED_TESTER
+		} else if (!strncmp_P(g_rx_buffer, UART_CMD_PWRLO, UART_BUFFER_SIZE)) {
+			g_highpower = false;
+		} else if (!strncmp_P(g_rx_buffer, UART_CMD_PWRHI, UART_BUFFER_SIZE)) {
+			g_highpower = true;
+#endif
 		} else if (g_rx_buffer[0] != 0) {
 			UART_PUTS_P(UART_STR_UNKNOWN);
 		}
