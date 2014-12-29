@@ -3,36 +3,35 @@
 #include "../random/prng.h"
 #include "../pixel.h"
 #include "../util.h"
+#include "../compat/pgmspace.h"
 
-
-#define HEIGHT 12
 #define LINE_DISTANCE 4
-#define SIN_LENGTH 18
+#define SINTAB_LENGTH 16
 #define SIN_MAX 6
 
-// uint8_t sin[SIN_LENGTH] = {0, 1, 2, 2, 3, 3, 4, 4, 4, 3, 3, 3, 2, 2, 1, 0};
+// lolshield etc.
+#define SMALL (NUM_ROWS < 10)
+#define PGM(x) pgm_read_byte(&(x))
 
-uint8_t sintab[SIN_LENGTH] = {
-		0,
-		1,
-		2,
-		3,
-		4,
-		5,
-		5,
-		6,
-		6,
-		6,
-		6,
-		6,
-		5,
-		5,
-		4,
-		3,
-		2,
-		1,
-		};
-
+uint8_t sintab_base[SINTAB_LENGTH] =
+	{
+			0, // 0
+			14,
+			18, // 1
+			24,
+			28,	// 2
+			32,
+			36, // 2
+			42,
+			44,	// 3
+			46,
+			50, // 3
+			52,
+			56, // 4
+			60,
+			62,	// 4
+			64
+	};
 
 /**
  * Shifts the Pixmap one px right
@@ -54,8 +53,18 @@ static void move(){
 		}
 }
 
+
 void dna(){
-	uint8_t mid = NUM_COLS / 2;
+
+	uint8_t height = NUM_ROWS * 3 / 4 ;
+	// small screen: bigger helix
+	if(SMALL){
+		height = NUM_ROWS;
+	}
+
+	uint8_t sin_length = 16;
+
+	uint8_t mid = NUM_ROWS / 2;
 	uint8_t draw_line = 0;
 
 	uint8_t top = 0;
@@ -65,12 +74,26 @@ void dna(){
 	uint8_t bottom_color = 2;
 
 	uint32_t c = 600;
+	uint8_t sintab[sin_length];
 
 	uint8_t sinpos = 0;
 
 	int8_t direction = 1;
+	// disable up- and down-movement on small screens
+	if(SMALL){
+		direction = 0;
+	}
+
 
 	clear_screen(0);
+
+	/* calculate sinus wave */
+	for(int i = 0; i < sin_length / 2; i++){
+		int index = i * SINTAB_LENGTH * 2 / sin_length;
+		sintab[i] = sintab_base[index] * height / 128;
+		sintab[sin_length - i - 1] = sintab[i];
+
+	}
 
 	while(c--){
 		top = mid - sintab[sinpos];
@@ -86,18 +109,18 @@ void dna(){
 			setpixel((pixel){NUM_COLS-1, mid}, 1);
 		}
 
-		if(sinpos == 0){
-			if(mid-SIN_MAX <= 0){
+		if(sinpos == sin_length-1){
+			if(mid-SIN_MAX <= 0 && direction){
 				direction = 1;
 			}
-			if(mid+SIN_MAX >= NUM_ROWS-1){
+			if(mid+SIN_MAX >= NUM_ROWS-1 && direction){
 				direction = -1;
 			}
 			mid = mid + (random8() > 200) * direction;
 		}
 
 		draw_line = (draw_line+1) % LINE_DISTANCE;
-		sinpos = (sinpos + 1) % SIN_LENGTH;
+		sinpos = (sinpos + 1) % sin_length;
 
 		if(sinpos == 0){
 			uint8_t tmp_color = top_color;
