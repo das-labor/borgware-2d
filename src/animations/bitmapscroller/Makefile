@@ -22,6 +22,10 @@ ifeq ($(ANIMATION_FAIRYDUST),y)
   SRC += fairydust.c
 endif
 
+ifeq ($(ANIMATION_LABOR10THANNIVERSAIRY),y)
+  SRC += labor10thanniversairy.c
+endif
+
 include $(MAKETOPDIR)/rules.mk
 
 include $(MAKETOPDIR)/depend.mk

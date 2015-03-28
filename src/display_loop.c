@@ -18,6 +18,7 @@
 #include "animations/bitmapscroller/amphibian.h"
 #include "animations/bitmapscroller/outofspec.h"
 #include "animations/bitmapscroller/fairydust.h"
+#include "animations/bitmapscroller/labor10thanniversairy.h"
 #include "animations/fpmath_patterns.h"
 #include "animations/mherweg.h"
 #include "animations/moire.h"
@@ -263,6 +264,12 @@ void display_loop(){
 #ifdef ANIMATION_DNA
 		case 26:
 			dna();
+			break;
+#endif
+
+#ifdef ANIMATION_LABOR10THANNIVERSAIRY
+		case 27:
+			logo_Labor10thAnniversairy();
 			break;
 #endif
 
