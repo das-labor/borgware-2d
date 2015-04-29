@@ -44,7 +44,7 @@ game_descriptor_t kart_game_descriptor __attribute__((section(".game_descriptors
 
 #define WAIT 15
 
-#define DRIVE_DIV 10
+#define DRIVE_DIV 9
 #define DIRECTION_DIV 20
 #define DECREASE_WIDTH_DIV 300
 #define ACCELERATE_DIV 800
@@ -64,6 +64,9 @@ game_descriptor_t kart_game_descriptor __attribute__((section(".game_descriptors
 #define BORDER_DARK 2
 #define OBSTACLE_COLOR 3
 
+#define NUM_FLASHES 3
+#define BLINK_TIME 300
+
 // borders = (middle, width, obstacle_pos)
 uint8_t borders[NUM_ROWS][3];
 uint32_t extra_score = 0;
@@ -72,6 +75,7 @@ void kart_game(){
 
 	// Initialisation
 	uint32_t decrease_width_div = DECREASE_WIDTH_DIV;
+	uint16_t accelerate_div = ACCELERATE_DIV;
 	uint8_t key_ignore[2];
 	uint8_t drive_div = DRIVE_DIV;
 	uint8_t carpos = NUM_COLS / 2;
@@ -109,12 +113,13 @@ void kart_game(){
 		// DECREASE WIDTH
 		if(cycle % decrease_width_div == 0){
 			width--;
-			decrease_width_div = decrease_width_div*2;
+			decrease_width_div *= 2;
 		}
 
 		// INCREASE SPEED
-		if(cycle % ACCELERATE_DIV == 0 ){
+		if(cycle % accelerate_div == 0 ){
 			drive_div--;
+			accelerate_div *= 2;
 		}
 
 		// MOVE
@@ -142,7 +147,8 @@ void kart_game(){
 
 			key_ignore[1] = KEY_IGNORE_INITIAL;
 			key_ignore[0] = 0;
-		}else if(JOYISUP && boost_till == 0){
+		}else if(JOYISFIRE && boost_till == 0){
+			blink();
 			boost_till = cycle + BOOST_CYCLES;
 			boost_multiplier = BOOST_MULTIPLIER;
 		}else if(!(JOYISRIGHT || JOYISLEFT)){
@@ -263,6 +269,33 @@ void save_street(uint8_t middle, uint8_t width, uint8_t obstacle_pos){
 	borders[0][1] = width;
 	borders[0][2] = obstacle_pos;
 
+}
+
+/**
+ * Flash the screen NUM_FLASHES times.
+ */
+void blink(){
+	// Two copies of the pixmap.
+	unsigned char pixmap_copy_1[NUMPLANE][NUM_ROWS][LINEBYTES];
+	unsigned char pixmap_copy_2[NUMPLANE][NUM_ROWS][LINEBYTES];
+	unsigned char plane, row, byte, flashes;
+
+	// create empty pixmap
+	for(plane = 0; plane < NUMPLANE; plane++){
+		for(row = 0; row < NUM_ROWS; row++){
+			for(byte = 0; byte < LINEBYTES; byte++){
+				pixmap_copy_2[plane][row][byte] = 0;
+			}
+		}
+	}
+
+	// Do a triangle shift.
+	for(flashes = NUM_FLASHES*2; flashes > 0; flashes--){
+		memcpy(pixmap_copy_1, pixmap, sizeof(pixmap));
+		memcpy(pixmap, pixmap_copy_2, sizeof(pixmap));
+		memcpy(pixmap_copy_2, pixmap_copy_1, sizeof(pixmap));
+		wait(BLINK_TIME);
+	}
 }
 
 /**
