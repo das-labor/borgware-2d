@@ -5,7 +5,7 @@
 #
 # General Setup
 #
-MCU=atmega32
+MCU=atmega16
 FREQ=16000000
 
 #
@@ -21,6 +21,7 @@ BORG_HW=HW_ANCIENTBORG
 #
 COLPORT=PORTC
 ROWPORT=PORTA
+# WATCHDOG_ENABLED is not set
 
 #
 # Features
