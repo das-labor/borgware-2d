@@ -266,6 +266,12 @@ void display_loop(){
 			break;
 #endif
 
+#ifdef ANIMATION_SURFACE_WAVE
+		case 27:
+			surfaceWave();
+			break;
+#endif
+
 #ifdef ANIMATION_TESTS
 		case 31:
 			test_level(1, false);

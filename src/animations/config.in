@@ -59,6 +59,9 @@ comment "Animations"
 
 		bool "Psychedelic"      ANIMATION_PSYCHEDELIC  $ANIMATION_FIXEDPOINT
 		int  "Additional Frame Delay (in ms) For Psychedelic" FP_PSYCHO_DELAY 15
+
+		bool "Surface Wave"     ANIMATION_SURFACE_WAVE  $ANIMATION_FIXEDPOINT
+		int  "Additional Frame Delay (in ms) For Psychedelic" FP_SURFACE_DELAY 15
 	endmenu
 
 	bool     "Black Hole"       ANIMATION_BLACKHOLE
