@@ -48,7 +48,7 @@
 #	define TIMER0_INT_ENABLE() TIMSK0 |= _BV(OCIE0A)
 #	define TIMER0_ISR          TIMER0_COMPA_vect
 #else // ATmega16/32
-#	define TIMER0_OFF()        TIMSK0 &= ~(OCIE0); TCCR0 = 0
+#	define TIMER0_OFF()        TIMSK &= ~(OCIE0); TCCR0 = 0
 #	define TIMER0_CTC_CS256()  TCCR0 = _BV(WGM01) | _BV(CS02)
 #	define TIMER0_RESET()      TCNT0 = 0
 #	define TIMER0_COMPARE(t)   OCR0  = t
