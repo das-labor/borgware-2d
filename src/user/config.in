@@ -1,0 +1,18 @@
+# This file eases the integration of your personal animations which are not
+# meant to be included in the official Borgware-2D repository.
+#
+# Just add configurations options for your animations here as shown in the
+# commented samples.
+
+mainmenu_option next_comment
+comment "User Animations"
+	comment "Insert config options for your own animations here!"
+
+#	bool "A simple anim" ANIMATION_MY_SIMPLE_ANIM $RANDOM_SUPPORT
+
+#	dep_bool_menu "A complex anim" ANIMATION_MY_COMPLEX_ANIM $RANDOM_SUPPORT
+#		int  "Sample integer config value" MY_SAMPLE_INT  100
+#		bool "Sample boolean config value" MY_SAMPLE_BOOL y
+#	endmenu
+
+endmenu

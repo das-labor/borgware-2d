@@ -51,6 +51,8 @@
 #  include "joystick/joystick.h"
 #endif
 
+#include "user/user_loop.h"
+
 volatile unsigned char oldMode, oldOldmode, reverseMode, mode;
 
 jmp_buf newmode_jmpbuf;
@@ -319,6 +321,8 @@ void display_loop(){
 		  rowbounce(SMALLANIMATION_ROWBOUNCE_COUNT,SMALLANIMATION_ROWBOUNCE_SPEED);
 		  break;
 #endif
+
+#include "user/user_loop.c"
 
 #ifdef MENU_SUPPORT
 		case 0xFDu:
