@@ -43,6 +43,7 @@ include $(MAKETOPDIR)/defaults.mk
 	@ echo "SUBDIRS += $(TOPDIR)/animations" >> $@
 	@ echo "SUBDIRS += $(TOPDIR)/animations/bitmapscroller" >> $@
 	@ echo "SUBDIRS += $(TOPDIR)/smallani" >> $@
+	@ echo "SUBDIRS += $(TOPDIR)/user" >> $@
 	@ (for subdir in `grep -e "^#define .*_SUPPORT" $(TOPDIR)/autoconf.h \
 	      | sed -e "s/^#define /$(TOPDIR)\//" -e "s/_SUPPORT.*//" \
 	      | tr "[A-Z]\\n" "[a-z] " `; do \

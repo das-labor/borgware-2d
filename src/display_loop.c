@@ -18,7 +18,7 @@
 #include "animations/bitmapscroller/amphibian.h"
 #include "animations/bitmapscroller/outofspec.h"
 #include "animations/bitmapscroller/fairydust.h"
-#include "animations/bitmapscroller/labor10thanniversairy.h"
+#include "animations/bitmapscroller/thisisnotdetroit.h"
 #include "animations/fpmath_patterns.h"
 #include "animations/mherweg.h"
 #include "animations/moire.h"
@@ -50,6 +50,8 @@
 #ifdef JOYSTICK_SUPPORT
 #  include "joystick/joystick.h"
 #endif
+
+#include "user/user_loop.h"
 
 volatile unsigned char oldMode, oldOldmode, reverseMode, mode;
 
@@ -267,9 +269,15 @@ void display_loop(){
 			break;
 #endif
 
-#ifdef ANIMATION_LABOR10THANNIVERSAIRY
+#ifdef ANIMATION_SURFACE_WAVE
 		case 27:
-			logo_Labor10thAnniversairy();
+			surfaceWave();
+			break;
+#endif
+
+#ifdef ANIMATION_THISISNOTDETROIT
+		case 28:
+			logo_thisIsNotDetroit();
 			break;
 #endif
 
@@ -313,6 +321,8 @@ void display_loop(){
 		  rowbounce(SMALLANIMATION_ROWBOUNCE_COUNT,SMALLANIMATION_ROWBOUNCE_SPEED);
 		  break;
 #endif
+
+#include "user/user_loop.c"
 
 #ifdef MENU_SUPPORT
 		case 0xFDu:

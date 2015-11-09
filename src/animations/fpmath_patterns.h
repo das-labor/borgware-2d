@@ -16,6 +16,8 @@ void plasma(void);
 
 void psychedelic(void);
 
+void surfaceWave(void);
+
 #endif /* FPMATH_PATTERNS_H_ */
 
 /*@}*/

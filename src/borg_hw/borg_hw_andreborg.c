@@ -19,18 +19,18 @@
     defined(__AVR_ATmega644P__)  || \
     defined(__AVR_ATmega1284__)  || \
     defined(__AVR_ATmega1284P__)
-#	define TIMER0_OFF()        TCCR0A = 0; TCCR0B = 0
+#	define TIMER0_OFF()        TIMSK0 &= ~(OCIE0A); TCCR0A = 0; TCCR0B = 0
 #	define TIMER0_CTC_CS256()  TCCR0A = _BV(WGM01); TCCR0B = _BV(CS02)
 #	define TIMER0_RESET()      TCNT0  = 0
 #	define TIMER0_COMPARE(t)   OCR0A  = t
-#	define TIMER0_INT_ENABLE() TIMSK0 = _BV(OCIE0A)
+#	define TIMER0_INT_ENABLE() TIMSK0 |= _BV(OCIE0A)
 #	define TIMER0_ISR          TIMER0_COMPA_vect
 #else // ATmega16/32
-#	define TIMER0_OFF()        TCCR0 = 0
+#	define TIMER0_OFF()        TIMSK &= ~(OCIE0); TCCR0 = 0
 #	define TIMER0_CTC_CS256()  TCCR0 = _BV(WGM01) | _BV(CS02)
 #	define TIMER0_RESET()      TCNT0 = 0
 #	define TIMER0_COMPARE(t)   OCR0  = t
-#	define TIMER0_INT_ENABLE() TIMSK = _BV(OCIE0)
+#	define TIMER0_INT_ENABLE() TIMSK |= _BV(OCIE0)
 #	define TIMER0_ISR          TIMER0_COMP_vect
 #endif
 

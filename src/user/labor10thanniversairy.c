@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include <assert.h>
 
-#include "../../compat/pgmspace.h"
-#include "bitmapscroller.h"
+#include "../compat/pgmspace.h"
+#include "../animations/bitmapscroller/bitmapscroller.h"
 #include "labor10thanniversairy.h"
 
 

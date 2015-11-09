@@ -22,8 +22,8 @@ ifeq ($(ANIMATION_FAIRYDUST),y)
   SRC += fairydust.c
 endif
 
-ifeq ($(ANIMATION_LABOR10THANNIVERSAIRY),y)
-  SRC += labor10thanniversairy.c
+ifeq ($(ANIMATION_THISISNOTDETROIT),y)
+  SRC += thisisnotdetroit.c
 endif
 
 include $(MAKETOPDIR)/rules.mk

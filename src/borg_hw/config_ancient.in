@@ -15,4 +15,6 @@ choice 'Row Port'			\
     PORTD  PORTD" \
    'PORTA' ROWPORT
 
+bool "Watchdog" WATCHDOG_ENABLED n
+
 endmenu

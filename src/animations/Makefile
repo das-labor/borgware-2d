@@ -42,7 +42,7 @@ ifeq ($(ANIMATION_LTN_ANT),y)
   SRC += ltn_ant.c
 endif
 
-ifneq (,$(filter y,$(ANIMATION_PLASMA) $(ANIMATION_PSYCHEDELIC)))
+ifneq (,$(filter y,$(ANIMATION_PLASMA) $(ANIMATION_PSYCHEDELIC) $(ANIMATION_SURFACE_WAVE)))
   SRC += fpmath_patterns.c
 endif
 

@@ -566,4 +566,81 @@ void psychedelic(void)
 
 #endif /* ANIMATION_PSYCHEDELIC */
 
+
+#ifdef ANIMATION_SURFACE_WAVE
+
+/**
+ * This type maintains values relevant for the surface wave animation which need
+ * to be persistent over consecutive invocations.
+ */
+typedef struct fixp_surface_s
+{
+	fixp_t fCenterX1; /**< X-coordinate of first curl's center. */
+	fixp_t fCenterY1; /**< Y-coordinate of first curl's center. */
+	fixp_t fCenterX2; /**< X-coordinate of second curl's center. */
+	fixp_t fCenterY2; /**< Y-coordinate of second curl's center. */
+} fixp_surface_t;
+
+
+/**
+ * Generates two flowing circular waves superimposing each other.
+ * @param x x-coordinate
+ * @param y y-coordinate
+ * @param t A step value which changes for each frame, allowing for animations.
+ * @param r A pointer to persistent interim results.
+ * @return The brightness value (0 < n <= NUM_PLANES) of the given coordinate.
+ */
+static unsigned char fixAnimSurfaceWave(unsigned char const x,
+                                        unsigned char const y,
+                                        fixp_t const t,
+                                        void *const r)
+{
+	assert(x < (LINEBYTES * 8));
+	assert(y < NUM_ROWS);
+	fixp_surface_t *p = (fixp_surface_t *)r;
+
+	if (x == 0 && y == 0)
+	{
+		p->fCenterX1 = fixMul(fixCos(t), fixScaleUp(NUM_COLS / 2));
+		p->fCenterY1 = fixMul(fixSin(t), fixScaleUp(NUM_ROWS / 2));
+		p->fCenterX2 = p->fCenterY1 + fixScaleUp(NUM_ROWS / (NUMPLANE + 1));
+		p->fCenterY2 = p->fCenterX1 + fixScaleUp(NUM_COLS / (NUMPLANE + 1));
+	}
+
+	unsigned char const nResult1 =
+		fixMul(fixSin(fixDist(fixScaleUp(x), fixScaleUp(y),
+		p->fCenterX1, p->fCenterY1)) + FIX,
+		(fixp_t)((NUMPLANE - 1.05) * FIX));
+
+	unsigned char const nResult2 =
+		fixMul(fixSin(fixDist(fixScaleUp(x), fixScaleUp(y),
+		p->fCenterX2, p->fCenterY2)) + FIX,
+		(fixp_t)((NUMPLANE - 1.05) * FIX));
+
+	unsigned char const nResult = (nResult1 + nResult2) / 2 / FIX;
+	assert(nResult <= NUMPLANE);
+
+	return nResult;
+}
+
+
+/**
+ * Starting point for the surface wave animation.
+ */
+void surfaceWave(void)
+{
+	fixp_surface_t r;
+#ifndef __AVR__
+	fixDrawPattern(0, fixScaleUp(75), 0.1 * FIX, 30, fixAnimSurfaceWave, &r);
+#else
+	#ifndef FP_SURFACE_DELAY
+		#define FP_SURFACE_DELAY 15
+	#endif
+	fixDrawPattern(0, fixScaleUp(60), 0.1 * FIX, FP_SURFACE_DELAY,
+			fixAnimSurfaceWave, &r);
+#endif /* __AVR__ */
+}
+
+#endif /* ANIMATION_SURFACE_WAVE */
+
 /*@}*/
