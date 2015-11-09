@@ -5,8 +5,8 @@
    src/display_loop.c file. Please make sure that you use a mode number
    200<=n<=252 to avoid conflicts with newer upstream animations.
 
-   Just add your header #include directives as shown in the commented
-   samples. */
+   Just add your case blocks (guarded by the config options you introduced in
+   config.in) as shown in the commented samples. */
 
 // #ifdef ANIMATION_MY_SIMPLE_ANIM
 // 		case 200:
