@@ -2,9 +2,8 @@
    meant to be included in the official Borgware-2D repository.
 
    It is inserted at the middle of the big switch/case block of the
-   src/display_loop.c file. Please make sure that your use a mode number
-   greater or equal than 200 to avoid conflicts with newer upstream
-   animations.
+   src/display_loop.c file. Please make sure that you use a mode number
+   200<=n<=252 to avoid conflicts with newer upstream animations.
 
    Just add your header #include directives as shown in the commented
    samples. */
