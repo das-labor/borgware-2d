@@ -1,3 +1,6 @@
+#ifndef USER_LOOP_H_
+#define USER_LOOP_H_
+
 /* This file eases the integration of your personal animations which are not
    meant to be included in the official Borgware-2D repository.
 
@@ -9,3 +12,5 @@
 // #include "my_simple_animation.h"
 
 // #include "my_complex_animation.h"
+
+#endif // USER_LOOP_H_
