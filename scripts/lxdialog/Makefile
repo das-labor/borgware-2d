@@ -32,7 +32,7 @@ lxdialog: $(OBJS)
 	$(HOSTCC) $(HOSTCFLAGS) -o lxdialog $(OBJS) $(LIBS)
 
 ncurses:
-	@echo "main() {}" > lxtemp.c
+	@echo "int main() {return 0;}" > lxtemp.c
 	@if $(HOSTCC) $(HOSTCFLAGS) -lncurses lxtemp.c ; then \
 		rm -f lxtemp.c a.out; \
 	else \

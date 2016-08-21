@@ -34,12 +34,17 @@
 
 #define MAX_FONTS 1
 font fonts[MAX_FONTS];
+
+// never used
+/*
 #define MAX_SPECIALCOLORS 3
 
-static const unsigned char PROGMEM colorTable[MAX_SPECIALCOLORS * NUM_ROWS] = {1, 1, 2, 3, 3, 2, 1, 1,
-                                                                3, 3, 2, 1, 1, 2, 3, 3,
-                                                                3, 3, 2, 2, 3, 3, 2, 2
+static const unsigned char PROGMEM colorTable[MAX_SPECIALCOLORS * NUM_ROWS] ={
+	1, 1, 2, 3, 3, 2, 1, 1,
+	3, 3, 2, 1, 1, 2, 3, 3,
+	3, 3, 2, 2, 3, 3, 2, 2
 };
+*/
 
 static const char default_text[] PROGMEM = SCROLLTEXT_TEXT;
 char scrolltext_text[SCROLLTEXT_BUFFER_SIZE];
