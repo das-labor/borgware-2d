@@ -50,9 +50,10 @@ extern volatile unsigned char reverseMode;
 
 #define CR "\r\n"
 
-#if (!(defined(eeprom_update_block) && \
-	((E2PAGESIZE == 2) || (E2PAGESIZE == 4) || (E2PAGESIZE == 8)))) || \
-	!defined(ANIMATION_TESTS) || !(defined(SCROLLTEXT_SUPPORT))
+#if ((__AVR_LIBC_MAJOR__ < 1) || \
+    ((__AVR_LIBC_MAJOR__ == 1) && (__AVR_LIBC_MINOR__ < 7))) || \
+    ((E2PAGESIZE != 2) && (E2PAGESIZE != 4) && (E2PAGESIZE != 8)) || \
+    !defined(ANIMATION_TESTS) || !(defined(SCROLLTEXT_SUPPORT))
 char const UART_STR_NOTIMPL[] PROGMEM = "Not implemented."CR;
 #endif
 
@@ -145,8 +146,9 @@ static void uartcmd_clear_buffer(void) {
  * Erases the complete EEPROM to reset counters and high score tables.
  */
 static void uartcmd_erase_eeprom(void) {
-#if defined(eeprom_update_block) && \
-	((E2PAGESIZE == 2) || (E2PAGESIZE == 4) || (E2PAGESIZE == 8))
+#if ((__AVR_LIBC_MAJOR__ > 1) || \
+    ((__AVR_LIBC_MAJOR__ == 1) && (__AVR_LIBC_MINOR__ >= 7)))  && \
+    ((E2PAGESIZE == 2) || (E2PAGESIZE == 4) || (E2PAGESIZE == 8))
 	uint8_t const eeclear[] =
 #	if E2PAGESIZE == 8
 		{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};

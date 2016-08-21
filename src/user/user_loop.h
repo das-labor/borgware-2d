@@ -1,3 +1,6 @@
+#ifndef USER_LOOP_H_
+#define USER_LOOP_H_
+
 /* This file eases the integration of your personal animations which are not
    meant to be included in the official Borgware-2D repository.
 
@@ -12,3 +15,4 @@
 
 #include "labor10thanniversairy.h"
 
+#endif // USER_LOOP_H_

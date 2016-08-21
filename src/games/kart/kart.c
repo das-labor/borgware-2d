@@ -23,7 +23,7 @@
 
 
 #if defined MENU_SUPPORT && defined GAME_KART
-// icon (TODO: convert to hex)
+// icon
 static const uint8_t icon[8] PROGMEM =
 	{	0xE1, 	// 0b11100001,
 		0xE1,	// 0b11100001,
@@ -230,7 +230,8 @@ void kart_game(){
 		wait(WAIT);
 	}
 
-	snprintf(game_over, sizeof(game_over), "</#Game Over, Score: %lu",  cycle);
+	snprintf(game_over, sizeof(game_over), "</#Game Over, Score: %lu",
+			(long unsigned)cycle);
 	scrolltext(game_over);
 }
 
