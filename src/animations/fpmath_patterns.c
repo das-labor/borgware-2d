@@ -603,8 +603,8 @@ static unsigned char fixAnimSurfaceWave(unsigned char const x,
 	{
 		p->fCenterX1 = fixMul(fixCos(t), fixScaleUp(NUM_COLS / 2));
 		p->fCenterY1 = fixMul(fixSin(t), fixScaleUp(NUM_ROWS / 2));
-		p->fCenterX2 = p->fCenterY1 + fixScaleUp(NUM_ROWS / (NUMPLANE + 1));
-		p->fCenterY2 = p->fCenterX1 + fixScaleUp(NUM_COLS / (NUMPLANE + 1));
+		p->fCenterX2 = p->fCenterY1 + fixScaleUp(NUM_ROWS / 2);
+		p->fCenterY2 = p->fCenterX1 + fixScaleUp(NUM_COLS / 2);
 	}
 
 	unsigned char const nResult1 =

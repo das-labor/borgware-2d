@@ -101,7 +101,7 @@ else
 							$(warning $(n)$(n)Simulator build is only supported on i386 and amd64.$(n)$(n))
 						endif
 					endif
-					LIBS_SIM = -lglut -lpthread -lGL -lGLU -lm
+					LIBS_SIM = -lglut -lpthread -lGL -lGLU -lm -lmosquitto
 				else
 					($(warning $(n)$(n)Simulator build is not supported on your system.$(n)$(n)\
 Currently supported platforms:$(n) \
