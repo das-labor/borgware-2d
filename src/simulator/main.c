@@ -27,13 +27,10 @@
 #include "../display_loop.h"
 #include "trackball.h"
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
 #include <stdbool.h>
 #include <mosquitto.h>
-int sockfd;
-struct addrinfo *servinfo, *p;
+
+struct mosquitto *mosq;
 
 /** Number of bytes per row. */
 #define LINEBYTES (((NUM_COLS - 1) / 8) + 1)
@@ -61,51 +58,6 @@ float view_rotz = 0;
 
 /** GLUT window handle. */
 int win;
-
-char *host = "raum";
-int port = 1883;
-int keepalive = 60;
-bool clean_session = true;
-struct mosquitto *mosq = NULL;
-
-void my_message_callback(struct mosquitto *mosq, void *userdata, const struct mosquitto_message *message)
-{
-	if(message->payloadlen){
-		printf("%s %s\n", message->topic, message->payload);
-	}else{
-		printf("%s (null)\n", message->topic);
-	}
-	fflush(stdout);
-}
-
-void my_connect_callback(struct mosquitto *mosq, void *userdata, int result)
-{
-	int i;
-	if(!result){
-		/* Subscribe to broker information topics on successful connect. */
-		mosquitto_subscribe(mosq, NULL, "$SYS/#", 2);
-	}else{
-		fprintf(stderr, "Connect failed\n");
-	}
-}
-
-void my_subscribe_callback(struct mosquitto *mosq, void *userdata, int mid, int qos_count, const int *granted_qos)
-{
-	int i;
-
-	printf("Subscribed (mid: %d): %d", mid, granted_qos[0]);
-	for(i=1; i<qos_count; i++){
-		printf(", %d", granted_qos[i]);
-	}
-	printf("\n");
-}
-
-void my_log_callback(struct mosquitto *mosq, void *userdata, int level, const char *str)
-{
-	/* Pring all log messages regardless of level. */
-	printf("%s\n", str);
-}
-
 
 /**
  * Simple wait function.
@@ -320,38 +272,6 @@ static void special(int k, int x, int y) {
 	glutPostRedisplay();
 }
 
-int init_socket() {
-    struct addrinfo hints = {.ai_family = AF_UNSPEC, .ai_socktype = SOCK_STREAM};
-    int rv;
-    int numbytes;
-
-    if ((rv = getaddrinfo("raum", "8883", &hints, &servinfo)) != 0) {
-        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
-        return 1;
-    }
-
-    // loop through all the results and make a socket
-    for(p = servinfo; p != NULL; p = p->ai_next) {
-        if ((sockfd = socket(p->ai_family, p->ai_socktype,
-                p->ai_protocol)) == -1) {
-            perror("talker: socket");
-            continue;
-        }
-        break;
-    }
-
-    if (p == NULL) {
-        fprintf(stderr, "talker: failed to bind socket\n");
-        return 2;
-    }
-
-    return 0;
-}
-
-void free_socket() {
-    freeaddrinfo(servinfo);
-    close(sockfd);
-}
 
 /**
  * Entry point for starting the display loop thread.
@@ -362,6 +282,20 @@ void *display_loop_run(void * unused) {
 	return 0;
 }
 
+struct mosquitto* mqtt_init()
+{
+	mosquitto_lib_init(); 	 
+	struct mosquitto *mosq = mosquitto_new(NULL, true, NULL);
+	if(mosq && mosquitto_connect(mosq, "raum", 1883, 60) == MOSQ_ERR_SUCCESS)
+		return mosq;
+	return 0;
+}
+
+void mqtt_cleanup(struct mosquitto *mosq)
+{
+    mosquitto_destroy(mosq);
+	mosquitto_lib_cleanup();
+}
 
 /**
  * Main function for the simulator.
@@ -370,23 +304,9 @@ void *display_loop_run(void * unused) {
  * @return Exit codem, always zero.
  */
 int main(int argc, char **argv) {
-	//init_socket();
-	int i;
-
-	mosquitto_lib_init(); 	 
-
-	mosq = mosquitto_new(NULL, clean_session, NULL);
-	if(!mosq){
-		fprintf(stderr, "Error: Out of memory.\n");
-		return 1;
-	}
-	//mosquitto_log_callback_set(mosq, my_log_callback);
-	//mosquitto_connect_callback_set(mosq, my_connect_callback);
-	//mosquitto_message_callback_set(mosq, my_message_callback);
-	//mosquitto_subscribe_callback_set(mosq, my_subscribe_callback);
-
-	if(mosquitto_connect(mosq, host, port, keepalive)){
-		fprintf(stderr, "Unable to connect.\n");
+	if ((mosq = mqtt_init(&mosq)) == 0)
+	{
+		printf("no!\n");
 		return 1;
 	}
 
@@ -440,9 +360,7 @@ int main(int argc, char **argv) {
 
 	glutMainLoop();
 
-//	free_socket();
-    mosquitto_destroy(mosq);
-	mosquitto_lib_cleanup();
+	mqtt_cleanup(mosq);
 	return 0;
 }
 
