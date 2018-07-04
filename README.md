@@ -1,6 +1,9 @@
 Borgware-2D
 ===========
 
+This fork will is work in progress please and actually not runnint, use the origin.
+I will port it to esp8266.
+
 Firmware for AVR based two-dimensional LED matrices, especially the
 [Blinken Borgs](http://www.das-labor.org/wiki/Blinken_Borgs) from
 [Das LABOR](http://das-labor.org/index.en.php).
