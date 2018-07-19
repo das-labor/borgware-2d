@@ -44,8 +44,7 @@
 // First Person Tetris icon, MSB is leftmost pixel
 static uint8_t const tetrisfp_icon[8] PROGMEM =
 		{ 0xee, 0x89, 0xee, 0x88, 0x88, 0x20, 0x2c, 0x6c };
-game_descriptor_t tetrisfp_game_descriptor
-		__attribute__((section(".game_descriptors"))) =
+game_descriptor_t tetrisfp_game_descriptor =
 {
 	&tetris_fp,
 	tetrisfp_icon,

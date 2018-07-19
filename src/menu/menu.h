@@ -9,13 +9,13 @@
 #include <inttypes.h>
 
 
-typedef struct{
-	void(*run)(void);
+typedef struct {
+	void (*run)(void);
 	uint8_t const *icon;
-}game_descriptor_t;
+} game_descriptor_t;
 
 
-void menu();
+void menu(void);
 
 #endif /*MENU_H_*/
 

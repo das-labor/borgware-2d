@@ -35,7 +35,7 @@ static const uint8_t icon[8] PROGMEM =
 		0x97,	// 0b10010111
 	};
 
-game_descriptor_t kart_game_descriptor __attribute__((section(".game_descriptors"))) =
+game_descriptor_t kart_game_descriptor =
 {
 	&kart_game,
 	icon,

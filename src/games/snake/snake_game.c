@@ -29,7 +29,7 @@
 static const uint8_t icon[8] PROGMEM =
 	{0xff, 0x81, 0xbd, 0xa5, 0xa5, 0xad, 0xa1, 0xbf};
 
-game_descriptor_t snake_game_descriptor __attribute__((section(".game_descriptors"))) =
+game_descriptor_t snake_game_descriptor =
 {
 	&snake_game,
 	icon,

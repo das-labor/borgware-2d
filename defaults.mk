@@ -90,25 +90,31 @@ else
 				endif
 				LIBS_SIM = -lglut -lpthread -lGL -lGLU -lm
 			else
-				ifeq ($(OSTYPE),Linux)
-					CFLAGS_SIM  = -g -Wall -pedantic -std=c99 -O0 -D_XOPEN_SOURCE=600
-					ifeq ($(MACHINE),x86_64)
-						LDFLAGS_SIM = -T ld_scripts/elf_x86_64.x
-					else
-						ifeq ($(MACHINE),i686)
-							LDFLAGS_SIM = -T ld_scripts/elf_i386.x
-						else
-							$(warning $(n)$(n)Simulator build is only supported on i386 and amd64.$(n)$(n))
-						endif
-					endif
+				ifeq ($(OSTYPE),Darwin)
+					CFLAGS_SIM = -g -I/usr/local/include -Wall -pedantic -std=c99 -O0
+					LDFLAGS_SIM = -L/usr/local/lib -L/usr/X11R6/lib -T ld_scripts/elf_x86_64_obsd.xd
 					LIBS_SIM = -lglut -lpthread -lGL -lGLU -lm
 				else
-					($(warning $(n)$(n)Simulator build is not supported on your system.$(n)$(n)\
+					ifeq ($(OSTYPE),Linux)
+						CFLAGS_SIM  = -g -Wall -pedantic -std=c99 -O0 -D_XOPEN_SOURCE=600
+						ifeq ($(MACHINE),x86_64)
+							LDFLAGS_SIM = -T ld_scripts/elf_x86_64.x
+						else
+							ifeq ($(MACHINE),i686)
+								LDFLAGS_SIM = -T ld_scripts/elf_i386.x
+							else
+								$(warning $(n)$(n)Simulator build is only supported on i386 and amd64.$(n)$(n))
+							endif
+						endif
+						LIBS_SIM = -lglut -lpthread -lGL -lGLU -lm
+					else
+						($(warning $(n)$(n)Simulator build is not supported on your system.$(n)$(n)\
 Currently supported platforms:$(n) \
 Linux on i386 and amd64$(n) \
 FreeBSD on i386 and amd64$(n) \
 NetBSD on i386 and amd64$(n) \
 Windows (via Cygwin) on i386 and amd64)
+					endif
 				endif
 			endif
 		endif
