@@ -21,7 +21,7 @@ typedef struct percnt_s {
 } percnt_t;
 
 extern uint8_t  g_reset_counter_idx;
-extern percnt_t g_reset_counter EEMEM;
+//extern percnt_t g_reset_counter EEMEM;
 
 void percnt_init(percnt_t *percnt, uint8_t *ring_index);
 uint32_t percnt_get(percnt_t *percnt, uint8_t *ring_index);

@@ -1,8 +1,19 @@
 
 //EEPPROM compatibility support for simulator
 
+#include "../games/tetris/highscore.h"
+#include "../random/persistendCounter.h"
+
+enum eep {
+	EEP_CAN_ADR     = 0,
+	EEP_PER_COUNTER = 1,
+	EEP_TETRIS      = (EEP_PER_COUNTER + sizeof(g_reset_counter)),,
+	EEP_END         = (EEP_TETRIS + sizeof(tetris_highscore_table_t))
+};
+
 #ifdef AVR
-	#include <avr/eeprom.h>
+	#define EEMEM
+	//#include <avr/eeprom.h>
 #else
 	#include <stdint.h>
 	
@@ -13,6 +24,6 @@
 	uint16_t eeprom_read_word (const uint16_t *p);
 	
 	#define eeprom_busy_wait()
-	#define EEMEM __attribute__((section(".eeprom")))
+	#define EEMEM
 	
 #endif

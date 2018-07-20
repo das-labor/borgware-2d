@@ -17,11 +17,11 @@
 #include "../joystick/joystick.h"
 
 #define MENU_TAB_VARS
-    #include "../games/menu.h"
+	#include "../games/menu.h"
 #undef MENU_TAB_VARS
 #define MENU_TAB_ENTRY
 game_descriptor_t *game_decriptor_ptr_table[] = {
-    #include "../games/menu.h"
+	#include "../games/menu.h"
 };
 #undef MENU_TAB_ENTRY
 
