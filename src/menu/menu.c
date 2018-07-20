@@ -223,8 +223,7 @@ void menu()
 				wait(MENU_WAIT_CHATTER);
 
 				// call corresponding function
-				_game_descriptors_start__[miSelection].run();
-
+				game_decriptor_ptr_table[miSelection]->run();
 				break;
 
 			}
