@@ -24,7 +24,7 @@ percnt_t g_reset_counter;
 void init_buffer(percnt_t *percnt, uint8_t *ring_index) {
 	uint8_t i;
 	eeprom_busy_wait();
-	eeprom_write_word(&(percnt->B08_23), 0x0000);
+	eeprom_write_word(EEP_PER_COUNTER + offsetof(percnt_t, B08_23), 0x0000);
 	for (i = 0; i < RING_SIZE; ++i) {
 		eeprom_busy_wait();
 		eeprom_write_byte(EEP_PER_COUNTER + offsetof(percnt_t, B0_7[i]), 0x00);
