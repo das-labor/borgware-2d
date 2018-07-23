@@ -396,8 +396,8 @@ static void fixDrawPattern(fixp_t const t_start,
 			*pOffscreenDistHigh = 0;
 		}
 
-		// wait a moment to ensure that the current frame is visible
-		wait(frame_delay);
+		// b2d_wait a moment to ensure that the current frame is visible
+		b2d_wait(frame_delay);
 	}
 }
 

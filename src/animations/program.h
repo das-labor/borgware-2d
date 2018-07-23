@@ -16,7 +16,7 @@ inline static void off()
 	clear_screen(0);
 
 	while(1)
-		wait(100);
+		b2d_wait(100);
 
 }
 #endif

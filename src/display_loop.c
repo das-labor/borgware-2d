@@ -347,9 +347,9 @@ void display_loop(){
 		case 0xFEu:
 #ifdef JOYSTICK_SUPPORT
 			waitForFire = 0;   // avoid circular jumps
-			while (JOYISFIRE); // wait until user released the fire button
+			while (JOYISFIRE); // b2d_wait until user released the fire button
 #endif
-			wait(25);          // wait for button to settle
+			b2d_wait(25);          // b2d_wait for button to settle
 
 #  ifdef GAME_TETRIS
 			tetris();
@@ -378,10 +378,10 @@ void display_loop(){
 #ifdef JOYSTICK_SUPPORT
 			while (JOYISFIRE); // avoid an unwanted restart of the game loop
 #endif
-			wait(25);          // wait for button to settle
+			b2d_wait(25);          // b2d_wait for button to settle
 			mode = oldOldmode; // restore old animation mode
 #ifdef JOYSTICK_SUPPORT
-			waitForFire = 1;   // reenable joystick query of the wait() function
+			waitForFire = 1;   // reenable joystick query of the b2d_wait() function
 #endif
 			break;
 #endif

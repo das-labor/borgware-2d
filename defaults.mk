@@ -37,75 +37,35 @@ MACHINE = $(shell uname -m)
 
 ifeq ($(findstring CYGWIN,$(OSTYPE)),CYGWIN)
 	CFLAGS_SIM  = -g -Wall -pedantic -std=c99 -O0 -D_WIN32 -D_XOPEN_SOURCE=600
-	ifeq ($(MACHINE),x86_64)
-		LDFLAGS_SIM = -T ld_scripts/i386pep.x
-	else
-		ifeq ($(MACHINE),i686)
-			LDFLAGS_SIM = -T ld_scripts/i386pe.x
-		else
-			$(warning $(n)$(n)Simulator build is only supported on i386 and amd64.$(n)$(n))
-		endif
-	endif
+	LDFLAGS_SIM = 
 	LIBS_SIM = -lgdi32 -lwinmm -lm
 else
 	ifeq ($(OSTYPE),FreeBSD)
-		CFLAGS_SIM = -g -I/usr/local/include -Wall -pedantic -std=c99 -O0
+		CFLAGS_SIM  = -g -I/usr/local/include -Wall -pedantic -std=c99 -O0
 		CFLAGS_SIM += -D_XOPEN_SOURCE=600
-		ifeq ($(MACHINE),amd64)
-			LDFLAGS_SIM = -L/usr/local/lib -T ld_scripts/elf_x86_64_fbsd.x
-		else
-			ifeq ($(MACHINE),i386)
-				LDFLAGS_SIM = -L/usr/local/lib -T ld_scripts/elf_i386_fbsd.x
-			else
-				$(warning $(n)$(n)Simulator build is only supported on i386 and amd64.$(n)$(n))
-			endif
-		endif
+		LDFLAGS_SIM = -L/usr/local/lib
 		LIBS_SIM = -lglut -lpthread -lGL -lGLU -lm
 	else
 		ifeq ($(OSTYPE),NetBSD)
 			CFLAGS_SIM = -g -I /usr/pkg/include -I/usr/X11R7/include -Wall -pedantic -std=c99 -O0
 			CFLAGS_SIM += -D_XOPEN_SOURCE=600
-			ifeq ($(MACHINE),amd64)
-				LDFLAGS_SIM = -L/usr/pkg/lib -L/usr/X11R7/lib -T ld_scripts/elf_x86_64_nbsd.x -Wl,-R/usr/pkg/lib,-R/usr/X11R7/lib
-			else
-				ifeq ($(MACHINE),i386)
-					LDFLAGS_SIM = -L/usr/pkg/lib -L/usr/X11R7/lib -T ld_scripts/elf_i386_nbsd.x -Wl,-R/usr/pkg/lib,-R/usr/X11R7/lib
-				else
-					$(warning $(n)$(n)Simulator build is only supported on i386 and amd64.$(n)$(n))
-				endif
-			endif
+			LDFLAGS_SIM = -L/usr/pkg/lib -L/usr/X11R7/lib -Wl,-R/usr/pkg/lib,-R/usr/X11R7/lib
 			LIBS_SIM = -lglut -lpthread -lGL -lGLU -lm
 		else
 			ifeq ($(OSTYPE),OpenBSD)
 				CFLAGS_SIM = -g -I/usr/local/include -I/usr/X11R6/include -Wall -pedantic -std=c99 -O0
 				CFLAGS_SIM += -D_XOPEN_SOURCE=600
-				ifeq ($(MACHINE),amd64)
-					LDFLAGS_SIM = -L/usr/local/lib -L/usr/X11R6/lib -T ld_scripts/elf_x86_64_obsd.xd
-				else
-					ifeq ($(MACHINE),i386)
-						LDFLAGS_SIM = -L/usr/local/lib -L/usr/X11R6/lib -T ld_scripts/elf_i386_obsd.xd
-					else
-						$(warning $(n)$(n)Simulator build is only supported on i386 and amd64.$(n)$(n))
-					endif
-				endif
+				LDFLAGS_SIM = -L/usr/local/lib -L/usr/X11R6/lib
 				LIBS_SIM = -lglut -lpthread -lGL -lGLU -lm
 			else
 				ifeq ($(OSTYPE),Darwin)
-					CFLAGS_SIM = -g -I/usr/local/include -Wall -pedantic -std=c99 -O0
-					LDFLAGS_SIM = -L/usr/local/lib -L/usr/X11R6/lib -T ld_scripts/elf_x86_64_obsd.xd
-					LIBS_SIM = -lglut -lpthread -lGL -lGLU -lm
+					CFLAGS_SIM = -g -Wall -pedantic -std=c99 -O0 -DOSX_
+					LDFLAGS_SIM = -Wall -prebind
+					LIBS_SIM = -lpthread -framework Carbon -framework GLUT -framework OpenGL -framework Foundation -framework AppKit
 				else
 					ifeq ($(OSTYPE),Linux)
 						CFLAGS_SIM  = -g -Wall -pedantic -std=c99 -O0 -D_XOPEN_SOURCE=600
-						ifeq ($(MACHINE),x86_64)
-							LDFLAGS_SIM = -T ld_scripts/elf_x86_64.x
-						else
-							ifeq ($(MACHINE),i686)
-								LDFLAGS_SIM = -T ld_scripts/elf_i386.x
-							else
-								$(warning $(n)$(n)Simulator build is only supported on i386 and amd64.$(n)$(n))
-							endif
-						endif
+						LDFLAGS_SIM = 
 						LIBS_SIM = -lglut -lpthread -lGL -lGLU -lm
 					else
 						($(warning $(n)$(n)Simulator build is not supported on your system.$(n)$(n)\

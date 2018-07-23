@@ -19,6 +19,13 @@
 #
 single_menu_mode=
 
+if [[ $OSTYPE = *"darwin"* ]]; then
+	AWK=gawk
+	echo "macOs mode (brew install gawk)"
+else
+	AWK=awk
+fi
+
 #
 # Make sure we're really running bash.
 #
@@ -875,7 +882,7 @@ function l_choice () {
 # Call awk, and watch for error codes, etc.
 #
 function callawk () {
-awk "$1" || { echo "Awk died with error code $?. Giving up."; exit 1; }
+$AWK "$1" || { echo "Awk died with error code $?. Giving up."; exit 1; }
 }
 
 #

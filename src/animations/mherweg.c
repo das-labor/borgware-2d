@@ -61,20 +61,20 @@ static void checkbox()
 	for (unsigned char i = 0; i < 4; ++i)
 	{
 		line(square[i], square[i + 1], color);
-		wait(delay);
+		b2d_wait(delay);
 	}
 
 	// draw two diagonal lines
 	line((pixel){7, 7}, (pixel){0, 0}, color);
-	wait(delay);
+	b2d_wait(delay);
 	line((pixel){0, 7}, (pixel){7, 0}, color);
-	wait(delay * 3);
+	b2d_wait(delay * 3);
 
 	// shift image to the right (shift_pximap_l() really shifts to the right)
 	for (unsigned char x = NUM_COLS; x--;)
 	{
 		shift_pixmap_l();
-		wait(shiftdelay);
+		b2d_wait(shiftdelay);
 	}
 }
 
@@ -94,14 +94,14 @@ static void movinglines()
 	for (unsigned char x = 0; x < NUM_COLS; x++)
 	{
 		shift_pixmap_l();
-		wait(delay);
+		b2d_wait(delay);
 	}
 
 	// a line walking from the lower to the upper border
 	for (unsigned char y = NUM_ROWS; y--;)
 	{
 		line((pixel){0, y}, (pixel){NUM_COLS - 1, y}, color);
-		wait(delay);
+		b2d_wait(delay);
 		line((pixel){0, y}, (pixel){NUM_COLS - 1, y}, blank);
 	}
 
@@ -113,7 +113,7 @@ static void movinglines()
 			unsigned char y = x % NUM_ROWS;
 			line((pixel){0, y}, (pixel){NUM_COLS - 1, y}, color);
 			line((pixel){x, 0}, (pixel){x, NUM_ROWS - 1}, color);
-			wait(delay / 2);
+			b2d_wait(delay / 2);
 			line((pixel){0, y}, (pixel){NUM_COLS - 1, y}, blank);
 			line((pixel){x, 0}, (pixel){x, NUM_ROWS - 1}, blank);
 		}
@@ -140,17 +140,17 @@ static void rectangle1()
 	unsigned char size = RECT_SIZE;
 	// darkest color as a starting point for the gradient
 	unsigned char color = 1;
-	// wait about 500 ms between each frame
+	// b2d_wait about 500 ms between each frame
 	int const delay = 500;
 
 	// create a gradient by drawing shrinking rectangles on top of each other
 	clear_screen(0);
 	for (unsigned char pos = 0; pos < (RECT_SIZE / 2); ++pos)
 	{
-		// draw the rectangle and wait for a moment
+		// draw the rectangle and b2d_wait for a moment
 		filled_rectangle((pixel){pos + RECT_OFFSET_X, pos + RECT_OFFSET_Y},
 				size, size, color);
-		wait(delay);
+		b2d_wait(delay);
 
 		// iterate through all colors periodically
 		++color;
@@ -160,7 +160,7 @@ static void rectangle1()
 		size -= 2;
 	}
 
-	wait(delay * 3);
+	b2d_wait(delay * 3);
 }
 
 
@@ -183,8 +183,8 @@ static void rectangles()
 
 		filled_rectangle((pixel){x, y}, w, h, color);
 
-		// wait between 500 and 750 ms
-		wait(500 + random8());
+		// b2d_wait between 500 and 750 ms
+		b2d_wait(500 + random8());
 	}
 }
 
@@ -206,7 +206,7 @@ static void lines1()
 		unsigned char const color = random8() % (NUMPLANE + 1);
 
 		line((pixel){x1, y1}, (pixel){x2, y2}, color);
-		wait(random8()); // wait up to 250 ms
+		b2d_wait(random8()); // b2d_wait up to 250 ms
 		line((pixel){x1, y1}, (pixel){x2, y2}, blank);
 	}
 }
@@ -234,11 +234,11 @@ static void dots1()
 		for (unsigned char i = 0; i < 5; ++i)
 		{
 			setpixel((pixel){x, y}, PGM(color[i]));
-			wait(glimmer_delay);
+			b2d_wait(glimmer_delay);
 		}
 
-		// wait up to 2.5 seconds before the next dot is drawn
-		wait(random8() * 10);
+		// b2d_wait up to 2.5 seconds before the next dot is drawn
+		b2d_wait(random8() * 10);
 	}
 }
 

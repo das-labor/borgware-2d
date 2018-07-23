@@ -25,10 +25,10 @@
  * defines *
  ***********/
 
-#define WAIT(ms) wait(ms)
+#define WAIT(ms) b2d_wait(ms)
 #define PM(value) pgm_read_byte(&value)
 
-/** Number of milliseconds that each loop cycle waits. */
+/** Number of milliseconds that each loop cycle b2d_waits. */
 #define TETRIS_INPUT_TICKS 5
 
 /**
@@ -62,7 +62,7 @@
 /** Number of loop cyles the drop button is ignored */
 #define TETRIS_INPUT_CHATTER_TICKS_DROP    36
 
-/** wait cycles per level (array of uint8_t) */
+/** b2d_wait cycles per level (array of uint8_t) */
 #define TETRIS_INPUT_LVL_CYCLES 200, 133, 100, 80, 66, 57, 50, 44, 40, 36, 33, \
 	30, 28, 26, 25, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9
 

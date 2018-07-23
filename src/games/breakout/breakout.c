@@ -56,7 +56,7 @@ void borg_breakout(uint8_t demomode)
 
 	while (cycles != 0)
 	{
-		wait(25);
+		b2d_wait(25);
 
 		if (tick_divider || JOYISFIRE)
 			rebound_tick(demomode ? &balls[0] : NULL);

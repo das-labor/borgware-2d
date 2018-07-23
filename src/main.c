@@ -55,8 +55,6 @@ int main (void){
 #endif
 
 	sei();
-
 	display_loop();
-
 	return 0;
 }

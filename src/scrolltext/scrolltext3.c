@@ -615,7 +615,7 @@ void scrolltext(char *str)
 				aktblob = aktblob->next;
 			}
 			update_pixmap();
-			wait(2);
+			b2d_wait(2);
 		};
 		startblob = setupBlob(0);
 		//showBlob(startblob);

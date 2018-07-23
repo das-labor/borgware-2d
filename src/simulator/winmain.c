@@ -65,12 +65,12 @@ LPCSTR g_strErrCreateUITimer   = "Could not create UI Timer.";
 /** Minimum timer resolution the system is capable of. */
 UINT g_uResolution;
 
-/** Event object for the multimedia timer (wait() function). */
+/** Event object for the multimedia timer (b2d_wait() function). */
 HANDLE g_hWaitEvent;
 
 /** Fake port for simulating joystick input. */
 volatile unsigned char fakeport;
-/** Flag which indicates if wait should jump to the menu if fire is pressed. */
+/** Flag which indicates if b2d_wait should jump to the menu if fire is pressed. */
 volatile unsigned char waitForFire;
 /** The simulated frame buffer of the borg. */
 volatile unsigned char pixmap[NUMPLANE][NUM_ROWS][LINEBYTES];
@@ -446,7 +446,7 @@ MMRESULT simSetMinimumTimerResolution()
  * @param ms The requested delay in milliseconds.
  * @param uResolution The minimum timer resolution the system is capable of.
  */
-void wait(int ms)
+void b2d_wait(int ms)
 {
 	MMRESULT mmTimerEventId;
 
@@ -464,7 +464,7 @@ void wait(int ms)
 	    TIME_ONESHOT | TIME_CALLBACK_EVENT_SET);
 	if (mmTimerEventId != 0)
 	{
-		/* now halt until that timer pulses our wait event object */
+		/* now halt until that timer pulses our b2d_wait event object */
 		WaitForSingleObject(g_hWaitEvent, INFINITE);
 		ResetEvent(g_hWaitEvent);
 
@@ -497,7 +497,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 		/* retrieve minimum timer resolution */
 		if (simSetMinimumTimerResolution() == TIMERR_NOERROR)
 		{
-			/* event handle for multimedia timer (for the wait() function) */
+			/* event handle for multimedia timer (for the b2d_wait() function) */
 			g_hWaitEvent = CreateEventA(NULL, TRUE, FALSE, "Local\\WaitEvent");
 			if (g_hWaitEvent != NULL)
 			{
@@ -534,7 +534,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 					fprintf(stderr, g_strErrCreateThread);
 				}
 
-				/* relieve wait event object from its duties */
+				/* relieve b2d_wait event object from its duties */
 				CloseHandle(g_hWaitEvent);
 			}
 			else

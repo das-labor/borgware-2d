@@ -14,11 +14,11 @@ void test_level(unsigned char level, bool debug){
 	for (unsigned char y=NUM_ROWS;y--;){
 		for (unsigned char x=NUM_COLS;x--;){
 			setpixel((pixel){x,y}, level);
-			wait(5);
+			b2d_wait(5);
 		}
 	}
 	if (!debug) {
-		wait(2000);
+		b2d_wait(2000);
 	}
 }
 
@@ -26,11 +26,11 @@ void test_palette(bool debug){
 	for (unsigned char y=NUM_ROWS;y--;){
 		for (unsigned char x=NUM_COLS;x--;){
 			setpixel((pixel){x,y}, y%4);
-			// wait(1);
+			// b2d_wait(1);
 		}
 	}
 	if (!debug) {
-		wait(2000);
+		b2d_wait(2000);
 	}
 }
 
@@ -41,11 +41,11 @@ void test_palette2(bool debug){
 		}
 	}
 	if (!debug) {
-		wait(1000);
+		b2d_wait(1000);
 		for (unsigned char x=NUM_COLS;x--;){
 			// shift image right
 			shift_pixmap_l();
-			wait(30);
+			b2d_wait(30);
 		}
 	}
 }
@@ -64,7 +64,7 @@ void spiral(int delay) {
 			x += pgm_read_byte(&delta[i]);
 			y += pgm_read_byte(&delta[i + 1]);
 			setpixel((pixel){x, y}, NUMPLANE);
-			wait(delay);
+			b2d_wait(delay);
 		}
 		length[i++ & 0x01]--;
 		i %= 4;
@@ -75,7 +75,7 @@ void spiral(int delay) {
 			setpixel((pixel){x, y}, 0);
 			x += pgm_read_byte(&delta[i]);
 			y += pgm_read_byte(&delta[i + 1]);
-			wait(delay);
+			b2d_wait(delay);
 		}
 		length[(i += 3) & 0x01]++;
 		i %= 4;
@@ -97,7 +97,7 @@ unsigned char i, j, x;
 			if((rol<<=1)==0)rol = 0x01;
 		}
 		if((rolr<<=1) == 0) rolr = 1;
-		wait(100);
+		b2d_wait(100);
 	}
 }
 #endif
@@ -111,7 +111,7 @@ void checkerboard(unsigned char times){
 				setpixel((pixel){col, row}, (times ^ row ^ col) & 0x01 ? 0 : 3);
 			}
 		}
-		wait(200);
+		b2d_wait(200);
 	}
 }
 #endif
@@ -161,7 +161,7 @@ void fire()
 			}
 		}
 
-		wait(FIRE_DELAY);
+		b2d_wait(FIRE_DELAY);
 	}
 }
 #endif
@@ -184,7 +184,7 @@ void random_bright(unsigned int cycles) {
 				}
 			}
 		}
-		wait(200);
+		b2d_wait(200);
 	}
 }
 #endif

@@ -179,8 +179,8 @@ static void menu_animate(uint8_t miInitial, menu_direction_t direction)
 			mi = MENU_PREVITEM(mi);
 		}
 
-		// wait between the frames so that the animation can be seen
-		wait(nWait);
+		// b2d_wait between the frames so that the animation can be seen
+		b2d_wait(nWait);
 		// animation speed can be throttled
 		nWait += MENU_WAIT_INCREMENT;
 	}
@@ -196,10 +196,10 @@ void menu()
 
 		clear_screen(0);
 
-		// wait as long as "fire" is pressed to prevent unwanted selections
+		// b2d_wait as long as "fire" is pressed to prevent unwanted selections
 		while (JOYISFIRE)
 		{
-			wait(MENU_POLL_INTERVAL);
+			b2d_wait(MENU_POLL_INTERVAL);
 		}
 
 		// set initial menu item
@@ -217,10 +217,10 @@ void menu()
 				// prevent unwanted selections
 				while (JOYISFIRE)
 				{
-					wait(MENU_POLL_INTERVAL);
+					b2d_wait(MENU_POLL_INTERVAL);
 				}
 				// work against the chatter effects of dump joysticks
-				wait(MENU_WAIT_CHATTER);
+				b2d_wait(MENU_WAIT_CHATTER);
 
 				// call corresponding function
 				game_decriptor_ptr_table[miSelection]->run();
@@ -248,7 +248,7 @@ void menu()
 			// return if timeout is reached
 			else
 			{
-				wait(MENU_POLL_INTERVAL);
+				b2d_wait(MENU_POLL_INTERVAL);
 				if (--nMenuIterations == 0)
 					break;
 			}

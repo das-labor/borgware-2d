@@ -60,7 +60,7 @@ void squares(void) {
 		nColOffset = (nColOffset + 1) % (NUMPLANE * 2);
 
 		// pause for a moment to ensure that frame transitions are visible
-		wait(TICK);
+		b2d_wait(TICK);
 	}
 }
 

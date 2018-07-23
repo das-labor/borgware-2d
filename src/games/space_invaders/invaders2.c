@@ -95,7 +95,7 @@ void borg_invaders()
 				break;
 			}
 
-			wait (WAIT_MS);
+			b2d_wait (WAIT_MS);
 		} //IN LEVEL LOOP
 
 	} while (pl.lives != 0); //GAME LOOP

@@ -462,7 +462,7 @@ void uart_putc(unsigned char data)
     tmphead  = (UART_TxHead + 1) & UART_TX_BUFFER_MASK;
 
     while ( tmphead == UART_TxTail ){
-        ;/* wait for free space in buffer */
+        ;/* b2d_wait for free space in buffer */
     }
 
     UART_TxBuf[tmphead] = data;
@@ -645,7 +645,7 @@ void uart1_putc(unsigned char data)
     tmphead  = (UART1_TxHead + 1) & UART_TX_BUFFER_MASK;
 
     while ( tmphead == UART1_TxTail ){
-        ;/* wait for free space in buffer */
+        ;/* b2d_wait for free space in buffer */
     }
 
     UART1_TxBuf[tmphead] = data;

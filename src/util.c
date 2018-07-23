@@ -23,7 +23,8 @@ extern jmp_buf newmode_jmpbuf;
 #  include "uart/uart_commands.h"
 #endif
 
-void wait(int ms){
+// rename because of conflicts with macOs b2d_wait function
+void b2d_wait(int ms) {
 	// initialize timer
 #if defined (__AVR_ATmega48__)    || \
     defined (__AVR_ATmega48P__)   || \
@@ -53,7 +54,7 @@ void wait(int ms){
 	/* Timer0
 	 * Some Arduino/LoL Shield variants require Timer1 for multiplexing. Timer0,
 	 * on the other hand, is free to use, which makes it a perfect candidate for
-	 * our wait() function. */
+	 * our b2d_wait() function. */
 	TCCR0A = _BV(WGM01);    // CTC mode
 	TCCR0B = _BV(CS02);     // clk/256
 	OCR0A = (F_CPU/256000);	//1000Hz
@@ -95,7 +96,7 @@ void wait(int ms){
 		}
 #endif
 
-	// busy waiting for compare match interrupt flag
+	// busy b2d_waiting for compare match interrupt flag
 #if defined (__AVR_ATmega48__)    || \
     defined (__AVR_ATmega48P__)   || \
     defined (__AVR_ATmega88__)    || \
@@ -117,24 +118,24 @@ void wait(int ms){
     defined (__AVR_ATmega2560__)
 #	ifndef USER_TIMER0_FOR_WAIT
 		/* Timer1 for the masses */
-		while(!(TIFR1 & _BV(OCF1A))); // wait for compare match flag
+		while(!(TIFR1 & _BV(OCF1A))); // b2d_wait for compare match flag
 		TIFR1 |= _BV(OCF1A);          // reset that flag
 #	else
 		/* Timer0 for e.g. Arduino/LoL Shield */
-		while(!(TIFR0 & _BV(OCF0A))); // wait for compare match flag
+		while(!(TIFR0 & _BV(OCF0A))); // b2d_wait for compare match flag
 		TIFR0 |= _BV(OCF0A);          // reset that flag
 #	endif
 #else
 #	ifndef USER_TIMER0_FOR_WAIT
 		/* Timer1 for the masses */
-		while(!(TIFR & _BV(OCF1A)));  // wait for compare match flag
+		while (!(TIFR & _BV(OCF1A)));  // b2d_wait for compare match flag
 		TIFR |= _BV(OCF1A);           // reset that flag
 #	elif !defined(__AVR_ATmega8__)
 		/* Timer0 */
-		while(!(TIFR & _BV(OCF0)));   // wait for compare match flag
+		while(!(TIFR & _BV(OCF0)));   // b2d_wait for compare match flag
 		TIFR |= _BV(OCF0);            // reset that flag
 #	else
-#		error Timer0 for wait() is not supported on ATmega8
+#		error Timer0 for b2d_wait() is not supported on ATmega8
 #	endif
 #endif
 	}

@@ -16,7 +16,7 @@ void rowbounce(uint8_t times,uint8_t speed)
 		setpixel( (pixel){i,j},(h==j) ? 1:0);
 	      }
 	    }
-	    wait(speed*10);
+	    b2d_wait(speed*10);
 	  }
 	  for (h=NUM_ROWS-1;h>1;h--){
 	    for (i=0;i<NUM_COLS;i++){
@@ -24,7 +24,7 @@ void rowbounce(uint8_t times,uint8_t speed)
 		setpixel( (pixel){i,j},((h-1)==j) ? 1:0);
 	      }
 	    }
-	    wait(speed*10);
+	    b2d_wait(speed*10);
 	  }
 
 	}

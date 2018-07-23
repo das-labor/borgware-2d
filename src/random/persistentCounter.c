@@ -18,7 +18,7 @@
 #endif
 
 uint8_t g_reset_counter_idx = 0xff;
-//percnt_t EEMEM g_reset_counter;
+percnt_t g_reset_counter;
 
 #ifdef INIT_EEPROM
 void init_buffer(percnt_t *percnt, uint8_t *ring_index) {

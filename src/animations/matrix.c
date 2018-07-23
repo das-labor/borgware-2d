@@ -96,7 +96,7 @@ void matrix() {
 				streamer_num++;
 			}
 		}
-		wait(60);
+		b2d_wait(60);
 
 	}
 }
