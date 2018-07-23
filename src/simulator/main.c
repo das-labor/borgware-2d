@@ -56,7 +56,7 @@ int win;
 
 
 /**
- * Simple b2d_wait function.
+ * Simple wait function.
  * @param ms The requested delay in milliseconds.
  */
 void b2d_wait(unsigned int ms) {

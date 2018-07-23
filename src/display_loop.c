@@ -68,7 +68,10 @@ void borg_breakout(unsigned char demomode);
 
 void display_loop(){
 //	mcuf_serial_mode();
-
+#ifdef RANDOM_SUPPORT
+	srandom32(percnt_get(&g_reset_counter, &g_reset_counter_idx));
+	percnt_inc(&g_reset_counter, &g_reset_counter_idx);
+#endif
 	mode = setjmp(newmode_jmpbuf);
 
 #ifdef JOYSTICK_SUPPORT
