@@ -12,6 +12,9 @@ enum eep {
 	EEP_END         = (EEP_TETRIS + sizeof(tetris_highscore_table_t))
 };
 
+inline static uint8_t* EEB(int arg) { return (uint8_t*)((size_t)arg); }
+inline static uint16_t* EEW(int arg) { return (uint16_t*)((size_t)arg); }
+
 #ifdef AVR
 	#include <avr/eeprom.h>
 #else

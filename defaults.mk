@@ -109,17 +109,7 @@ ifneq ($(MAKECMDGOALS),clean)
 		ifneq ($(MAKECMDGOALS),menuconfig)  
 			include $(MAKETOPDIR)/.config
 			CPPFLAGS += -DF_CPU=$(FREQ)UL -mmcu=$(MCU)
-
-			# flags for the linker, choose appropriate linker script
-			ifeq ($(findstring atmega256,$(MCU)),atmega256)
-				LDFLAGS += -Wl,-Map,image.map -mmcu=$(MCU)
-			else
-				ifeq ($(findstring atmega128,$(MCU)),atmega128)
-					LDFLAGS += -Wl,-Map,image.map -mmcu=$(MCU)
-				else
-					LDFLAGS += -Wl,-Map,image.map -mmcu=$(MCU)
-				endif
-			endif
+			LDFLAGS += -Wl,-Map,image.map -mmcu=$(MCU)
 		endif # MAKECMDGOALS!=menuconfig
 	endif # MAKECMDGOALS!=mrproper
 endif # MAKECMDGOALS!=clean

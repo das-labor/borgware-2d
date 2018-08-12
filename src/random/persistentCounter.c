@@ -24,10 +24,10 @@ percnt_t g_reset_counter;
 void init_buffer(percnt_t *percnt, uint8_t *ring_index) {
 	uint8_t i;
 	eeprom_busy_wait();
-	eeprom_write_word(EEP_PER_COUNTER + offsetof(percnt_t, B08_23), 0x0000);
+	eeprom_write_word(EEW(EEP_PER_COUNTER) + offsetof(percnt_t, B08_23), 0x0000);
 	for (i = 0; i < RING_SIZE; ++i) {
 		eeprom_busy_wait();
-		eeprom_write_byte(EEP_PER_COUNTER + offsetof(percnt_t, B0_7[i]), 0x00);
+		eeprom_write_byte(EEB(EEP_PER_COUNTER) + offsetof(percnt_t, B0_7[i]), 0x00);
 	}
 }
 #endif
@@ -35,19 +35,19 @@ void init_buffer(percnt_t *percnt, uint8_t *ring_index) {
 void percnt_init(percnt_t *percnt, uint8_t *ring_index) {
 	uint8_t i;
 	uint8_t maxidx = 0;
-	uint8_t t, max = eeprom_read_byte(EEP_PER_COUNTER + offsetof(percnt_t, B0_7[0]));
+	uint8_t t, max = eeprom_read_byte(EEB(EEP_PER_COUNTER) + offsetof(percnt_t, B0_7[0]));
 #ifdef INIT_EEPROM
 	/* test if the 2 MSB == 0xFFFF */
-	if (eeprom_read_word(EEP_PER_COUNTER + offsetof(percnt_t, B08_23)) == 0xFFFF) {
+	if (eeprom_read_word(EEW(EEP_PER_COUNTER) + offsetof(percnt_t, B08_23)) == 0xFFFF) {
 		/* test the first two bytes of ringbuffer */
-		if (eeprom_read_word(EEP_PER_COUNTER + offsetof(percnt_t, B0_7[0])) == 0xFFFF)
+		if (eeprom_read_word(EEW(EEP_PER_COUNTER) + offsetof(percnt_t, B0_7[0])) == 0xFFFF)
 			init_buffer(percnt, ring_index);
 	}
 #endif
 	/* might be faster, but such optimizations are prone to timing attacks */
 	for (i = 0; i < RING_SIZE; ++i) {
 		eeprom_busy_wait();
-		t = eeprom_read_byte(EEP_PER_COUNTER + offsetof(percnt_t, B0_7[i]));
+		t = eeprom_read_byte(EEB(EEP_PER_COUNTER) + offsetof(percnt_t, B0_7[i]));
 		if (t == max + 1) {
 			max = t;
 			maxidx = i;
@@ -63,9 +63,9 @@ uint32_t percnt_get(percnt_t *percnt, uint8_t *ring_index) {
 		percnt_init(percnt, ring_index);
 	cli();
 	eeprom_busy_wait();
-	ret  = eeprom_read_word(EEP_PER_COUNTER + offsetof(percnt_t, B08_23)) << 8;
+	ret  = eeprom_read_word(EEW(EEP_PER_COUNTER) + offsetof(percnt_t, B08_23)) << 8;
 	eeprom_busy_wait();
-	ret |= eeprom_read_byte(EEP_PER_COUNTER + offsetof(percnt_t, B0_7[*ring_index]));
+	ret |= eeprom_read_byte(EEB(EEP_PER_COUNTER) + offsetof(percnt_t, B0_7[*ring_index]));
 	sei();
 	return ret;
 }
@@ -89,17 +89,17 @@ void percnt_inc(percnt_t *percnt, uint8_t *ring_index) {
 #endif
 			}
 			eeprom_busy_wait();
-			eeprom_write_byte(EEP_PER_COUNTER + offsetof(percnt_t, B08_23) + 1, // highByte
+			eeprom_write_byte(EEB(EEP_PER_COUNTER) + offsetof(percnt_t, B08_23) + 1, // highByte
 					((u + 1) >> 16) & 0xff);
 		}
 		eeprom_busy_wait();
-		eeprom_write_byte(EEP_PER_COUNTER + offsetof(percnt_t, B08_23),
+		eeprom_write_byte(EEB(EEP_PER_COUNTER) + offsetof(percnt_t, B08_23),
 				((u + 1) >> 8) & 0xff);
 	}
 	/* set least significant byte (in ringbuffer) */
 	*ring_index = (*ring_index + 1) % RING_SIZE;
 	eeprom_busy_wait();
-	eeprom_write_byte(EEP_PER_COUNTER + offsetof(percnt_t, B0_7[*ring_index]), (u + 1) & 0xff);
+	eeprom_write_byte(EEB(EEP_PER_COUNTER) + offsetof(percnt_t, B0_7[*ring_index]), (u + 1) & 0xff);
 	eeprom_busy_wait();
 
 	if (u + 1 != percnt_get(percnt, ring_index)) {
