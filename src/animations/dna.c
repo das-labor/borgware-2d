@@ -122,13 +122,13 @@ void dna(){
 		draw_line = (draw_line+1) % LINE_DISTANCE;
 		sinpos = (sinpos + 1) % sin_length;
 
-		if(sinpos == 0){
+		if (sinpos == 0){
 			uint8_t tmp_color = top_color;
 			top_color = bottom_color;
 			bottom_color = tmp_color;
 		}
 
-		wait(50);
+		b2d_wait(50);
 		move();
 	}
 

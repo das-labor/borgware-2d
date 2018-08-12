@@ -306,7 +306,7 @@ void gameoflife() {
 	pfprint(pf1);
 	for (cycle = 1; cycle < GOL_CYCLES; ++cycle) {
 		DEBUG_BYTE(0, (uint8_t)(GOL_CYCLES-cycle) & 0xff); DEBUG_BYTE(1, SREG);
-		wait(GOL_DELAY);
+		b2d_wait(GOL_DELAY);
 		pfcopy(pf2, pf1);
 		nextiteration(pf1, pf2);
 		pfprint(pf1);

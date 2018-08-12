@@ -80,6 +80,6 @@ void ltn_ant() {
 		ant.x = (ant.x + xdcomp[ant.vector_index]) % UNUM_COLS;
 		ant.y = (ant.y + ydcomp[ant.vector_index]) % UNUM_ROWS;
 
-		wait(100);
+		b2d_wait(100);
 	}
 }

@@ -243,7 +243,7 @@ void bitmap_scroll(unsigned char const nWidth,
 			x += bitmap.nWidth > bitmap.nViewportWidth ? dx : 0;
 			y += bitmap.nHeight > bitmap.nViewportHeight ? dy : 0;
 		}
-		wait(nTick);
+		b2d_wait(nTick);
 	}
 }
 

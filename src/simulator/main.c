@@ -32,7 +32,7 @@
 
 /** Fake port for simulating joystick input. */
 volatile unsigned char fakeport;
-/** Flag which indicates if wait should jump to the menu if fire is pressed. */
+/** Flag which indicates if b2d_wait should jump to the menu if fire is pressed. */
 volatile unsigned char waitForFire;
 /** The simulated frame buffer of the borg. */
 volatile unsigned char pixmap[NUMPLANE][NUM_ROWS][LINEBYTES];
@@ -59,7 +59,7 @@ int win;
  * Simple wait function.
  * @param ms The requested delay in milliseconds.
  */
-void wait(unsigned int ms) {
+void b2d_wait(unsigned int ms) {
 	if (waitForFire) {
 		if (fakeport & 0x01) {
 			longjmp(newmode_jmpbuf, 0xFEu);

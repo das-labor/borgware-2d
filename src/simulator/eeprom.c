@@ -5,6 +5,7 @@
 #include <stdio.h>	
 #include <stdlib.h>
 #include <string.h>
+#include "../compat/eeprom.h"
 
 #define EEPROM_SIZE 1024
 
@@ -14,7 +15,7 @@ static uint8_t eemem[EEPROM_SIZE];
 
 static uint8_t inited;
 static void init(){
-	if(!inited){
+	if (!inited){
 		inited = 1;
 		char* filename = ".simulated_eeprom.bin"; 
 		size_t size;
@@ -33,19 +34,17 @@ static void init(){
 	}
 }
 
-extern uint8_t _eeprom_start__[];
-
 uint16_t conv_addr(void * p){
 	uint16_t addr;
-	addr = (unsigned long)p - (unsigned long)_eeprom_start__;
-	if(addr >= EEPROM_SIZE){
+	addr = (unsigned long)p;
+	if (addr >= EEP_END) {
 		printf ("warning: eeprom write to %X\n",addr);
 	}
 	addr &= (EEPROM_SIZE-1);
 	return addr;
 }
 
-void 	eeprom_write_byte (uint8_t *p, uint8_t value){
+void eeprom_write_byte(uint8_t *p, uint8_t value) {
 	printf("sim eeprom write [%04X]=%02X\n", conv_addr(p), value);
 	init();
 	eemem[conv_addr(p)] = value;
@@ -53,7 +52,7 @@ void 	eeprom_write_byte (uint8_t *p, uint8_t value){
 	fwrite(eemem, 1, EEPROM_SIZE, fp);
 }
 
-void 	eeprom_write_word (uint16_t *p, uint16_t value){
+void eeprom_write_word(uint16_t *p, uint16_t value){
 	printf("sim eeprom write [%04X]=%04X\n", conv_addr(p), value);
 
 	init();
@@ -65,12 +64,12 @@ void 	eeprom_write_word (uint16_t *p, uint16_t value){
 	fflush(fp);
 }
 
-uint8_t  eeprom_read_byte (uint8_t *p){
+uint8_t eeprom_read_byte(const uint8_t *p) {
 	init();
 	return eemem[conv_addr(p)];
 }
 
-uint16_t eeprom_read_word (uint16_t *p){
+uint16_t eeprom_read_word(const uint16_t *p){
 	init();
 	return eemem[conv_addr((uint8_t*)p)] | (eemem[conv_addr((uint8_t*)p)+1]<<8);
 }

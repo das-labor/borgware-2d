@@ -29,7 +29,7 @@
 static const uint8_t icon[8] PROGMEM =
 	{0xff, 0x81, 0xbd, 0xa5, 0xa5, 0xad, 0xa1, 0xbf};
 
-game_descriptor_t snake_game_descriptor __attribute__((section(".game_descriptors"))) =
+game_descriptor_t snake_game_descriptor =
 {
 	&snake_game,
 	icon,
@@ -358,7 +358,7 @@ static void snake_eliminateProtagonist(snake_protagonist_t *pprotSnake)
 	{
 		clearpixel(pprotSnake->aSegments[pprotSnake->nTailIndex++]);
 		pprotSnake->nTailIndex %= USNAKE_MAX_LENGTH;
-		wait(SNAKE_TERMINATION_DELAY);
+		b2d_wait(SNAKE_TERMINATION_DELAY);
 	}
 }
 
@@ -497,16 +497,16 @@ void snake_engine(uint8_t bDemoMode)
 #if defined ANIMATION_SNAKE && defined GAME_SNAKE
 		if (bDemoMode)
 		{
-			wait(SNAKE_ANIM_DELAY);
+			b2d_wait(SNAKE_ANIM_DELAY);
 		}
 		else
 		{
-			wait(SNAKE_GAME_DELAY / 2);
+			b2d_wait(SNAKE_GAME_DELAY / 2);
 		}
 #elif defined ANIMATION_SNAKE
-		wait(SNAKE_ANIM_DELAY);
+		b2d_wait(SNAKE_ANIM_DELAY);
 #else
-		wait(SNAKE_GAME_DELAY / 2);
+		b2d_wait(SNAKE_GAME_DELAY / 2);
 #endif
 	}
 }

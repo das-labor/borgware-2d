@@ -61,7 +61,7 @@ void tetris_main(tetris_variant_t const *const pVariantMethods)
 		// what we do strongly depends on the status of the bucket
 		switch (tetris_bucket_getStatus(pBucket))
 		{
-		// the bucket awaits a new piece
+		// the bucket ab2d_waits a new piece
 		case TETRIS_BUS_READY:
 			pPiece = pVariantMethods->choosePiece(pVariantData);
 			// destruct old piece (if it exists) since we don't need it anymore

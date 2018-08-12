@@ -80,7 +80,7 @@ void blackhole(void) {
 			}
 			helpRadius = (helpRadius * 2) / 3;
 		}
-		wait(30);
+		b2d_wait(30);
 		clear_screen(0);
 		angle++;
 		firstRadius += 2;

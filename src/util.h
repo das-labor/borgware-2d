@@ -1,6 +1,6 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-void wait(int ms);
+void b2d_wait(int ms);
 
 #endif

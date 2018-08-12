@@ -438,7 +438,7 @@ static void tetris_view_blinkBorders(tetris_view_t *pV)
 	{
 		tetris_view_drawBorders(pV, (i & 0x01) ?
 				TETRIS_VIEW_COLORBORDER : TETRIS_VIEW_COLORPIECE);
-		wait(TETRIS_VIEW_BORDER_BLINK_DELAY);
+		b2d_wait(TETRIS_VIEW_BORDER_BLINK_DELAY);
 	}
 }
 
@@ -487,8 +487,8 @@ static void tetris_view_blinkLines(tetris_view_t *pV)
 				}
 				nMask <<= 1;
 			}
-			// wait a few ms to make the blink effect visible
-			wait(TETRIS_VIEW_LINE_BLINK_DELAY);
+			// b2d_wait a few ms to make the blink effect visible
+			b2d_wait(TETRIS_VIEW_LINE_BLINK_DELAY);
 		}
 	}
 }

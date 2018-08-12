@@ -10,7 +10,6 @@
 #define PERSISTENTCOUNTER_H_
 
 #include <stdint.h>
-#include "../compat/eeprom.h"
 
 #define PERSISTENT_COUNTER_BITS 24
 #define RING_SIZE 168
@@ -20,8 +19,10 @@ typedef struct percnt_s {
 	uint8_t  B0_7[RING_SIZE];
 } percnt_t;
 
+#include "../compat/eeprom.h"
+
 extern uint8_t  g_reset_counter_idx;
-extern percnt_t g_reset_counter EEMEM;
+extern percnt_t g_reset_counter;
 
 void percnt_init(percnt_t *percnt, uint8_t *ring_index);
 uint32_t percnt_get(percnt_t *percnt, uint8_t *ring_index);

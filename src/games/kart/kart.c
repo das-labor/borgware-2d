@@ -35,7 +35,7 @@ static const uint8_t icon[8] PROGMEM =
 		0x97,	// 0b10010111
 	};
 
-game_descriptor_t kart_game_descriptor __attribute__((section(".game_descriptors"))) =
+game_descriptor_t kart_game_descriptor =
 {
 	&kart_game,
 	icon,
@@ -227,7 +227,7 @@ void kart_game(){
 		if(key_ignore[1] > 0){
 			key_ignore[1]--;
 		}
-		wait(WAIT);
+		b2d_wait(WAIT);
 	}
 
 	snprintf(game_over, sizeof(game_over), "</#Game Over, Score: %lu",
@@ -295,7 +295,7 @@ void blink(){
 		memcpy(pixmap_copy_1, pixmap, sizeof(pixmap));
 		memcpy(pixmap, pixmap_copy_2, sizeof(pixmap));
 		memcpy(pixmap_copy_2, pixmap_copy_1, sizeof(pixmap));
-		wait(BLINK_TIME);
+		b2d_wait(BLINK_TIME);
 	}
 }
 

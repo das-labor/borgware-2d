@@ -277,8 +277,7 @@ static void tetris_bastet_evaluatePieces(tetris_bastet_variant_t *pBastet)
 // Bastet icon, MSB is leftmost pixel
 static uint8_t const bastet_icon[8] PROGMEM =
 		{ 0x81, 0xc3, 0xff, 0x99, 0xff, 0xff, 0x66, 0x3c };
-game_descriptor_t bastet_game_descriptor
-		__attribute__((section(".game_descriptors"))) =
+game_descriptor_t bastet_game_descriptor =
 {
 	&tetris_bastet,
 	bastet_icon,

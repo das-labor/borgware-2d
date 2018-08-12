@@ -31,11 +31,6 @@
 int main (void){
 	clear_screen(0);
 
-#ifdef RANDOM_SUPPORT
-	srandom32(percnt_get(&g_reset_counter, &g_reset_counter_idx));
-	percnt_inc(&g_reset_counter, &g_reset_counter_idx);
-#endif
-
 #ifdef RFM12_SUPPORT
 	borg_rfm12_init();
 #endif
@@ -55,8 +50,6 @@ int main (void){
 #endif
 
 	sei();
-
 	display_loop();
-
 	return 0;
 }

@@ -15,7 +15,7 @@ void rowwalk(uint8_t times,uint8_t speed)
 		setpixel( (pixel){i,j},(h==j) ? 1:0);
 	      }
 	    }
-	    wait(speed*10);
+	    b2d_wait(speed*10);
 	  }
 	}
 

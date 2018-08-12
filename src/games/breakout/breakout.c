@@ -23,7 +23,7 @@
 //static uint8_t breakout_icon[8] PROGMEM = {0x03, 0x03, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00}; /* our Icon */
 static const uint8_t breakout_icon[8] PROGMEM = {0x00, 0x18, 0x18, 0x00, 0x00, 0xff, 0xff, 0x00}; /* our Icon */
 
-game_descriptor_t breakout_game_descriptor __attribute__((section(".game_descriptors"))) =
+game_descriptor_t breakout_game_descriptor =
 {
 	&borg_breakout_game,
 	breakout_icon
@@ -56,7 +56,7 @@ void borg_breakout(uint8_t demomode)
 
 	while (cycles != 0)
 	{
-		wait(25);
+		b2d_wait(25);
 
 		if (tick_divider || JOYISFIRE)
 			rebound_tick(demomode ? &balls[0] : NULL);

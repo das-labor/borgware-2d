@@ -16,12 +16,17 @@
 #include "../pixel.h"
 #include "../joystick/joystick.h"
 
-
-extern game_descriptor_t _game_descriptors_start__[];
-extern game_descriptor_t _game_descriptors_end__[];
+#define MENU_TAB_VARS
+	#include "../games/menu.h"
+#undef MENU_TAB_VARS
+#define MENU_TAB_ENTRY
+game_descriptor_t *game_decriptor_ptr_table[] = {
+	#include "../games/menu.h"
+};
+#undef MENU_TAB_ENTRY
 
 // defines
-#define MENU_ITEM_MAX ((uint8_t)(((size_t)_game_descriptors_end__ - (size_t)_game_descriptors_start__) / sizeof(game_descriptor_t)))
+#define MENU_ITEM_MAX ((uint8_t)(sizeof(game_decriptor_ptr_table) / sizeof(game_decriptor_ptr_table[0])))
 
 #define MENU_WIDTH_ICON 8
 #define MENU_HEIGHT_ICON 8
@@ -47,8 +52,6 @@ enum menu_direction
 #else
 	typedef enum menu_direction menu_direction_t;
 #endif
-
-
 
 static void menu_setpixel(uint8_t x, uint8_t y, uint8_t isSet)
 {
@@ -91,7 +94,7 @@ static uint8_t menu_getIconPixel(uint8_t item, uint8_t x, uint8_t y)
 	{
 		// return pixel
 		return (0x80 >> x) &
-			pgm_read_byte(&_game_descriptors_start__[item].icon[y]);
+			pgm_read_byte(&game_decriptor_ptr_table[item]->icon[y]);
 	}
 	else
 	{
@@ -176,8 +179,8 @@ static void menu_animate(uint8_t miInitial, menu_direction_t direction)
 			mi = MENU_PREVITEM(mi);
 		}
 
-		// wait between the frames so that the animation can be seen
-		wait(nWait);
+		// b2d_wait between the frames so that the animation can be seen
+		b2d_wait(nWait);
 		// animation speed can be throttled
 		nWait += MENU_WAIT_INCREMENT;
 	}
@@ -193,10 +196,10 @@ void menu()
 
 		clear_screen(0);
 
-		// wait as long as "fire" is pressed to prevent unwanted selections
+		// b2d_wait as long as "fire" is pressed to prevent unwanted selections
 		while (JOYISFIRE)
 		{
-			wait(MENU_POLL_INTERVAL);
+			b2d_wait(MENU_POLL_INTERVAL);
 		}
 
 		// set initial menu item
@@ -204,7 +207,7 @@ void menu()
 		// scroll in currently selected menu item
 		menu_animate(MENU_PREVITEM(miSelection), MENU_DIRECTION_LEFT);
 
-		uint16_t nMenuIterations= MENU_TIMEOUT_ITERATIONS;
+		uint16_t nMenuIterations = MENU_TIMEOUT_ITERATIONS;
 
 		while (1)
 		{
@@ -214,14 +217,13 @@ void menu()
 				// prevent unwanted selections
 				while (JOYISFIRE)
 				{
-					wait(MENU_POLL_INTERVAL);
+					b2d_wait(MENU_POLL_INTERVAL);
 				}
 				// work against the chatter effects of dump joysticks
-				wait(MENU_WAIT_CHATTER);
+				b2d_wait(MENU_WAIT_CHATTER);
 
 				// call corresponding function
-				_game_descriptors_start__[miSelection].run();
-
+				game_decriptor_ptr_table[miSelection]->run();
 				break;
 
 			}
@@ -246,7 +248,7 @@ void menu()
 			// return if timeout is reached
 			else
 			{
-				wait(MENU_POLL_INTERVAL);
+				b2d_wait(MENU_POLL_INTERVAL);
 				if (--nMenuIterations == 0)
 					break;
 			}

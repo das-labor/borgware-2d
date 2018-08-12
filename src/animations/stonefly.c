@@ -220,6 +220,6 @@ void stonefly(void)
 		}
 
 		//loop delay
-		wait(60);
+		b2d_wait(60);
 	}
 }

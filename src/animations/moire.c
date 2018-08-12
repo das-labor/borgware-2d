@@ -78,12 +78,12 @@ void moire(void)
 		line(p1, p2, gradient[color_index++]);
 
 		// if we have reached the origin, reset position, rotate color index and
-		// wait for 40 ms (25 fps) to make the frame visible for human viewers
+		// b2d_wait for 40 ms (25 fps) to make the frame visible for human viewers
 		if (++pos == NUMBER_OF_BORDER_PIXELS)
 		{
 			pos = 0;
 			++color_index;
-			wait(40);
+			b2d_wait(40);
 		}
 		// ensure the color index keeps within bounds
 		color_index %= WRAP;

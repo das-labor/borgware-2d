@@ -398,7 +398,7 @@ static void uartcmd_test(void) {
 			while (UART_GETC() >= 0x20){ // wait for any control character
 #	ifdef JOYSTICK_SUPPORT
 				uartcmd_joy_test(&last_joy_value);
-				wait(20);
+				b2d_wait(20);
 #	endif
 			}
 		} else {

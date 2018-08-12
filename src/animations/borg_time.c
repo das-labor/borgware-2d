@@ -55,9 +55,9 @@ uint8_t time_update(void)
 	//send request
 	time_request();
 
-	//wait some time for a reply in 1ms steps
+	//b2d_wait some time for a reply in 1ms steps
 	while((lap_time_update == 0) && (timeout-- > 0))
-		wait(1);
+		b2d_wait(1);
 
 	return lap_time_update;
 }
