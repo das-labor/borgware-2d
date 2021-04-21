@@ -30,16 +30,13 @@
 
 
 int main (void){
-    puts("Program Start");
 	clear_screen(0);
 
 #ifdef RFM12_SUPPORT
 	borg_rfm12_init();
 #endif
 
-    puts("HW Init");
 	borg_hw_init();
-    puts("HW Init Complete");
 
 #ifdef CAN_SUPPORT
 	bcan_init();
@@ -50,7 +47,6 @@ int main (void){
 #endif
 
 #ifdef JOYSTICK_SUPPORT
-    puts("JOYSTICK INIT");
 	joy_init();	
 #endif
 

@@ -86,21 +86,16 @@ void display_loop(){
 	waitForFire = 1;
 #endif
 
-    puts("Entering main loop");
-    
 	for(;;){
-        puts("Loop Run");
 #ifndef MENU_SUPPORT
 		clear_screen(0);
 #endif
 		oldMode = mode;
-        printf("Mode is %i\n", mode);
 
 		switch(mode++) {
 
 #ifdef ANIMATION_SCROLLTEXT
 		case 1:
-            puts("Animation: Scrolltext");
 			scrolltext(scrolltext_text);
 
 	#ifdef RANDOM_SUPPORT
@@ -116,7 +111,6 @@ void display_loop(){
 #ifndef ANIMATION_SCROLLTEXT
 		case 1:
 #endif
-            puts("Animation: Time");
 			time_anim();
 			break;
 #else
@@ -131,14 +125,12 @@ void display_loop(){
 #		endif
 
 		case 2:
-            puts("Animation: Spiral");
 			spiral(SPIRAL_DELAY);
 			break;
 #endif
 
 #ifdef ANIMATION_JOERN1
 		case 3:
-            puts("Animation: Joern1");
 			joern1();
 			break;
 #endif
@@ -358,12 +350,10 @@ void display_loop(){
 
 		case 0xFEu:
 #ifdef JOYSTICK_SUPPORT
-            puts("Wait Joystick");
 			waitForFire = 0;   // avoid circular jumps
 			while (JOYISFIRE) {
                 // b2d_wait until user released the fire button
                 b2d_wait(25);
-                puts("Wait Joystick sleep done");
             }
 #else
 			b2d_wait(25);          // b2d_wait for button to settle
@@ -410,7 +400,6 @@ void display_loop(){
 			break;
 #endif
 		default:
-            puts("No Animation Found");
             b2d_wait(5);
 			if (reverseMode) {
 				if (reverseMode-- == (mode - 1)) {
