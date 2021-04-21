@@ -1,4 +1,3 @@
-TARGET     := image
 TARGET_SIM := borgsim
 TOPDIR = src
 MAKETOPDIR = .
@@ -21,17 +20,30 @@ SERIAL = COM6
 export TOPDIR
 ##############################################################################
 
-all: compile-$(TARGET)
-	@echo "==============================="
-	@echo "$(TARGET) compiled for: $(MCU)"
-	@echo "size is: "
-	@$(CONFIG_SHELL) scripts/size $(TARGET)
-	@echo "==============================="
+all: compile-main
 
 ##############################################################################
 # generic fluff
+
+ifneq ($(no_deps),t)
+ifneq ($(MAKECMDGOALS),clean)
+ifneq ($(MAKECMDGOALS),mrproper)
+ifneq ($(MAKECMDGOALS),menuconfig)
+
+-include $(MAKETOPDIR)/.subdirs
+include $(MAKETOPDIR)/.config
+include $(TOPDIR)/games/games.mk
+include $(TOPDIR)/platform/$(PLATFORM)/platform.mk
+
+endif # MAKECMDGOALS!=menuconfig
+endif # MAKECMDGOALS!=mrproper
+endif # MAKECMDGOALS!=clean
+endif # no_deps!=t
+
 include $(MAKETOPDIR)/defaults.mk
 #include $(MAKETOPDIR)/rules.mk
+
+export PLATFORM
 
 ##############################################################################
 # generate SUBDIRS variable
@@ -50,37 +62,24 @@ include $(MAKETOPDIR)/defaults.mk
 	  test -d $$subdir && echo "SUBDIRS += $$subdir" ; \
 	done) | sort -u >> $@
 
-ifneq ($(no_deps),t)
-ifneq ($(MAKECMDGOALS),clean)
-ifneq ($(MAKECMDGOALS),mrproper)
-ifneq ($(MAKECMDGOALS),menuconfig)
-
--include $(MAKETOPDIR)/.subdirs
-include $(MAKETOPDIR)/.config
-include $(TOPDIR)/games/games.mk
-
-endif # MAKECMDGOALS!=menuconfig
-endif # MAKECMDGOALS!=mrproper
-endif # MAKECMDGOALS!=clean
-endif # no_deps!=t
-
 
 ##############################################################################
 
 SUBDIRS_AVR = $(TOPDIR)/borg_hw
 SUBDIRS_AVR += $(SUBDIRS)
 
-.PHONY: compile-subdirs_avr
-compile-subdirs_avr:
+.PHONY: compile-subdirs
+compile-subdirs:
 	@ for dir in $(SUBDIRS_AVR); do $(MAKE) -C $$dir objects_avr || exit 5; done
 
-.PHONY: compile-$(TARGET)
-compile-$(TARGET): compile-subdirs_avr $(TARGET).hex $(TARGET).bin $(TARGET).lst
+compile-sources: compile-subdirs $(TARGET)
+
+.PHONY: compile-main
+# This target is defined in the platform specific makefile in src/platform/*/platform.mk
 
 
-
-OBJECTS += $(patsubst $(TOPDIR)/%.c,$(TOPDIR)/obj_avr/%.o,${SRC})
-SUBDIROBJECTS = $(foreach subdir,$(SUBDIRS_AVR),$(foreach object,$(shell cat $(subdir)/obj_avr/.objects 2>/dev/null),$(subdir)/$(object)))
+OBJECTS += $(patsubst $(TOPDIR)/%.c,$(TOPDIR)/obj/%.o,${SRC})
+SUBDIROBJECTS = $(foreach subdir,$(SUBDIRS_AVR),$(foreach object,$(shell cat $(subdir)/obj/.objects 2>/dev/null),$(subdir)/$(object)))
 
 $(TARGET): $(OBJECTS) $(SUBDIROBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(SUBDIROBJECTS) $(LIBS)
@@ -88,25 +87,10 @@ $(TARGET): $(OBJECTS) $(SUBDIROBJECTS)
 
 ##############################################################################
 #generic rules for AVR-Build
-$(TOPDIR)/obj_avr/%.o: $(TOPDIR)/%.c
-	@ if [ ! -d $(TOPDIR)/obj_avr ]; then mkdir $(TOPDIR)/obj_avr ; fi
+$(TOPDIR)/obj/%.o: $(TOPDIR)/%.c
+	@ if [ ! -d $(TOPDIR)/obj ]; then mkdir $(TOPDIR)/obj ; fi
 	@ echo "compiling $<"
 	@ $(CC) -o $@ $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -c $<
-
-%.hex: %
-	$(OBJCOPY) -O ihex -R .eeprom $< $@
-
-%.bin: %
-	$(OBJCOPY) -O binary -R .eeprom $< $@
-
-%.eep.hex: %
-	$(OBJCOPY) --set-section-flags=.eeprom="alloc,load" --change-section-lma .eeprom=0 -O ihex -j .eeprom $< $@
-
-%.lst: %
-	$(OBJDUMP) -h -S $< > $@
-
-%-size: %.hex
-	$(SIZE) $<
 
 ##############################################################################
 #Rules for simulator build
@@ -175,7 +159,7 @@ clean:
 	  test "x$$subdir" != "x." \
 	  && test -e $$subdir/Makefile \
 	  && $(MAKE) no_deps=t -C $$subdir clean ; done ; true
-	$(RM) -fr $(TOPDIR)/obj_avr $(TOPDIR)/obj_sim
+	$(RM) -fr $(TOPDIR)/obj $(TOPDIR)/obj_sim
 	$(RM) -f $(TARGET_SIM) $(TARGET_SIM).exe
 
 mrproper:

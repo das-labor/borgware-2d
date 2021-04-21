@@ -59,6 +59,19 @@ unsigned char get_pixel(pixel p){
 	}
 }
 
+unsigned char get_pixel_value(pixel p) {
+    if ((p.x >= NUM_COLS) || (p.y >= NUM_ROWS)) {
+        return 0xff;
+    } else {
+        for (int i = NUMPLANE; i > 0; i--) {
+            if (pixmap[i - 1][p.y][p.x/8] & shl_table[p.x%8]) {
+                return i;
+            }
+        }
+		return 0xff;
+    }
+}
+
 /**
  * An implementation of Bresenham's line drawing algorithm.
  * @param p1 first coordinate of the line

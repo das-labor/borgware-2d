@@ -10,8 +10,24 @@
 extern unsigned char waitForFire;
 void joy_init();
 
+#ifdef BROWSER_JOYSTICK_SUPPORT
+	enum JoystickButton {
+		UP,
+		DOWN,
+		LEFT,
+		RIGHT,
+		FIRE
+	};
 
-#ifdef AVR
+	int joy_button_pressed(enum JoystickButton button);
+
+#	define JOYISUP    (joy_button_pressed(UP))
+#	define JOYISDOWN  (joy_button_pressed(DOWN))
+#	define JOYISLEFT  (joy_button_pressed(LEFT))
+#	define JOYISRIGHT (joy_button_pressed(RIGHT))
+#	define JOYISFIRE  (joy_button_pressed(FIRE))
+
+#elif defined(AVR)
 
 #	include <avr/io.h>
 #	ifdef NES_PAD_SUPPORT

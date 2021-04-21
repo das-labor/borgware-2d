@@ -7,6 +7,7 @@
  */
 
 #include <stdint.h>
+#include <string.h>
 #ifdef AVR
 	#include <util/delay.h>
 	#include <avr/sfr_defs.h> /* for debugging */

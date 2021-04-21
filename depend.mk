@@ -22,17 +22,17 @@ endif
 
 define make-deps
 echo "checking dependencies for $<"
-if [ ! -d obj_avr ]; then mkdir obj_avr ; fi
+if [ ! -d obj ]; then mkdir obj ; fi
 set -e; $(CC) $(CFLAGS) $(CPPFLAGS) -M -MM $<  | \
-sed > $@.new -e 's;$(*F)\.o:;$@ obj_avr/$*.o obj_avr/$*.E $*.s:;' \
+sed > $@.new -e 's;$(*F)\.o:;$@ obj/$*.o obj/$*.E $*.s:;' \
 	     -e 's% [^ ]*/gcc-lib/[^ ]*\.h%%g'
 if test -s $@.new; then mv -f $@.new $@; else rm -f $@.new; fi
 endef
 
 # Here is how to make .d files from .c files
-obj_avr/%.d: %.c ; @ $(make-deps)
+obj/%.d: %.c ; @ $(make-deps)
 
-obj_avr/%.d: %.S ; @ $(make-deps)
+obj/%.d: %.S ; @ $(make-deps)
 
 
 define make-deps-sim

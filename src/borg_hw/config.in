@@ -7,24 +7,29 @@ uint "Number of columns" NUM_COLS 16
 int "Number of brightnes-levels" NUMPLANE 3
 
 
-
-choice 'Hardware Driver'			\
-   "Borg-16                HW_BORG_16 \
-    Borg-16-HGMod          HW_BORG_16_HGM \
-    Andre-Borg             HW_BORG_ANDRE \
-    Laufschrift-Borg	   HW_BORG_LS \
-    Laufschrift-Borg-MH    HW_BORG_MH \
-    LoL-Shield             HW_LOLSHIELD \
-    FFM-Jochen             HW_BORG_LSJO \
-    FFM-LedBrett           HW_LEDBRETT \
-    Borg-Mini              HW_BORG_MINI \
-    Panel-One              HW_PANEL_ONE \
-    4xPD1165               HW_PD1165 \
-    Ping-Pong              HW_PINGPONG \
-    Giga-Borg              HW_GIGABORG \
-    Ancient-Borg           HW_ANCIENTBORG \
-    LED-Tester             HW_LED_TESTER" \
-   'Borg-16' BORG_HW
+if [ "$PLATFORM" == "avr" ] || [ "$PLATFORM" == "" ]; then
+    choice 'Hardware Driver'			\
+       "Borg-16                HW_BORG_16 \
+        Borg-16-HGMod          HW_BORG_16_HGM \
+        Andre-Borg             HW_BORG_ANDRE \
+        Laufschrift-Borg	   HW_BORG_LS \
+        Laufschrift-Borg-MH    HW_BORG_MH \
+        LoL-Shield             HW_LOLSHIELD \
+        FFM-Jochen             HW_BORG_LSJO \
+        FFM-LedBrett           HW_LEDBRETT \
+        Borg-Mini              HW_BORG_MINI \
+        Panel-One              HW_PANEL_ONE \
+        4xPD1165               HW_PD1165 \
+        Ping-Pong              HW_PINGPONG \
+        Giga-Borg              HW_GIGABORG \
+        Ancient-Borg           HW_ANCIENTBORG \
+        LED-Tester             HW_LED_TESTER" \
+       'Borg-16' BORG_HW
+elif [ "$PLATFORM" == "wasm" ]; then
+    choice 'Hardware Driver'			\
+       "Webbrowser             HW_BROWSER" \
+       'Webbrowser' BORG_HW
+fi
 
 
 if [ "$BORG_HW" == "HW_BORG_16" ] ; then
@@ -89,6 +94,10 @@ fi
 
 if [ "$BORG_HW" == "HW_LED_TESTER" ] ; then
   source src/borg_hw/config_borg_led_tester.in
+fi
+
+if [ "$BORG_HW" == "HW_BROWSER" ] ; then
+  source src/borg_hw/config_borg_browser.in
 fi
 
 endmenu

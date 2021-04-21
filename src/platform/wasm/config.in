@@ -1,0 +1,3 @@
+choice 'Target Borg'          \
+   "Lounge-Borg original"     \
+    'Lounge-Borg' TARGET_BORG

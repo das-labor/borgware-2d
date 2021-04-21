@@ -1,21 +1,34 @@
-mainmenu_option next_comment
-comment "Joystick Support"
+#mainmenu_option next_comment
+dep_bool_menu "Joystick Support" JOYSTICK_SUPPORT y
+# comment "Joystick Support"
 
-bool "Joystick Support" JOYSTICK_SUPPORT n
+# bool "Joystick Support" JOYSTICK_SUPPORT n
 
-if [ "x$JOYSTICK_CHOICE" == "x" ] ; then
-   define_string JOYSTICK_CHOICE "JOY_PARALLEL"
-fi
 
-if [ "$JOYSTICK_SUPPORT" = "y" ]; then
+if [ "$PLATFORM" == "avr" ]; then
+
+    if [ "x$JOYSTICK_CHOICE" == "x" ] ; then
+       define_string JOYSTICK_CHOICE "JOY_PARALLEL"
+    fi
+
+    if [ "$JOYSTICK_SUPPORT" = "y" ]; then
+       choice 'Joystick Type' \
+          "Atari-9-Pin   JOY_PARALLEL \
+           NES-Game-Pad  JOY_NES_PAD \
+           RFM12         JOY_RFM12 \
+           LED-Brett     JOY_LEDBRETT \
+           LoL-Shield    JOY_LOLSHIELD \
+           Webbrowser    JOY_BROWSER \
+           None          JOY_NULL" \
+           'Atari-9-Pin' JOYSTICK_CHOICE
+    fi
+elif [ "$PLATFORM" == "wasm" ]; then
+
    choice 'Joystick Type' \
-      "Atari-9-Pin   JOY_PARALLEL \
-       NES-Game-Pad  JOY_NES_PAD \
-       RFM12         JOY_RFM12 \
-       LED-Brett     JOY_LEDBRETT \
-       LoL-Shield    JOY_LOLSHIELD \
+      "Webbrowser    JOY_BROWSER \
        None          JOY_NULL" \
-       'Atari-9-Pin' JOYSTICK_CHOICE
+       'Webbrowser' JOYSTICK_CHOICE
+fi
 
 ###################### parallel joystick menu #################################
    if [ "$JOYSTICK_CHOICE" == "JOY_PARALLEL" ]; then
@@ -229,6 +242,8 @@ if [ "$JOYSTICK_SUPPORT" = "y" ]; then
    fi
 ###############################################################################
 
-fi
+   if [ "$JOYSTICK_CHOICE" == "JOY_BROWSER" ]; then
+      define_bool BROWSER_JOYSTICK_SUPPORT y
+   fi
 
 endmenu

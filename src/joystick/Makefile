@@ -24,6 +24,9 @@ endif
 ifeq ($(NULL_JOYSTICK_SUPPORT), y)
   SRC  = null_joystick.c
 endif
+ifeq ($(JOYSTICK_CHOICE), JOY_BROWSER)
+  SRC = browser_joystick.c
+endif
 
 include $(MAKETOPDIR)/rules.mk
 

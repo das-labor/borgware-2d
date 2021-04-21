@@ -55,7 +55,14 @@ typedef struct cursor{
  * Pixel routines
  */
 
+/**
+ * Checks if a pixel is set. This means 0 if the pixel is off and 1 otherwise.
+ */
 unsigned char get_pixel(pixel p);
+/**
+ * Returns the numeric value of the pixel. The Value is between 0 and NUMPLANE
+ */
+unsigned char get_pixel_value(pixel p);
 
 inline static pixel next_pixel(pixel pix, direction_t dir){
 	static char const nDelta[] = {0, -1, 0, 1, 0};

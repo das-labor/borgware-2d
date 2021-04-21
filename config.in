@@ -5,33 +5,46 @@ mainmenu_option next_comment
 comment "General Setup"
 	#bool 'Prompt for experimental code' CONFIG_EXPERIMENTAL
 
-	choice 'Target MCU'           \
-	  "ATmega1280     atmega1280  \
-	   ATmega1284     atmega1284  \
-	   ATmega1284P    atmega1284p \
-	   ATmega16       atmega16    \
-	   ATmega164      atmega164   \
-	   ATmega164P     atmega164p  \
-	   ATmega168      atmega168   \
-	   ATmega168P     atmega168p  \
-	   ATmega2560     atmega2560  \
-	   ATmega32       atmega32    \
-	   ATmega324      atmega324   \
-	   ATmega324P     atmega324p  \
-	   ATmega328      atmega328   \
-	   ATmega328P     atmega328p  \
-	   ATmega32U4     atmega32u4  \
-	   ATmega48       atmega48    \
-	   ATmega48P      atmega48p   \
-	   ATmega644      atmega644   \
-	   ATmega644P     atmega644p  \
-	   ATmega8        atmega8     \
-	   ATmega8515     atmega8515  \
-	   ATmega88       atmega88    \
-	   ATmega88P      atmega88p"  \
-	   'ATmega32' MCU
+    choice 'Platform'             \
+      "AVR            avr         \
+       Webassembly    wasm        \
+       Simulator      simulator"  \
+       'AVR' PLATFORM
 
-	int "MCU frequency" FREQ 16000000
+    if [ "$PLATFORM" == "avr" ] || [ "$PLATFORM" == "" ]; then
+        choice 'Target MCU'           \
+          "ATmega1280     atmega1280  \
+           ATmega1284     atmega1284  \
+           ATmega1284P    atmega1284p \
+           ATmega16       atmega16    \
+           ATmega164      atmega164   \
+           ATmega164P     atmega164p  \
+           ATmega168      atmega168   \
+           ATmega168P     atmega168p  \
+           ATmega2560     atmega2560  \
+           ATmega32       atmega32    \
+           ATmega324      atmega324   \
+           ATmega324P     atmega324p  \
+           ATmega328      atmega328   \
+           ATmega328P     atmega328p  \
+           ATmega32U4     atmega32u4  \
+           ATmega48       atmega48    \
+           ATmega48P      atmega48p   \
+           ATmega644      atmega644   \
+           ATmega644P     atmega644p  \
+           ATmega8        atmega8     \
+           ATmega8515     atmega8515  \
+           ATmega88       atmega88    \
+           ATmega88P      atmega88p"  \
+           'ATmega32' MCU
+
+        int "MCU frequency" FREQ 16000000
+    fi
+
+    if [ "$PLATFORM" == "wasm" ]; then
+        source src/platform/wasm/config.in
+    fi
+    
 endmenu
 ###############################################################################
 
@@ -44,7 +57,11 @@ source src/borg_hw/config.in
 ### Features Menu #############################################################
 mainmenu_option next_comment
 comment "Features"
-	bool     "prng random number generator" RANDOM_SUPPORT y
+    #choice     "prng random number generator" "None none Noekeon noekeon LFSR lfsr" None PRNG
+    dep_bool_menu "PRNG Support" RANDOM_SUPPORT y
+        choice "PRNG Implementation" "Noekeon noekeon LFSR lfsr" Noekeon RANDOM_IMPLEMENTATION
+    endmenu
+    
 	dep_bool "CAN Time Extension"   LAP_TIME_EXTENSION $CAN_SUPPORT
 endmenu
 ###############################################################################
@@ -54,9 +71,10 @@ endmenu
 source src/scrolltext/config.in
 ###############################################################################
 
-
 ### RFM12 Menu ################################################################
-source src/rfm12/config.in
+if [ "$PLATFORM" != "wasm" ]; then
+    source src/rfm12/config.in
+fi
 ###############################################################################
 
 
@@ -66,12 +84,16 @@ source src/joystick/config.in
 
 
 ### CAN Menu ##################################################################
-source src/can/config.in
+if [ "$PLATFORM" != "wasm" ]; then
+    source src/can/config.in
+fi
 ###############################################################################
 
 
 ### UART Menu #################################################################
-source src/uart/config.in
+if [ "$PLATFORM" != "wasm" ]; then
+    source src/uart/config.in
+fi
 ###############################################################################
 
 

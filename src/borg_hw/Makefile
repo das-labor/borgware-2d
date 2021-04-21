@@ -71,6 +71,10 @@ ifeq ($(BORG_HW),HW_LED_TESTER)
   SRC = borg_hw_led_tester.c
 endif
 
+ifeq ($(BORG_HW),HW_BROWSER)
+  SRC = borg_hw_browser.c
+endif
+
 ifeq ($(SRC),'')
   $(error no valid hardware driver selected )
 endif

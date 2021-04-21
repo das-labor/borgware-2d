@@ -1,21 +1,21 @@
 ##############################################################################
 # rules for buildung AVR objects
 
-OBJECTS += $(patsubst %.c,obj_avr/%.o,${SRC})
-OBJECTS += $(patsubst %.S,obj_avr/%.o,${ASRC})
+OBJECTS += $(patsubst %.c,obj/%.o,${SRC})
+OBJECTS += $(patsubst %.S,obj/%.o,${ASRC})
 
-./obj_avr/%.o: %.S
-	@ if [ ! -d obj_avr ]; then mkdir obj_avr ; fi
+./obj/%.o: %.S
+	@ if [ ! -d obj ]; then mkdir obj ; fi
 	@ echo "assembling $<"
 	@ $(CC) -o $@ $(CPPFLAGS) $(ASFLAGS) -c $<
 
-./obj_avr/%.o: %.c
-	@ if [ ! -d obj_avr ]; then mkdir obj_avr ; fi
-	@ echo "compiling $<"
+./obj/%.o: %.c
+	@ if [ ! -d obj ]; then mkdir obj ; fi
+	@ echo "compiling $< using $(CC)"
 	@ $(CC) -o $@ $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -c $<
 
 objects_avr: $(OBJECTS)
-	@ if [ -d obj_avr ]; then echo "writing object inventory" ; echo $(OBJECTS) > obj_avr/.objects ; fi
+	@ if [ -d obj ]; then echo "writing object inventory" ; echo $(OBJECTS) > obj/.objects ; fi
 
 ##############################################################################
 # rules for buildung simulator objects
@@ -25,7 +25,7 @@ OBJECTS_SIM += $(patsubst %.c,obj_sim/%.o,${SRC_SIM})
 
 ./obj_sim/%.o: %.c
 	@ if [ ! -d obj_sim ]; then mkdir obj_sim ; fi
-	@ echo "compiling $<"
+	@ echo "compiling $< using $(HOSTCC)"
 	@ $(HOSTCC) -o $@ $(CFLAGS_SIM) -c $<
 
 objects_sim: $(OBJECTS_SIM)
@@ -35,7 +35,7 @@ objects_sim: $(OBJECTS_SIM)
 
 clean-common:
 	$(RM) $(TARGET) *.[odasE] *.d.new *~
-	$(RM) -r obj_avr
+	$(RM) -r obj
 	$(RM) -r obj_sim
 
 clean: clean-common

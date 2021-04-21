@@ -1,6 +1,8 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
+#define wasm 42
+
 #include "autoconf.h"
 
 #if defined(__cplusplus)
